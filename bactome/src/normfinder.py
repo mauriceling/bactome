@@ -13,5 +13,15 @@ Licence: Python Software Foundation License version 2
 """
 
 def normfinder(data, header=True):
+    """
+    NormFinder implementation.
+    
+    @param data: List of values in the format of 
+        [[<row identifier>, value, value, ...]]
+    @param header: Flag if first row of data is sample header
+        (default = True)
+    @return: Dictionary of result - 
+        {<data row number>: [<row identifier>, <NormFinder Index>]
+    """
     return result
     
