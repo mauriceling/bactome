@@ -27,13 +27,8 @@ class testGO(unittest.TestCase):
         
     def testnormfinder_2(self):
         result = g.normfinder(testdata, True)
-        self.assertTrue(result['SPCS1'], [0.32639493])
-        self.assertTrue(result['HADHB'], [0.35463989])
+        self.assertTrue(result['2'][0], 'SPCS1')
+        self.assertAlmostEqual(result['2'][1], 0.32639493)
+        self.assertTrue(result['66'][0], 'HADHB')
+        self.assertAlmostEqual(result['66'][1], 0.35463989)
         
-    def testnormfinder_3(self):
-        result = g.normfinder(testdata, True)
-        testvalues = [0.851, 0.852, 0.854, 0.860, 0.868, 0.877, 
-                      0.882, 0.885, 0.888]
-        print 'Generated results for ACTG1: ' + str(result['ACTG1'])
-        print 'Test values for ACTG1: ' + str(testvalues)
-        self.assertTrue(len(result['ACTG1']), 9)
