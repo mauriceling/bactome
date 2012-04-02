@@ -109,3 +109,96 @@ data = {'200027_at': ['13105.8', '10840.7', '11677.6', '9026.7', '11701.4', '123
         '200049_at': ['1843', '1838.7', '2437.9', '2772.1', '3146', '4361.9', '2617.9', '2307.1', '2079.1', '2468.6', '2300.5', '2027.9', '2390', '1980.7', '3241.3', '3629.4', '2194.6', '1331.9', '2999.2', '1799.8', '1714.5', '1798.4', '2004.9', '938', '3186.1', '2514', '3070.4', '2952.3', '2595.5', '3727.9', '3206.6', '1247.1', '2289.7', '2954.1', '1732.1', '2521.1', '1620.2', '2084.1', '2286.5', '2239.8', '2124.6', '3115.5', '1600.2', '1041.1', '3274.1', '1858.4', '1784.1', '2706.9', '3373.6', '2633.5', '2304.5', '2389.5', '2220.6', '1669.7', '2514.2', '4576.5', '908.4', '1069.8', '3067.2', '1361.3', '3108.8', '2094', '1716.1', '3072.3', '4827', '1240', '1309.4', '1229', '674.4', '691.5', '2496.7', '3073.3', '1010.4', '2551.9', '1446', '1247.1', '1463.4', '4352.4', '659.5', '2115.6', '1025.7', '2029.9', '1906.3', '2200.1', '911.3', '1828.1', '1563.7', '1553.9', '3602.8', '1686.6', '3630.3', '1825.8', '863.3', '1346.3', '905.9', '1498.9', '3302.3', '1454.4', '2633.2', '1866.1']
         }
     
+from copads.samplestatistics import SingleSample, TwoSample
+
+def selfed_ratio_correlation(data):
+    """
+    The average absolute correlation between dataset X and the quotient
+    of X and a tested data where small value represents higher
+    stability
+    
+    Pseudocode:
+    1. tested_gene <-- list of expression for gene to be tested
+    2. dataset_X <-- list of expression for any other gene
+    3. q_set <-- {dataset_X(i) / tested_gene(i) | 1 < i < n}
+    4. correlation <-- {|r(dataset_X, q_set)|}, repeat steps 2 to 4
+    for all genes that are not tested_gene
+    5. average_correlation(tested_gene) <-- average of correlation
+    6. repeat steps 1 to 5 to test for all genes
+    """
+    results = {}
+    for genename in data.keys():
+        gene = [float(x) for x in data[genename]]
+        pcc = []
+        for tester in data.keys():
+            tester = [float(x) for x in data[tester]]
+            tester = [tester[i] / gene[i]
+                      for i in range(len(gene))]
+            sample = TwoSample(gene, 'genename', tester, 'tester')
+            try: pcc.append(abs(sample.pearson()))
+            except: pass
+        results[genename] = float(sum(pcc)) / len(pcc)
+    return results
+
+def selfed_product_correlation(data):
+    """
+    The average absolute correlation between dataset X and the product
+    of X and a tested data where large value represents higher
+    stability
+    
+    Pseudocode:
+    1. tested_gene <-- list of expression for gene to be tested
+    2. dataset_X <-- list of expression for any other gene
+    3. q_set <-- {dataset_X(i) * tested_gene(i) | 1 < i < n}
+    4. correlation <-- {|r(dataset_X, q_set)|}, repeat steps 2 to 4
+    for all genes that are not tested_gene
+    5. average_correlation(tested_gene) <-- average of correlation
+    6. repeat steps 1 to 5 to test for all genes
+    """
+    results = {}
+    for genename in data.keys():
+        gene = [float(x) for x in data[genename]]
+        pcc = []
+        for tester in data.keys():
+            tester = [float(x) for x in data[tester]]
+            tester = [tester[i] * gene[i]
+                      for i in range(len(gene))]
+            sample = TwoSample(gene, 'genename', tester, 'tester')
+            try: pcc.append(sample.pearson())
+            except: pass
+        results[genename] = float(sum(pcc)) / len(pcc)
+    return results
+
+def regression_ratio(data):
+    """
+    The quotient of R-square and gradient where large value represents
+    higher stability.
+
+    @see Lee et al. 2007. Identification of novel universal
+    housekeeping genes by statistical analysis of microarray data.
+    Journal of Biochemistry and Molecular Biology 40(2):226-231.
+    """
+    results = {}
+    for genename in data.keys():
+        gene = [float(x) for x in data[genename]]
+        tester = range(len(gene))
+        sample = TwoSample(gene, 'genename', tester, 'nominal')
+        (gradient, intercept) = sample.linear_regression()
+        if gradient == 0.0: gradient = 0.001
+        pcc = sample.pearson()
+        results[genename] = (pcc * pcc) / gradient
+    return results
+
+def gradient(data):
+    """
+    The linear regression gradient where small value represents
+    higher stability.
+    """
+    results = {}
+    for genename in data.keys():
+        gene = [float(x) for x in data[genename]]
+        tester = range(len(gene))
+        sample = TwoSample(gene, 'genename', tester, 'nominal')
+        (gradient, intercept) = sample.linear_regression()
+        results[genename] = abs(gradient)
+    return results
