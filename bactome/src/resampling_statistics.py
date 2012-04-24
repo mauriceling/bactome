@@ -9,7 +9,7 @@ Licence: Python Software Foundation License version 2
 def randomization(statfunction, fulldata, testdata, iteration=1000):
     """
     Test harness for statistical randomization test, also known as
-    permutation test.
+    permutation test or bootstrapping.
 
     Pitman, EJG. 1938. Significance tests which may be applied to samples
     from any population. Part III. The analysis of variance test.
@@ -38,7 +38,7 @@ def randomization(statfunction, fulldata, testdata, iteration=1000):
                 if x >= test_statistic]
     return sum(more) / float(len(randomized_statistic))
 
-def bootstrap(data, iteration=1000):
+def sample_bootstrap(data, iteration=1000):
     """
     Calculates bootstrapped means and standard deviation.
     
@@ -60,6 +60,28 @@ def bootstrap(data, iteration=1000):
     pool = [sum(sample_wr(data, len_data)) / float(len_data)
             for x in range(iteration)]
     poolmeans = float(sum(pool)) / float(len(pool))
+    div = [(x - poolmeans)**2 for x in pool]
+    stdev = math.sqrt(sum(div)) / (len(pool) - 1)
+    return (poolmeans, stdev)
+	
+def sample_jackknife(data):
+	"""
+	Estimates mean and standard deviation from a single sample
+	using Jackknife method.
+	
+	Wu, CFJ. 1986. Jackknife, Bootstrap and other resampling methods 
+	in regression analysis. The Annals of Statistics 14:1261–1295.
+	
+	Parameters:
+        data = list of data to generate bootstrapped samples from.
+		
+	Returns:
+        (estimated means, estimated standard deviation)
+	"""
+	len_data = len(data)
+	pool = [sum(data.pop(i)) / float(len_data -1) 
+			for i in range(len_data)]
+	poolmeans = float(sum(pool)) / float(len(pool))
     div = [(x - poolmeans)**2 for x in pool]
     stdev = math.sqrt(sum(div)) / (len(pool) - 1)
     return (poolmeans, stdev)
