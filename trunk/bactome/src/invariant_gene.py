@@ -171,8 +171,8 @@ def selfed_product_correlation(data):
 
 def regression_ratio(data):
     """
-    The quotient of R-square and gradient where large value represents
-    higher stability.
+    The quotient of coefficient of determination and gradient where
+    large value represents higher stability.
 
     @see Lee et al. 2007. Identification of novel universal
     housekeeping genes by statistical analysis of microarray data.
