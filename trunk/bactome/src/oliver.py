@@ -4,6 +4,10 @@ normalization genes) from expression data
 
 Date created: 16th April 2013
 
+@see: Chan, OYW, Keng, BMH, Ling, MHT. 2014. Correlation and Variation 
+Based Method for Reference Genes Identification from Large Datasets. 
+Electronic Physician 6(1): 719-727.
+
 License: GNU General Public License version 3 for academic or 
 not-for-profit use only
 """
@@ -22,6 +26,19 @@ from invariant_gene import cv
 from invariant_gene import gradient
 
 def datafile(filename):
+    '''
+    Reads input data file (containing probe and expression data) into a 
+    dictionary.
+    
+    Input data file is a comma-delimited file in the format of
+    ProbeName1,Sample1Value,Sample2value,Sample3Value, ...
+    ProbeName2,Sample1Value,Sample2value,Sample3Value, ...
+    ProbeName3,Sample1Value,Sample2value,Sample3Value, ...
+    
+    @param filename: input data file name
+    @return: dictionary where key is ProbeName and value is a list of 
+    SampleValues
+    '''
     print 'Reading data from', filename
     t = time.time()
     f = open(filename, 'r').readlines()
@@ -42,6 +59,17 @@ def datafile(filename):
     return data
 
 def p_gradient(data, options, methods, results):
+    '''
+    Processor for reference gene identification method: gradient
+    
+    @param data: dictionary of input data from datafile function
+    @param options: options for current method (please see user manual)
+    @param methods: list of methods used (current method will be appended 
+    for final result file)
+    @param results: results dictionary in the format of {<ProbeName>: 
+    {<method>: <results from method>}}
+    @return: tuple of (methods, results)
+    '''
     print 'Calculating gradients ...'
     t = time.time()
     t_results = gradient(data)
@@ -55,6 +83,18 @@ def p_gradient(data, options, methods, results):
     return (methods, results)
 
 def p_cv(data, options, methods, results):
+    '''
+    Processor for reference gene identification method: coefficient of 
+    variation
+    
+    @param data: dictionary of input data from datafile function
+    @param options: options for current method (please see user manual)
+    @param methods: list of methods used (current method will be appended 
+    for final result file)
+    @param results: results dictionary in the format of {<ProbeName>: 
+    {<method>: <results from method>}}
+    @return: tuple of (methods, results)
+    '''
     print 'Calculating coefficient of variations ...'
     t = time.time()
     t_results = cv(data)
@@ -68,6 +108,18 @@ def p_cv(data, options, methods, results):
     return (methods, results)
 
 def p_regression_ratio(data, options, methods, results):
+    '''
+    Processor for reference gene identification method: ratio of 
+    coefficient of determination (R^2) and gradient
+    
+    @param data: dictionary of input data from datafile function
+    @param options: options for current method (please see user manual)
+    @param methods: list of methods used (current method will be appended 
+    for final result file)
+    @param results: results dictionary in the format of {<ProbeName>: 
+    {<method>: <results from method>}}
+    @return: tuple of (methods, results)
+    '''
     print 'Calculating regression ratios (R^2/slope) ...'
     t = time.time()
     t_results = regression_ratio(data)
@@ -81,6 +133,18 @@ def p_regression_ratio(data, options, methods, results):
     return (methods, results)
     
 def p_average_stdev(data, options, methods, results):
+    '''
+    Processor for reference gene identification method: product of average 
+    and standard deviation
+    
+    @param data: dictionary of input data from datafile function
+    @param options: options for current method (please see user manual)
+    @param methods: list of methods used (current method will be appended 
+    for final result file)
+    @param results: results dictionary in the format of {<ProbeName>: 
+    {<method>: <results from method>}}
+    @return: tuple of (methods, results)
+    '''
     print 'Calculating average x stdev ...'
     t = time.time()
     t_results = average_stdev(data)
@@ -94,6 +158,20 @@ def p_average_stdev(data, options, methods, results):
     return (methods, results)
     
 def p_selfed_product_correlation(data, options, methods, results):
+    '''
+    Processor for reference gene identification method: average 
+    absolute pairwise correlation between dataset X and the 
+    product of X and sample of non-X data (n = randomsize) 
+    where large value represents higher stability
+    
+    @param data: dictionary of input data from datafile function
+    @param options: options for current method (please see user manual)
+    @param methods: list of methods used (current method will be appended 
+    for final result file)
+    @param results: results dictionary in the format of {<ProbeName>: 
+    {<method>: <results from method>}}
+    @return: tuple of (methods, results)
+    '''
     print 'Calculating selfed product correlation ...'
     t = time.time()
     if not options.has_key('rss'): options['rss'] = 30
@@ -108,6 +186,20 @@ def p_selfed_product_correlation(data, options, methods, results):
     return (methods, results)
     
 def p_selfed_ratio_correlation(data, options, methods, results):
+    '''
+    Processor for reference gene identification method: average 
+    absolute pairwise correlation between dataset X and the 
+    quotient of X and sample of non-X data (n = randomsize) 
+    where small value represents higher stability
+    
+    @param data: dictionary of input data from datafile function
+    @param options: options for current method (please see user manual)
+    @param methods: list of methods used (current method will be appended 
+    for final result file)
+    @param results: results dictionary in the format of {<ProbeName>: 
+    {<method>: <results from method>}}
+    @return: tuple of (methods, results)
+    '''
     print 'Calculating selfed ratio correlation ...'
     t = time.time()
     if not options.has_key('rss'): options['rss'] = 30
@@ -122,6 +214,20 @@ def p_selfed_ratio_correlation(data, options, methods, results):
     return (methods, results)
     
 def p_selfed_correlation(data, options, methods, results):
+    '''
+    Processor for reference gene identification method: average 
+    absolute pairwise correlation between dataset X and sample 
+    non-X data (n = randomsize) where small value represents 
+    higher stability
+    
+    @param data: dictionary of input data from datafile function
+    @param options: options for current method (please see user manual)
+    @param methods: list of methods used (current method will be appended 
+    for final result file)
+    @param results: results dictionary in the format of {<ProbeName>: 
+    {<method>: <results from method>}}
+    @return: tuple of (methods, results)
+    '''
     print 'Calculating selfed correlation ...'
     t = time.time()
     if not options.has_key('rss'): options['rss'] = 30
@@ -136,6 +242,18 @@ def p_selfed_correlation(data, options, methods, results):
     return (methods, results)
 
 def p_geomean_expratio_cv(data, options, methods, results):
+    '''
+    Processor for reference gene identification method: geometric mean 
+    of exponent of ratio correlation (e^ratio) and coefficient of variation
+    
+    @param data: dictionary of input data from datafile function
+    @param options: options for current method (please see user manual)
+    @param methods: list of methods used (current method will be appended 
+    for final result file)
+    @param results: results dictionary in the format of {<ProbeName>: 
+    {<method>: <results from method>}}
+    @return: tuple of (methods, results)
+    '''
     print 'Calculating geometric mean of ratio correlation and CV ...'
     (methods, results) = p_selfed_ratio_correlation(data, options, 
                                                     methods, results)
@@ -152,6 +270,19 @@ def p_geomean_expratio_cv(data, options, methods, results):
     return (methods, results)
 
 def p_avgexpratio_avgcv(data, options, methods, results):
+    '''
+    Processor for reference gene identification method: 
+    (e^ratio_correlation / average of e^ratio_correlation) + 
+    (cv / average of cv)
+    
+    @param data: dictionary of input data from datafile function
+    @param options: options for current method (please see user manual)
+    @param methods: list of methods used (current method will be appended 
+    for final result file)
+    @param results: results dictionary in the format of {<ProbeName>: 
+    {<method>: <results from method>}}
+    @return: tuple of (methods, results)
+    '''
     print 'Calculating sum of averaged ratio correlation and averaged CV ...'
     (methods, results) = p_selfed_ratio_correlation(data, options, 
                                                     methods, results)
@@ -173,10 +304,17 @@ def p_avgexpratio_avgcv(data, options, methods, results):
             results[genename] = {'avgexpratio_avgcv': r}
     return (methods, results)
     
-def p_xxx(data, options, methods, results):
-    return (methods, results)
-    
 def processor(data, options):
+    '''
+    Main processor loop to execute each required reference gene 
+    identification method processors
+    
+    @param data: dictionary of input data from datafile function
+    @param options: options for current method (please see user manual)
+    @return: tuple of (methods, results) where methods is list of methods 
+    used, and results is a dictionary in the format of {<ProbeName>: 
+    {<method>: <results from method>}}
+    '''
     results = {}
     methods = []
     if options.has_key('all_methods') or options.has_key('gradient'):
@@ -214,6 +352,15 @@ def processor(data, options):
     return (methods, results)
 
 def results_writer(filename, methods, results):
+    '''
+    Function to write out analysis results.
+    
+    @param filename: name of output (results) file
+    @param methods: list of methods used
+    @param results: results dictionary in the format of {<ProbeName>: 
+    {<method>: <results from method>}}
+    @return: none
+    '''
     out = open(filename, 'w')
     out.write('ResultFile,' + ','.join(methods) + '\n')
     for genename in results:
@@ -223,6 +370,10 @@ def results_writer(filename, methods, results):
     out.close()
 
 def option_processor(argv):
+    '''
+    Processor for options from command line into a dictionary (for example, 
+    -rss:30 --> {'rss': 30})
+    '''
     options = {}
     options['application'] = argv[0]
     argv = [x[1:] for x in argv[1:] if x.startswith('-')]
@@ -235,6 +386,9 @@ def option_processor(argv):
     return options
 
 def print_usage():
+    '''
+    Prints usage statement
+    '''
     print '''
     OLIgonucleotide Variable Expression Ranker (OLIVER) 1.0:
     A tool for identifying suitable reference (invariant) genes from 
