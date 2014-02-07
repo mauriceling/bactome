@@ -9,7 +9,9 @@ setup(name='oliver',
       long_description='''
 OLIgonucleotide Variable Expression Ranker (OLIVER): A set of tools for 
 identifying suitable reference (invariant) genes from large transcriptome 
-datasets.
+datasets. 
+
+Part of Bactome project (http://www.sf.net/projects/bactome)
 
 References:
 - Chan, OYW, Keng, BMH, Ling, MHT. 2014. Correlation and Variation Based 
