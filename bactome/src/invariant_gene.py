@@ -2,6 +2,10 @@
 Methods for identifying invariant genes (suitable reference/
 normalization genes) from expression data 
 
+@see: Chan, OYW, Keng, BMH, Ling, MHT. 2014. Correlation and Variation 
+Based Method for Reference Genes Identification from Large Datasets. 
+Electronic Physician 6(1): 719-727.
+
 Date created: 29th March 2012
 
 License: General Public License version 3
@@ -24,6 +28,13 @@ def selfed_correlation(data, randomsize):
     for all genes that are not tested_gene
     5. average_correlation(tested_gene) <-- average of correlation
     6. repeat steps 1 to 5 to test for all genes
+    
+    @param data: input data as a dictionary (processed by datafile function 
+    in oliver.py) where key is ProbeName and value is a list of 
+    SampleValues
+    @param randomsize: number of random samples to take
+    @return: dictionary where key is ProbeName and value is result from 
+    current reference gene identification method
     """
     results = {}
     count = 0
@@ -57,6 +68,13 @@ def selfed_ratio_correlation(data, randomsize):
     for all genes that are not tested_gene
     5. average_correlation(tested_gene) <-- average of correlation
     6. repeat steps 1 to 5 to test for all genes
+    
+    @param data: input data as a dictionary (processed by datafile function 
+    in oliver.py) where key is ProbeName and value is a list of 
+    SampleValues
+    @param randomsize: number of random samples to take
+    @return: dictionary where key is ProbeName and value is result from 
+    current reference gene identification method
     """
     results = {}
     count = 0
@@ -92,6 +110,13 @@ def selfed_product_correlation(data, randomsize):
     for all genes that are not tested_gene
     5. average_correlation(tested_gene) <-- average of correlation
     6. repeat steps 1 to 5 to test for all genes
+    
+    @param data: input data as a dictionary (processed by datafile function 
+    in oliver.py) where key is ProbeName and value is a list of 
+    SampleValues
+    @param randomsize: number of random samples to take
+    @return: dictionary where key is ProbeName and value is result from 
+    current reference gene identification method
     """
     results = {}
     count = 0
@@ -121,6 +146,12 @@ def regression_ratio(data):
     @see Lee et al. 2007. Identification of novel universal
     housekeeping genes by statistical analysis of microarray data.
     Journal of Biochemistry and Molecular Biology 40(2):226-231.
+    
+    @param data: input data as a dictionary (processed by datafile function 
+    in oliver.py) where key is ProbeName and value is a list of 
+    SampleValues
+    @return: dictionary where key is ProbeName and value is result from 
+    current reference gene identification method
     """
     results = {}
     count = 0
@@ -144,6 +175,12 @@ def average_stdev(data):
     @see Lee et al. 2007. Identification of novel universal
     housekeeping genes by statistical analysis of microarray data.
     Journal of Biochemistry and Molecular Biology 40(2):226-231.
+    
+    @param data: input data as a dictionary (processed by datafile function 
+    in oliver.py) where key is ProbeName and value is a list of 
+    SampleValues
+    @return: dictionary where key is ProbeName and value is result from 
+    current reference gene identification method
     """
     results = {}
     count = 0
@@ -160,6 +197,12 @@ def cv(data):
     """
     The coefficient of variation where small value represents
     higher stability.
+    
+    @param data: input data as a dictionary (processed by datafile function 
+    in oliver.py) where key is ProbeName and value is a list of 
+    SampleValues
+    @return: dictionary where key is ProbeName and value is result from 
+    current reference gene identification method
     """
     results = {}
     count = 0
@@ -176,6 +219,12 @@ def gradient(data):
     """
     The linear regression gradient where small value represents
     higher stability.
+    
+    @param data: input data as a dictionary (processed by datafile function 
+    in oliver.py) where key is ProbeName and value is a list of 
+    SampleValues
+    @return: dictionary where key is ProbeName and value is result from 
+    current reference gene identification method
     """
     results = {}
     count = 0
