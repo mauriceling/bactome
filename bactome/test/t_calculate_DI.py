@@ -32,4 +32,4 @@ distance = [(p1, p2, Nei_Li(profile[p1], profile[p2]))
             for p1 in range(len(profile))
             for p2 in range(len(profile))]
 
-print distance
+print(distance)

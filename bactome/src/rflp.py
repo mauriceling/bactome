@@ -54,15 +54,15 @@ def restriction_digest(seq, enzyme, max_band=23130, min_band=2000,
     gel.sort()
     ugel.sort()
     if p == 'yes':
-        print 'Enzyme: ' + str(enzyme)
-        print 'Restriction site: ' + enzyme.site
-        print 'Number of fragments: ' + str(len(fragment))
-        print 'Number of fragments (x > ' + str(max_band) + '): ' + \
-            str(len(ogel))
-        print 'Number of fragments (' + str(max_band) + ' < x < ' + \
-            str(min_band) + '): ' + str(len(gel))
-        print 'Number of fragments (x < ' + str(min_band) + '): ' + \
-            str(len(ugel))
+        print('Enzyme: ' + str(enzyme))
+        print('Restriction site: ' + enzyme.site)
+        print('Number of fragments: ' + str(len(fragment)))
+        print('Number of fragments (x > ' + str(max_band) + '): ' + \
+            str(len(ogel)))
+        print('Number of fragments (' + str(max_band) + ' < x < ' + \
+            str(min_band) + '): ' + str(len(gel)))
+        print('Number of fragments (x < ' + str(min_band) + '): ' + \
+            str(len(ugel)))
         print
     return (len(fragment), ogel, gel, ugel)
 
@@ -117,13 +117,13 @@ def restriction_supplier(seq, max_band=23130, min_band=2000,
             digest = restriction_digest(seq, enzyme, max_band, min_band,
                                         linear, p)
         except MemoryError:
-            print 'Memory Error during ' + str(enzyme) + ' digestion'
+            print('Memory Error during ' + str(enzyme) + ' digestion')
         result[str(enzyme)] = (digest[0], len(digest[1]),
                                len(digest[2]), len(digest[3]))
         count = count + 1
         if p != 'yes':
             if count % 10 == 0:
-                print str(count) + ' restriction endonuclease processed'
+                print(str(count) + ' restriction endonuclease processed')
     return result
     
 def setCompare(original, test, absent):
@@ -160,9 +160,9 @@ def listCompare(original, test, absent):
     for i in range(len(original)):
         if original[i] == absent and test[i] == absent: pass
         elif original[i] == test[i]: both = both + 1
-        elif original[i] <> absent and test[i] == absent:
+        elif original[i] != absent and test[i] == absent:
             original_only = original_only + 1
-        elif original[i] == absent and test[i] <> absent: 
+        elif original[i] == absent and test[i] != absent: 
             test_only = test_only + 1
         else: pass
     return (original_only, test_only, both)

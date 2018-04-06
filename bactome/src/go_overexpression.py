@@ -30,7 +30,7 @@ def parse_GAF(gaf_file):
     @raise AttributeError: when there is no GAF version or if GAF 
     version is not 1.0 or 2.0
     """
-    gaf = open(gaf_file, 'r').xreadlines()
+    gaf = open(gaf_file, 'r').readlines()
     gaf = [x[:-1].strip() for x in gaf]
     header = [x for x in gaf if x.startswith('!')]
     gaf = [x for x in gaf if not x.startswith('!')]
@@ -201,24 +201,24 @@ def _write_headers(f, assoc_file, samplefile, outputfile,
     f.write(' '.join(['Number of statistical tests:',
                       str(test_count), '\n']))
     if display:
-        print ' '.join(['Gene Ontology association file:',
-                      str(assoc_file)])
-        print ' '.join(['Sample file:', str(samplefile)])
-        print ' '.join(['Output file:', str(outputfile)])
-        print ' '.join(['Number of genes in association file:',
-                      str(genome_count)])
-        print ' '.join(['Number of ontological terms in association file:',
-                      str(ontology_count)])
-        print ' '.join(['Number of genes in sample file:',
-                      str(sample_count)])
-        print ' '.join(['Number of genes in sample file mapped:',
-                      str(mapped_count)])
-        print ' '.join(['Genes in sample file mapped:',
-                      str(genes_mapped)])
-        print ' '.join(['Genes in sample file not mapped:',
-                      str(genes_not_mapped)])
-        print ' '.join(['Number of statistical tests:',
-                      str(test_count)])
+        print(' '.join(['Gene Ontology association file:',
+                      str(assoc_file)]))
+        print(' '.join(['Sample file:', str(samplefile)]))
+        print(' '.join(['Output file:', str(outputfile)]))
+        print(' '.join(['Number of genes in association file:',
+                      str(genome_count)]))
+        print(' '.join(['Number of ontological terms in association file:',
+                      str(ontology_count)]))
+        print(' '.join(['Number of genes in sample file:',
+                      str(sample_count)]))
+        print(' '.join(['Number of genes in sample file mapped:',
+                      str(mapped_count)]))
+        print(' '.join(['Genes in sample file mapped:',
+                      str(genes_mapped)]))
+        print(' '.join(['Genes in sample file not mapped:',
+                      str(genes_not_mapped)]))
+        print(' '.join(['Number of statistical tests:',
+                      str(test_count)]))
 
 def main(assoc_file, samplefile, outputfile, display=True):
     """
@@ -246,8 +246,8 @@ def main(assoc_file, samplefile, outputfile, display=True):
     output_f.write(','.join(['Term', 'Expected Count', '(Not) Expected',
                               'Actual Count', '(Not) Actual', '\n']))
     if display:
-        print '\t'.join(['Term', 'Expected Count', '(Not) Expected',
-                         'Actual Count', '(Not) Actual'])
+        print('\t'.join(['Term', 'Expected Count', '(Not) Expected',
+                         'Actual Count', '(Not) Actual']))
     for ontology in sample_ontology:
         expectation = calculate_expectation(ontology, genome, genome_count)
         expected_count = expectation * sample_count
@@ -260,11 +260,11 @@ def main(assoc_file, samplefile, outputfile, display=True):
                                  str(actual_count),
                                  str(actual_uncount), '\n']))
         if display:
-            print '\t'.join([ontology,
+            print('\t'.join([ontology,
                              str(expected_count),
                              str(expected_uncount),
                              str(actual_count),
-                             str(actual_uncount)])
+                             str(actual_uncount)]))
     output_f.close()
         
 def test():
@@ -278,7 +278,7 @@ def test():
 
 if __name__ == '__main__':
     if len(sys.argv) != 4 and sys.argv[1] != 'test':
-        print """Usage: python go_overexpression.py <association file> 
+        print("""Usage: python go_overexpression.py <association file> 
         <gene list file> <output file> \n
         where \n
         <association file> is the Gene Ontology annotation file for the 
@@ -288,7 +288,7 @@ if __name__ == '__main__':
         <output file> is the name of CSV file (comma-separated file) where 
         output is stored \n
         For example: python go_overexpression.py gene_association.ecocyc 
-        e_coli_gene.txt e_coli_output.csv'"""
+        e_coli_gene.txt e_coli_output.csv""")
     elif sys.argv[1] == 'test':
         test()
     else:
