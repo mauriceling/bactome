@@ -23,6 +23,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import fire
 from Bio import SeqIO
 
+
 class GenBankFile(object):
     '''
     Class to read a Genbank file, parse it using BioPython library, into
@@ -176,7 +177,23 @@ class GenBankFile(object):
         return self._getItem(ID, 'features')
 
 
-def readGenBankFile(gbfile='P balearica DSM 6083 genome.gb'):
+def recordSelector(gbfile='DSM6083.gb', RecordIndex=0, RecordID=None,
+                   returntype='sequence'):
+    gb = GenBankFile()
+    gb.readGB(gbfile)
+    IDs = list(gb.getIDs())
+    if RecordIndex == 0 or RecordID == None:
+        ID = IDs[0]
+    elif RecordIndex != 0 and RecordID == None:
+        ID = int(RecordIndex)
+    elif RecordID != None:
+        ID = RecordIndex
+    if returntype == 'sequence':
+        return gb.getSequence(ID)
+    elif returntype == 'features':
+        return gb.getFeatures(ID)
+
+def readGenBankFile(gbfile='DSM6083.gb'):
     '''
     python genbank.py readgb --gbfile=--gbfile=test/DSM6083.gb
     '''
@@ -201,7 +218,7 @@ def readGenBankFile(gbfile='P balearica DSM 6083 genome.gb'):
         features = gb.getFeatures(ID)
         print('Number of Features: ' + str(len(features)))
 
-def displayFeatureTypes(gbfile='P balearica DSM 6083 genome.gb'):
+def displayFeatureTypes(gbfile='DSM6083.gb'):
     '''
     python genbank.py displayfeaturetypes --gbfile=test/DSM6083.gb
     '''
@@ -222,8 +239,27 @@ def displayFeatureTypes(gbfile='P balearica DSM 6083 genome.gb'):
             print('%s: %i' % (k, count[k]))
         print()
 
+def featureMap(feature='CDS', RecordIndex=0, RecordID=None,
+               gbfile='DSM6083.gb', output='feature_result.txt'):
+    '''
+    python genbank.py featuring --feature=rRNA --RecordIndex=0 --gbfile=test/DSM6083.gb --output=feature_result.txt
+    '''
+    features = recordSelector(gbfile, RecordIndex, RecordID,
+                              'features')
+    required_feature = str(feature)
+    data = []
+    for f in features:
+        if f['type'] == required_feature:
+            data.append((f['start'], f['end']))
+    f = open(output, 'w')
+    for region in data:
+        for base in range(int(region[0]), (region[1])+1):
+            f.write(str(base) + '\n')
+    f.close()
+
 
 if __name__ == '__main__':
     exposed_functions = {'readgb': readGenBankFile,
-                         'displayfeaturetypes': displayFeatureTypes}
+                         'displayfeaturetypes': displayFeatureTypes,
+                         'featuring': featureMap}
     fire.Fire(exposed_functions)
