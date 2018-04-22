@@ -26,7 +26,10 @@ from Bio import SeqIO
 
 class GenBankFile(object):
     '''
-    Class to read a Genbank file, parse it using BioPython library, into a Python dictionary. If the Genbank file consists of more than one Genbank records, the respective Genbank record name will be used as key in the dictionary.
+    Class to read a Genbank file, parse it using BioPython library, 
+    into a Python dictionary. If the Genbank file consists of more 
+    than one Genbank records, the respective Genbank record name will 
+    be used as key in the dictionary.
 
     A Genbank record consists of the following keys (as described in 
     https://www.ncbi.nlm.nih.gov/Sitemap/samplerecord.html):
