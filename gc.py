@@ -40,17 +40,17 @@ def sliderGC(gbfile='DSM6083.gb', RecordIndex=0, RecordID=None,
     sequence = sequenceSelector(sequence, start, end)
     window = int(window)
     interval = int(interval)
-    pointer = 0
+    pointer = 1
     pdata = []
-    while (pointer + window) < len(sequence):
-        s = sequence[pointer:pointer+window]
+    while (pointer - 1 + window) < len(sequence):
+        s = sequence[pointer-1:pointer-1+window]
         gc = float(s.count('G') + s.count('C')) * 100/window
         print('%i : %i : %.4f' % (pointer, 
-                                  pointer+window,
+                                  pointer-1+window,
                                   gc))
         if output:
             pdata.append('%i : %i : %.4f' % (pointer, 
-                                             pointer+window,
+                                             pointer-1+window,
                                              gc))
         pointer = pointer + interval
     if output:
@@ -66,17 +66,17 @@ def blockGC(gbfile='DSM6083.gb', RecordIndex=0, RecordID=None,
                               'sequence')
     sequence = sequenceSelector(sequence, start, end)
     window = int(window)
-    pointer = 0
+    pointer = 1
     pdata = []
-    while (pointer + window) < len(sequence):
-        s = sequence[pointer:pointer+window]
+    while (pointer - 1 + window) < len(sequence):
+        s = sequence[pointer-1:pointer-1+window]
         gc = float(s.count('G') + s.count('C')) * 100/window
         print('%i : %i : %.4f' % (pointer, 
-                                  pointer+window,
+                                  pointer-1+window,
                                   gc))
         if output:
             pdata.append('%i : %i : %.4f' % (pointer, 
-                                             pointer+window,
+                                             pointer-1+window,
                                              gc))
         pointer = pointer + window
     if output:
