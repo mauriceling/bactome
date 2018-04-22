@@ -24,38 +24,9 @@ import random
 
 import fire
 
-from genbank import GenBankFile
-
-
-def recordSelector(gbfile='DSM6083.gb', RecordIndex=0, RecordID=None):
-    gb = GenBankFile()
-    gb.readGB(gbfile)
-    IDs = list(gb.getIDs())
-    if RecordIndex == 0 or RecordID == None:
-        ID = IDs[0]
-    elif RecordIndex != 0 and RecordID == None:
-        ID = int(RecordIndex)
-    elif RecordID != None:
-        ID = RecordIndex
-    return gb.getSequence(ID)
-
-def sequenceSelector(sequence, start=0, end=-1):
-    if int(start) == 0 and int(end) == -1:
-        pass
-    elif int(start) > 0 and int(end) == -1:
-        sequence = sequence[int(start):]
-    elif int(start) == 0 and int(end) > -1:
-        sequence = sequence[:int(end)]
-    elif int(start) > 0 and int(end) > -1:
-        sequence = sequence[int(start):int(end)]
-    return sequence
-
-def outputWriter(output, header, data):
-    f = open(output, 'w')
-    f.write(str(header) + '\n')
-    for line in data:
-        f.write(str(line) + '\n')
-    f.close()
+from bactome_utils import outputWriter
+from bactome_utils import sequenceSelector
+from genbank import recordSelector
 
 
 def sliderGC(gbfile='DSM6083.gb', RecordIndex=0, RecordID=None,
@@ -64,7 +35,8 @@ def sliderGC(gbfile='DSM6083.gb', RecordIndex=0, RecordID=None,
     '''
     python gc.py slidegc --gbfile=test/DSM6083.gb --RecordIndex=0 --start=0 --end=-1 --window=10000 --interval=10 --output=gc_window.txt
     '''
-    sequence = recordSelector(gbfile, RecordIndex, RecordID)
+    sequence = recordSelector(gbfile, RecordIndex, RecordID, 
+                              'sequence')
     sequence = sequenceSelector(sequence, start, end)
     window = int(window)
     interval = int(interval)
@@ -90,7 +62,8 @@ def blockGC(gbfile='DSM6083.gb', RecordIndex=0, RecordID=None,
     '''
     python gc.py blockgc --gbfile=test/DSM6083.gb --RecordIndex=0 --start=0 --end=-1 --window=10000 --output=gc_block.txt
     '''
-    sequence = recordSelector(gbfile, RecordIndex, RecordID)
+    sequence = recordSelector(gbfile, RecordIndex, RecordID,
+                              'sequence')
     sequence = sequenceSelector(sequence, start, end)
     window = int(window)
     pointer = 0
@@ -115,7 +88,8 @@ def randomize(gbfile='DSM6083.gb', RecordIndex=0, RecordID=None,
     '''
     python gc.py random --gbfile=test/DSM6083.gb --RecordIndex=0 --start=0 --end=-1 --window=10000 --n=200 --output=gc_random.txt
     '''
-    sequence = recordSelector(gbfile, RecordIndex, RecordID)
+    sequence = recordSelector(gbfile, RecordIndex, RecordID,
+                              'sequence')
     sequence = sequenceSelector(sequence, start, end)
     choices = list(range(len(sequence)))
     window = int(window)
