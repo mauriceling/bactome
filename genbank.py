@@ -1,4 +1,4 @@
-'''
+'''!
 Genbank file reader and processor
 
 Date created: 7th May 2017
@@ -25,7 +25,7 @@ from Bio import SeqIO
 
 
 class GenBankFile(object):
-    '''
+    '''!
     Class to read a Genbank file, parse it using BioPython library, 
     into a Python dictionary. If the Genbank file consists of more 
     than one Genbank records, the respective Genbank record name will 
@@ -111,6 +111,11 @@ class GenBankFile(object):
         return record
     
     def readGB(self, filepath):
+        '''!
+        Method to read a GenBank file and parse it into a dictionary. 
+
+        @param filepath string: file path of the Genbank file
+        '''
         self.filepath = filepath
         gb = open(self.filepath, 'r')
         self.records = {}
@@ -194,8 +199,8 @@ def recordSelector(gbfile='DSM6083.gb', RecordIndex=0, RecordID=None,
         return gb.getFeatures(ID)
 
 def readGenBankFile(gbfile='DSM6083.gb'):
-    '''
-    python genbank.py readgb --gbfile=--gbfile=test/DSM6083.gb
+    '''!
+    python genbank.py readgb --gbfile=test/DSM6083.gb
     '''
     gb = GenBankFile()
     gb.readGB(gbfile)
@@ -219,7 +224,7 @@ def readGenBankFile(gbfile='DSM6083.gb'):
         print('Number of Features: ' + str(len(features)))
 
 def displayFeatureTypes(gbfile='DSM6083.gb'):
-    '''
+    '''!
     python genbank.py displayfeaturetypes --gbfile=test/DSM6083.gb
     '''
     gb = GenBankFile()
@@ -240,22 +245,24 @@ def displayFeatureTypes(gbfile='DSM6083.gb'):
         print()
 
 def featureMap(feature='CDS', RecordIndex=0, RecordID=None,
-               gbfile='DSM6083.gb', output='feature_result.txt'):
-    '''
-    python genbank.py featuring --feature=rRNA --RecordIndex=0 --gbfile=test/DSM6083.gb --output=feature_result.txt
+               gbfile='DSM6083.gb', expand=False, resolution=1):
+    '''!
+    python genbank.py featuring --feature=rRNA --RecordIndex=0 --gbfile=test/DSM6083.gb --expand=False --resolution=1
     '''
     features = recordSelector(gbfile, RecordIndex, RecordID,
                               'features')
     required_feature = str(feature)
-    data = []
+    expand = str(expand).lower()
     for f in features:
         if f['type'] == required_feature:
-            data.append((f['start'], f['end']))
-    f = open(output, 'w')
-    for region in data:
-        for base in range(int(region[0]), (region[1])+1):
-            f.write(str(base) + '\n')
-    f.close()
+            if expand == 'false':
+                print('%s : %s : %s' % \
+                      (feature, str(f['start']), str(f['end'])))
+            if expand == 'true':
+                resolution = int(resolution)
+                for base in range(f['start'], f['end']+1,
+                                  resolution):
+                    print('%s : %s' % (feature, base))
 
 
 if __name__ == '__main__':
