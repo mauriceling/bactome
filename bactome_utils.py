@@ -32,9 +32,3 @@ def sequenceSelector(sequence, start=0, end=-1):
         sequence = sequence[int(start):int(end)]
     return sequence
 
-def outputWriter(output, header, data):
-    f = open(output, 'w')
-    f.write(str(header) + '\n')
-    for line in data:
-        f.write(str(line) + '\n')
-    f.close()

@@ -24,16 +24,14 @@ import random
 
 import fire
 
-from bactome_utils import outputWriter
 from bactome_utils import sequenceSelector
 from genbank import recordSelector
 
 
 def sliderGC(gbfile='DSM6083.gb', RecordIndex=0, RecordID=None,
-             start=0, end=-1, window=10000, interval=1, 
-             output=False):
+             start=0, end=-1, window=10000, interval=1):
     '''
-    python gc.py slidegc --gbfile=test/DSM6083.gb --RecordIndex=0 --start=0 --end=-1 --window=10000 --interval=10 --output=gc_window.txt
+    python gc.py slidegc --gbfile=test/DSM6083.gb --RecordIndex=0 --start=0 --end=-1 --window=10000 --interval=10 
     '''
     sequence = recordSelector(gbfile, RecordIndex, RecordID, 
                               'sequence')
@@ -48,19 +46,12 @@ def sliderGC(gbfile='DSM6083.gb', RecordIndex=0, RecordID=None,
         print('%i : %i : %.4f' % (pointer+start, 
                                   pointer-1+start+window,
                                   gc))
-        if output:
-            pdata.append('%i : %i : %.4f' % (pointer+start, 
-                                             pointer-1+start+window,
-                                             gc))
         pointer = pointer + interval
-    if output:
-        header = 'start_position : end_position : percent_GC'
-        outputWriter(output, header, pdata)
 
 def blockGC(gbfile='DSM6083.gb', RecordIndex=0, RecordID=None,
-            start=0, end=-1, window=10000, output=False):
+            start=0, end=-1, window=10000):
     '''
-    python gc.py blockgc --gbfile=test/DSM6083.gb --RecordIndex=0 --start=0 --end=-1 --window=10000 --output=gc_block.txt
+    python gc.py blockgc --gbfile=test/DSM6083.gb --RecordIndex=0 --start=0 --end=-1 --window=10000
     '''
     sequence = recordSelector(gbfile, RecordIndex, RecordID,
                               'sequence')
@@ -74,19 +65,12 @@ def blockGC(gbfile='DSM6083.gb', RecordIndex=0, RecordID=None,
         print('%i : %i : %.4f' % (pointer+start, 
                                   pointer-1+start+window,
                                   gc))
-        if output:
-            pdata.append('%i : %i : %.4f' % (pointer+start, 
-                                             pointer-1+start+window,
-                                             gc))
         pointer = pointer + window
-    if output:
-        header = 'start_position : end_position : percent_GC'
-        outputWriter(output, header, pdata)
 
 def randomize(gbfile='DSM6083.gb', RecordIndex=0, RecordID=None,
-              start=0, end=-1, window=10000, n=5000, output=False):
+              start=0, end=-1, window=10000, n=5000):
     '''
-    python gc.py random --gbfile=test/DSM6083.gb --RecordIndex=0 --start=0 --end=-1 --window=10000 --n=200 --output=gc_random.txt
+    python gc.py random --gbfile=test/DSM6083.gb --RecordIndex=0 --start=0 --end=-1 --window=10000 --n=200
     '''
     sequence = recordSelector(gbfile, RecordIndex, RecordID,
                               'sequence')
@@ -103,8 +87,6 @@ def randomize(gbfile='DSM6083.gb', RecordIndex=0, RecordID=None,
         gc = float(s.count('G') + s.count('C')) * 100/window
         data.append(gc)
         print('%i : %.4f' % (count+1, gc))
-        if output:
-            pdata.append('%i : %.4f' % (count+1, gc))
         count = count + 1
     print()
     mean_gc = sum(data) / len(data)
@@ -112,9 +94,6 @@ def randomize(gbfile='DSM6083.gb', RecordIndex=0, RecordID=None,
         (len(data) - 1)) ** 0.5
     print('Average Percent GC: %.4f' % mean_gc)
     print('Standard Deviation Percent GC: %.5f' % stdev_gc)
-    if output:
-        header = 'iteration : percent_GC'
-        outputWriter(output, header, pdata)
 
 
 if __name__ == '__main__':
