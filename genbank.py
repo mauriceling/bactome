@@ -402,25 +402,31 @@ def featureMap(feature='CDS', RecordIndex=0, RecordID=None,
     Usage 1: Prints the range of bases for a required feature
     
         python genbank.py featuring --feature=<feature type> 
-        --RecordIndex=<Record number> --gbfile=<Genbank file path> 
+        --RecordIndex=<Record number> --RecordID=<Genbank record name> 
+        --gbfile=<Genbank file path> 
 
     Usage 2: Prints out individual base position for a required 
     feature
     
         python genbank.py featuring --feature=<feature type> 
-        --RecordIndex=<record number> --gbfile=<Genbank file path> 
+        --RecordIndex=<record number> --RecordID=<Genbank record name> 
+        --gbfile=<Genbank file path> 
         --expand=False --resolution=<resolution>
 
     where
         - record number is the relative Genbank record number in 
         the given Genbank file where 0 is the first record and 
         1 is the secord record, and so on
+        - Genbank record name is the identifying ID for the Genbank 
+        record
         - resolution is to control the resolution of printouts. 
         For example, resolution of 1 will print out every base 
         position for a given feature type; which will generate 
         a long printout. Increasing the resolution will reduce 
         the volume of printout but may not accurately pin-point 
         the end base position of the feature 
+
+    In both usage, it requires either RecordIndex or RecordID.
 
     Usage 1 will generate the following output:
 
