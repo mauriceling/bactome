@@ -25,9 +25,16 @@ from Bio import SeqIO
 
 import fire
 
+
 class CodonUsageBias(object):
+    '''!
+    Class to hold the core methods for codon usage bias analysis.
+    '''
 
     def __init__(self):
+        '''!
+        Constructor method.
+        '''
         self.seqNN = {}
         self.codonCount = {}
         self.aalist = ['A', 'C', 'D', 'E', 'F', 
@@ -36,11 +43,32 @@ class CodonUsageBias(object):
                        'S', 'T', 'V', 'W', 'Y', 
                        '*']
 
-    def addSequencesFromFasta(self,fastafile):
+    def addSequencesFromFasta(self, fastafile):
+        '''!
+        Method to add sequences from FASTA file into data structure. 
+        This allows for sequences to be added from multiple FASTA 
+        files.
+
+        @param fastafile String: Path to the FASTA file to add.
+        '''
         for r in SeqIO.parse(fastafile, 'fasta'):
             self.seqNN[r.id] = [r.seq, r.description]
 
     def generateCodonCount(self, seq, genetic_code=1):
+        '''!
+        Method to generate codon counts from sequence. This method 
+        will take the nucleotide sequence to translate into amino 
+        acid sequence before codon count generation for each amino 
+        acid, resulting in codon counts per amino acid.
+
+        @param seq String: Nucleotide sequence string
+        @param genetic_code Integer: Genetic code number to be used 
+        for translation. Default = 1 (Standard Code). For more 
+        information, see <https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi>
+
+        @return A nested dictionary of {'amino acid': {'codon': 
+        count}}
+        '''
         nnseq = str(seq)
         nnseq = [nnseq[i:3+i] for i in range(0, len(nnseq), 3)]
         aaseq = str(seq.translate(genetic_code))
@@ -60,12 +88,38 @@ class CodonUsageBias(object):
         return table
 
     def generateCodonCounts(self, genetic_code=1):
+        '''!
+        Method to iterate through all sequences to generate codon 
+        counts.
+
+        @param genetic_code Integer: Genetic code number to be used 
+        for translation. Default = 1 (Standard Code). For more 
+        information, see <https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi>
+        '''
         for k in self.seqNN:
             codonCount = self.generateCodonCount(self.seqNN[k][0],
                                                  genetic_code)
             self.codonCount[k] = codonCount
 
 def sequenceIDs(fastafile):
+    '''!
+    Function to print out the sequence IDs of all the FASTA records 
+    in the FASTA file.
+
+    Usage:
+
+        python cub.py showIDs --fastafile=<FASTA file path>
+
+    The output will be in the format of
+
+        <count> : <sequence ID>
+
+    where 
+        - count is the numeric running order
+        - sequence ID is the sequence ID of the FASTA record.
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    '''
     o = CodonUsageBias()
     o.addSequencesFromFasta(fastafile)
     count = 1
@@ -74,6 +128,25 @@ def sequenceIDs(fastafile):
         count = count + 1
 
 def sequenceDescriptions(fastafile):
+    '''!
+    Function to print out the sequence IDs and descriptions of all the 
+    FASTA records in the FASTA file.
+
+    Usage:
+
+        python cub.py showDesc --fastafile=<FASTA file path>
+
+    The output will be in the format of
+
+        <count> : <sequence ID> : <description>
+
+    where 
+        - count is the numeric running order
+        - sequence ID is the sequence ID of the FASTA record
+        - description is the description of the FASTA record
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    '''
     o = CodonUsageBias()
     o.addSequencesFromFasta(fastafile)
     count = 1
@@ -82,6 +155,29 @@ def sequenceDescriptions(fastafile):
         count = count + 1
 
 def translate(fastafile, genetic_code=1):
+    '''!
+    Function to translate all the FASTA records from nucleotide 
+    sequence(s) to amino acid sequence(s).
+
+    Usage:
+
+        python cub.py translate --fastafile=<FASTA file path> 
+        --genetic_code=<genetic code number>
+
+    The output will be in the format of
+
+        <sequence ID> : <amino acid sequence>
+
+    where 
+        - sequence ID is the sequence ID of the FASTA record
+        - amino acid sequence is the translated amino acid sequence 
+        of the FASTA record
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    @param genetic_code Integer: Genetic code number to be used for 
+    translation. Default = 1 (Standard Code). For more information, 
+    see <https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi>
+    '''
     o = CodonUsageBias()
     o.addSequencesFromFasta(fastafile)
     for k in o.seqNN:
@@ -89,6 +185,33 @@ def translate(fastafile, genetic_code=1):
         print('%s : %s' % (k, str(aaseq)))
 
 def aminoacidCount(fastafile, genetic_code=1):
+    '''!
+    Function to translate each nucleotide sequence (by FASTA record) 
+    and generate a frequency table of the amino acids.
+
+    Usage:
+
+        python cub.py aacount --fastafile=<FASTA file path> 
+        --genetic_code=<genetic code number>
+
+    The output will be in the format of
+
+        <sequence ID> : <A count> : <C count> : <D count> : <E count> 
+        : <F count> : <G count> : <H count> : <I count> : <K count> : 
+        <L count> : <M count> : <N count> : <P count> : <Q count> : 
+        <R count> : <S count> : <T count> : <V count> : <W count> : 
+        <Y count>
+
+    where 
+        - sequence ID is the sequence ID of the FASTA record
+        - the counts are the number of the respective amino acid; for 
+        example, A count is the number of alanine in the peptide
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    @param genetic_code Integer: Genetic code number to be used for 
+    translation. Default = 1 (Standard Code). For more information, 
+    see <https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi>
+    '''
     o = CodonUsageBias()
     o.addSequencesFromFasta(fastafile)
     header = ' : '.join(['SequenceID', 'A', 'C', 'D', 'E', 'F', 'G', 
@@ -106,6 +229,28 @@ def aminoacidCount(fastafile, genetic_code=1):
         print(data)
 
 def peptideLength(fastafile, genetic_code=1):
+    '''!
+    Function to translate each nucleotide sequence (by FASTA record) 
+    and count the number of amino acids (peptide length).
+
+    Usage:
+
+        python cub.py plength --fastafile=<FASTA file path> 
+        --genetic_code=<genetic code number>
+
+     The output will be in the format of
+
+        <sequence ID> : <peptide length>
+
+    where 
+        - sequence ID is the sequence ID of the FASTA record
+        - peptide length is the number of amino acids in the peptide
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    @param genetic_code Integer: Genetic code number to be used for 
+    translation. Default = 1 (Standard Code). For more information, 
+    see <https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi>
+    '''
     o = CodonUsageBias()
     o.addSequencesFromFasta(fastafile)
     for k in o.seqNN:
@@ -113,6 +258,24 @@ def peptideLength(fastafile, genetic_code=1):
         print('%s : %s' % (k, str(len(str(aaseq)))))
 
 def nucleotideLength(fastafile):
+    '''!
+    Function to count the number of nucleotides (number of bases) in 
+    each FASTA record.
+
+    Usage:
+
+        python cub.py nlength --fastafile=<FASTA file path> 
+
+     The output will be in the format of
+
+        <sequence ID> : <nucleotide length>
+
+    where 
+        - sequence ID is the sequence ID of the FASTA record
+        - nucleotide length is the number of bases in the peptide
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    '''
     o = CodonUsageBias()
     o.addSequencesFromFasta(fastafile)
     for k in o.seqNN:
@@ -120,6 +283,15 @@ def nucleotideLength(fastafile):
         print('%s : %s' % (k, str(len(str(nnseq)))))
 
 def flattenCodonCount(CC):
+    '''!
+    Function to flatten the codon usage / frequency table by 
+    removing the amino acid identifiers.
+
+    @param CC: Codon usage table as a nested dictionary 
+    of {'amino acid': {'codon': count}}.
+
+    @return Dictionary of {'codon': count}.
+    '''
     table = {'AAA': 0, 'AAT': 0, 'AAG': 0, 'AAC': 0,
              'ATA': 0, 'ATT': 0, 'ATG': 0, 'ATC': 0,
              'AGA': 0, 'AGT': 0, 'AGG': 0, 'AGC': 0,
@@ -142,6 +314,45 @@ def flattenCodonCount(CC):
     return table
 
 def codonCount(fastafile, genetic_code=1):
+    '''!
+    Function to generate the codon usage frequency table by each 
+    FASTA record.
+
+    Usage:
+
+        python cub.py codoncount --fastafile=<FASTA file path> 
+        --genetic_code=<genetic code number>
+
+    The output will be in the format of
+
+        <sequence ID> : <AAA count> : <AAC count> : <AAG count> : 
+        <AAT count> : <ACA count> : <ACC count> : <ACG count> : 
+        <ACT count> : <AGA count> : <AGC count> : <AGG count> : 
+        <AGT count> : <ATA count> : <ATC count> : <ATG count> : 
+        <ATT count> : <CAA count> : <CAC count> : <CAG count> : 
+        <CAT count> : <CCA count> : <CCC count> : <CCG count> : 
+        <CCT count> : <CGA count> : <CGC count> : <CGG count> : 
+        <CGT count> : <CTA count> : <CTC count> : <CTG count> : 
+        <CTT count> : <GAA count> : <GAC count> : <GAG count> : 
+        <GAT count> : <GCA count> : <GCC count> : <GCG count> : 
+        <GCT count> : <GGA count> : <GGC count> : <GGG count> : 
+        <GGT count> : <GTA count> : <GTC count> : <GTG count> : 
+        <GTT count> : <TAA count> : <TAC count> : <TAG count> : 
+        <TAT count> : <TCA count> : <TCC count> : <TCG count> : 
+        <TCT count> : <TGA count> : <TGC count> : <TGG count> : 
+        <TGT count> : <TTA count> : <TTC count> : <TTG count> : 
+        <TTT count>
+
+     where 
+        - sequence ID is the sequence ID of the FASTA record
+        - the counts are the number of each codon; for example, 
+        AAA count is the number of AAA codon in the sequence
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    @param genetic_code Integer: Genetic code number to be used for 
+    translation. Default = 1 (Standard Code). For more information, 
+    see <https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi>
+    '''
     o = CodonUsageBias()
     o.addSequencesFromFasta(fastafile)
     header = ' : '.join(['SequenceID', 'AAA', 'AAC', 'AAG', 'AAT', 
