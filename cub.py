@@ -112,6 +112,13 @@ def peptideLength(fastafile, genetic_code=1):
         aaseq = o.seqNN[k][0].translate(genetic_code)
         print('%s : %s' % (k, str(len(str(aaseq)))))
 
+def nucleotideLength(fastafile):
+    o = CodonUsageBias()
+    o.addSequencesFromFasta(fastafile)
+    for k in o.seqNN:
+        nnseq = o.seqNN[k][0]
+        print('%s : %s' % (k, str(len(str(nnseq)))))
+
 def flattenCodonCount(CC):
     table = {'AAA': 0, 'AAT': 0, 'AAG': 0, 'AAC': 0,
              'ATA': 0, 'ATT': 0, 'ATG': 0, 'ATC': 0,
@@ -182,6 +189,7 @@ if __name__ == '__main__':
     exposed_functions = {'showIDs': sequenceIDs,
                          'showDesc': sequenceDescriptions,
                          'plength': peptideLength,
+                         'nlength': nucleotideLength,
                          'translate': translate,
                          'codoncount': codonCount,
                          'aacount': aminoacidCount}
