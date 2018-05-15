@@ -38,6 +38,16 @@ class RandomSequence(object):
         >>> s.initiateNucleotide(selection)
         >>> s.generateSequence(50, True, True)
         'AGAUCCCCCGGACAGGUUAUGGAUAAGUGUCCACCUCUAACUAUUUCUGC'
+
+    Example without start and stop:
+
+        >>> s = RandomSequence()
+        >>> selection = {'A':25, 'T':25, 'G':25, 'C':25}
+        >>> s.initiateNucleotide(selection)
+        >>> s.initiateStart('TTG,CTG,ATG')
+        >>> s.initiateStop('TAA,TAG,TGA')
+        >>> s.generateSequence(50, False, False)
+        'AATCCGGACAAATCAAGCACAGGCAGTTTATTCAAGGGGTACCCCAGAAC'
     '''
 
     def __init__(self):
