@@ -28,10 +28,42 @@ from bactome_utils import sequenceSelector
 from genbank import recordSelector
 
 
-def sliderGC(gbfile='DSM6083.gb', RecordIndex=0, RecordID=None,
-             start=0, end=-1, window=10000, interval=1):
-    '''
-    python gc.py slidegc --gbfile=test/DSM6083.gb --RecordIndex=0 --start=0 --end=-1 --window=10000 --interval=10 
+def sliderGC(gbfile, RecordIndex=0, RecordID=None, start=0, 
+             end=-1, window=10000, interval=1):
+    '''!
+    Function to calculate %GC of a specific sequence in Genbank 
+    file using a sliding-window method.
+
+    Usage:
+
+        python gc.py slidegc --gbfile=<Genbank file path> 
+        --RecordIndex=<record number> --RecordID=<Genbank record name> 
+        --start=<starting base position> --end=<ending base position> 
+        --window=<window size> --interval=<interval size>
+
+    where
+        - record number is the relative Genbank record number in 
+        the given Genbank file where 0 is the first record and 
+        1 is the secord record, and so on
+        - Genbank record name is the identifying ID for the Genbank 
+        record
+        - starting and ending base positions define the boundary of 
+        analysis (region of interest). If entire chromosome is of 
+        interest, starting and ending base positions will be 0 and 
+        -1 respectively
+        - window size is the window to calculate. For example, if 
+        window size is 1000, %GC will be calculated as ratio of GC 
+        per 1000 bases
+        - interval refers to be magnitude of slide
+
+    Either RecordIndex or RecordID is required.
+
+    @param gbfile string: file path of the Genbank file
+    @param RecordIndex Integer: Relative Genbank record number in 
+    the given Genbank file where 0 is the first record and 1 is 
+    the secord record, and so on
+    @param RecordID String: Unique name (identifying IDs) for the 
+    specific Genbank record
     '''
     sequence = recordSelector(gbfile, RecordIndex, RecordID, 
                               'sequence')
@@ -48,10 +80,41 @@ def sliderGC(gbfile='DSM6083.gb', RecordIndex=0, RecordID=None,
                                   gc))
         pointer = pointer + interval
 
-def blockGC(gbfile='DSM6083.gb', RecordIndex=0, RecordID=None,
-            start=0, end=-1, window=10000):
-    '''
-    python gc.py blockgc --gbfile=test/DSM6083.gb --RecordIndex=0 --start=0 --end=-1 --window=10000
+def blockGC(gbfile, RecordIndex=0, RecordID=None, start=0, end=-1, 
+            window=10000):
+    '''!
+    Function to calculate %GC by blocks of a specific sequence in 
+    Genbank file.
+
+    Usage: 
+
+        python gc.py blockgc --gbfile=<Genbank file path> 
+        --RecordIndex=<record number> --RecordID=<Genbank record name> 
+        --start=<starting base position> --end=<ending base position> 
+        --window=<window size> 
+
+    where
+        - record number is the relative Genbank record number in 
+        the given Genbank file where 0 is the first record and 
+        1 is the secord record, and so on
+        - Genbank record name is the identifying ID for the Genbank 
+        record
+        - starting and ending base positions define the boundary of 
+        analysis (region of interest). If entire chromosome is of 
+        interest, starting and ending base positions will be 0 and 
+        -1 respectively
+        - window size is the window to calculate. For example, if 
+        window size is 1000, %GC will be calculated as ratio of GC 
+        per 1000 bases
+
+    Either RecordIndex or RecordID is required.
+
+    @param gbfile string: file path of the Genbank file
+    @param RecordIndex Integer: Relative Genbank record number in 
+    the given Genbank file where 0 is the first record and 1 is 
+    the secord record, and so on
+    @param RecordID String: Unique name (identifying IDs) for the 
+    specific Genbank record
     '''
     sequence = recordSelector(gbfile, RecordIndex, RecordID,
                               'sequence')
@@ -67,10 +130,43 @@ def blockGC(gbfile='DSM6083.gb', RecordIndex=0, RecordID=None,
                                   gc))
         pointer = pointer + window
 
-def randomize(gbfile='DSM6083.gb', RecordIndex=0, RecordID=None,
-              start=0, end=-1, window=10000, n=5000):
-    '''
-    python gc.py random --gbfile=test/DSM6083.gb --RecordIndex=0 --start=0 --end=-1 --window=10000 --n=200
+def randomize(gbfile, RecordIndex=0, RecordID=None, start=0, end=-1, 
+              window=10000, n=5000):
+    '''!
+    Function to generate random sequence samples from a specific 
+    sequence in Genbank file and calculate the %GC of each randomized 
+    sequence.
+
+    Usage:
+
+        python gc.py random --gbfile=<Genbank file path> 
+        --RecordIndex=<record number> --RecordID=<Genbank record name> 
+        --start=<starting base position> --end=<ending base position> 
+        --window=<window size> --n=<sample size>
+
+    where
+        - record number is the relative Genbank record number in 
+        the given Genbank file where 0 is the first record and 
+        1 is the secord record, and so on
+        - Genbank record name is the identifying ID for the Genbank 
+        record
+        - starting and ending base positions define the boundary of 
+        analysis (region of interest). If entire chromosome is of 
+        interest, starting and ending base positions will be 0 and 
+        -1 respectively
+        - window is the window size to calculate. For example, if 
+        window size is 1000, %GC will be calculated as ratio of GC 
+        per 1000 bases
+        - sample size is the number of randomized samples to generate
+
+    Either RecordIndex or RecordID is required.
+
+    @param gbfile string: file path of the Genbank file
+    @param RecordIndex Integer: Relative Genbank record number in 
+    the given Genbank file where 0 is the first record and 1 is 
+    the secord record, and so on
+    @param RecordID String: Unique name (identifying IDs) for the 
+    specific Genbank record
     '''
     sequence = recordSelector(gbfile, RecordIndex, RecordID,
                               'sequence')
