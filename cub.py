@@ -395,6 +395,68 @@ def codonCount(fastafile, genetic_code=1):
             print(data)
         except: pass
 
+def percentGC(fastafile):
+    '''!
+    Function to generate the %GC by each FASTA record.
+
+    Usage:
+
+        python cub.py gc --fastafile=<FASTA file path>
+
+    The output will be in the format of
+
+        <sequence ID> : <%GC>
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    '''
+    o = CodonUsageBias()
+    o.addSequencesFromFasta(fastafile)
+    for k in o.seqNN:
+        sequence = str(o.seqNN[k][0])
+        percent = sequence.count('G') + sequence.count('C') + \
+                  sequence.count('g') + sequence.count('c')
+        percent = percent / len(sequence)
+        data = [k, percent]
+        data = ' : '.join([str(x) for x in data])
+        print(data)
+
+def percentGCi(fastafile, i, j=3):
+    '''!
+    Function to generate the %GC of the i-th base in each codon 
+    (of j length) by each FASTA record.
+
+    Usage:
+
+        python cub.py gci --i=1 --j=3 --fastafile=<FASTA file path>
+
+    The output will be in the format of
+
+        <sequence ID> : <%GC of first base in codon>
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    @param i Integer: Position of the base in the codon
+    @param j Integer: Size (length) of each codon. Default = 3
+    '''
+    o = CodonUsageBias()
+    o.addSequencesFromFasta(fastafile)
+    i = int(i)
+    j = int(j)
+    for k in o.seqNN:
+        sequence = str(o.seqNN[k][0])
+        sequence = [sequence[i:i+j] 
+                    for i in range(0, len(sequence), j)]
+        temp = []
+        for x in sequence:
+            try: temp.append(x[i-1])
+            except IndexError: pass
+        sequence = temp
+        percent = sequence.count('G') + sequence.count('C') + \
+                  sequence.count('g') + sequence.count('c')
+        percent = percent / len(sequence)
+        data = [k, percent]
+        data = ' : '.join([str(x) for x in data])
+        print(data)
+
 
 if __name__ == '__main__':
     exposed_functions = {'showIDs': sequenceIDs,
@@ -403,5 +465,7 @@ if __name__ == '__main__':
                          'nlength': nucleotideLength,
                          'translate': translate,
                          'codoncount': codonCount,
-                         'aacount': aminoacidCount}
+                         'aacount': aminoacidCount,
+                         'gc': percentGC,
+                         'gci': percentGCi}
     fire.Fire(exposed_functions)
