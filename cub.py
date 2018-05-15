@@ -431,11 +431,11 @@ def percentGCi(fastafile, i, j=3):
 
     The output will be in the format of
 
-        <sequence ID> : <%GC of first base in codon>
+        <sequence ID> : <%GC of i-th base in codon of j bases>
 
     @param fastafile String: Path to the FASTA file to be processed.
-    @param i Integer: Position of the base in the codon
-    @param j Integer: Size (length) of each codon. Default = 3
+    @param i Integer: Position of the base in the codon.
+    @param j Integer: Size (length) of each codon. Default = 3.
     '''
     o = CodonUsageBias()
     o.addSequencesFromFasta(fastafile)
@@ -453,8 +453,7 @@ def percentGCi(fastafile, i, j=3):
         percent = sequence.count('G') + sequence.count('C') + \
                   sequence.count('g') + sequence.count('c')
         percent = percent / len(sequence)
-        data = [k, percent]
-        data = ' : '.join([str(x) for x in data])
+        data = ' : '.join([str(k), str(percent)])
         print(data)
 
 
