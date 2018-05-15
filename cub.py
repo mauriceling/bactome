@@ -420,6 +420,54 @@ def percentGC(fastafile):
         data = ' : '.join([str(x) for x in data])
         print(data)
 
+def percentG(fastafile):
+    '''!
+    Function to generate the %G by each FASTA record.
+
+    Usage:
+
+        python cub.py g --fastafile=<FASTA file path>
+
+    The output will be in the format of
+
+        <sequence ID> : <%G>
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    '''
+    o = CodonUsageBias()
+    o.addSequencesFromFasta(fastafile)
+    for k in o.seqNN:
+        sequence = str(o.seqNN[k][0])
+        percent = sequence.count('G') + sequence.count('g')
+        percent = percent / len(sequence)
+        data = [k, percent]
+        data = ' : '.join([str(x) for x in data])
+        print(data)
+
+def percentA(fastafile):
+    '''!
+    Function to generate the %A by each FASTA record.
+
+    Usage:
+
+        python cub.py a --fastafile=<FASTA file path>
+
+    The output will be in the format of
+
+        <sequence ID> : <%A>
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    '''
+    o = CodonUsageBias()
+    o.addSequencesFromFasta(fastafile)
+    for k in o.seqNN:
+        sequence = str(o.seqNN[k][0])
+        percent = sequence.count('A') + sequence.count('a')
+        percent = percent / len(sequence)
+        data = [k, percent]
+        data = ' : '.join([str(x) for x in data])
+        print(data)
+
 def percentGCi(fastafile, i, j=3):
     '''!
     Function to generate the %GC of the i-th base in each codon 
@@ -456,6 +504,76 @@ def percentGCi(fastafile, i, j=3):
         data = ' : '.join([str(k), str(percent)])
         print(data)
 
+def percentGi(fastafile, i, j=3):
+    '''!
+    Function to generate the %G of the i-th base in each codon 
+    (of j length) by each FASTA record.
+
+    Usage:
+
+        python cub.py gi --i=1 --j=3 --fastafile=<FASTA file path>
+
+    The output will be in the format of
+
+        <sequence ID> : <%G of i-th base in codon of j bases>
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    @param i Integer: Position of the base in the codon.
+    @param j Integer: Size (length) of each codon. Default = 3.
+    '''
+    o = CodonUsageBias()
+    o.addSequencesFromFasta(fastafile)
+    i = int(i)
+    j = int(j)
+    for k in o.seqNN:
+        sequence = str(o.seqNN[k][0])
+        sequence = [sequence[i:i+j] 
+                    for i in range(0, len(sequence), j)]
+        temp = []
+        for x in sequence:
+            try: temp.append(x[i-1])
+            except IndexError: pass
+        sequence = temp
+        percent = sequence.count('G') + sequence.count('g')
+        percent = percent / len(sequence)
+        data = ' : '.join([str(k), str(percent)])
+        print(data)
+
+def percentAi(fastafile, i, j=3):
+    '''!
+    Function to generate the %A of the i-th base in each codon 
+    (of j length) by each FASTA record.
+
+    Usage:
+
+        python cub.py ai --i=1 --j=3 --fastafile=<FASTA file path>
+
+    The output will be in the format of
+
+        <sequence ID> : <%A of i-th base in codon of j bases>
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    @param i Integer: Position of the base in the codon.
+    @param j Integer: Size (length) of each codon. Default = 3.
+    '''
+    o = CodonUsageBias()
+    o.addSequencesFromFasta(fastafile)
+    i = int(i)
+    j = int(j)
+    for k in o.seqNN:
+        sequence = str(o.seqNN[k][0])
+        sequence = [sequence[i:i+j] 
+                    for i in range(0, len(sequence), j)]
+        temp = []
+        for x in sequence:
+            try: temp.append(x[i-1])
+            except IndexError: pass
+        sequence = temp
+        percent = sequence.count('A') + sequence.count('a')
+        percent = percent / len(sequence)
+        data = ' : '.join([str(k), str(percent)])
+        print(data)
+
 
 if __name__ == '__main__':
     exposed_functions = {'showIDs': sequenceIDs,
@@ -466,5 +584,9 @@ if __name__ == '__main__':
                          'codoncount': codonCount,
                          'aacount': aminoacidCount,
                          'gc': percentGC,
-                         'gci': percentGCi}
+                         'g': percentG,
+                         'a': percentA,
+                         'gci': percentGCi,
+                         'gi': percentGi,
+                         'ai': percentAi}
     fire.Fire(exposed_functions)
