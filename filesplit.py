@@ -26,7 +26,17 @@ import fire
 
 def splitByLine(inputfile, size=5000):
     '''!
-    python filesplit.py line --inputfile=test.txt --size=5000
+    Function to split a large file into multiple smaller files 
+    by the number of lines. Each of the smaller files will take 
+    the file name of <original file name>.<incremental number>.txt.
+
+    Usage:
+
+        python filesplit.py line --inputfile=<input file path> --size=<number of lines>
+
+    @param inputfile String: Path of file to split.
+    @param size Integer: Number of lines per split file. Default = 
+    5000. 
     '''
     size = int(size)
     count = 1
