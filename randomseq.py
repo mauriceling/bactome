@@ -184,7 +184,7 @@ def _initial_RandomSequence(start_codons, stop_codons,
     Private method - Instantiate a RandomSequence object based on 
     parameters. Main requirement is either selection or source_seq. 
     If both selection and source_seq are given (not empty) strings, 
-    only selection will be used.
+    only source_seq will be used.
 
     @param start_codons String: A comma-delimited list to represent 
     start codons. This is used for two purposes. Firstly, it can be 
@@ -276,7 +276,7 @@ def gFixedLength(length, n, allow_start=False, allow_stop=False,
     
     Usage:
 
-        python randomseq.py FLS --length=100 --n=10 --allow_start=False --allow_stop=False --start_codons='TTG,CTG,ATG' --stop_codons='TAA,TAG,TGA' --cap_start=True --cap_stop=True --selection=A,250;T,250;G,250;C,250 --fasta=True, --prefix='Test'
+        python randomseq.py FLS --length=100 --n=10 --allow_start=False --allow_stop=False --start_codons='TTG,CTG,ATG' --stop_codons='TAA,TAG,TGA' --cap_start=True --cap_stop=True --selection=A,250;T,250;G,250;C,250 --fasta=True --prefix='Test'
 
     @param length Integer: Length of random sequence to generate. 
     @param n Integer: Number of random sequence(s) to generate.
@@ -340,7 +340,7 @@ def gVariableLength(min_length, max_length, n,
     
     Usage:
 
-        python randomseq.py VLS --min_length=90 --max_length=110 --n=10 --allow_start=False --allow_stop=False --start_codons='TTG,CTG,ATG' --stop_codons='TAA,TAG,TGA' --cap_start=True --cap_stop=True --selection=A,250;T,250;G,250;C,250 --fasta=True, --prefix='Test'
+        python randomseq.py VLS --min_length=90 --max_length=110 --n=10 --allow_start=False --allow_stop=False --start_codons='TTG,CTG,ATG' --stop_codons='TAA,TAG,TGA' --cap_start=True --cap_stop=True --selection=A,250;T,250;G,250;C,250 --fasta=True --prefix='Test'
 
     @param min_length Integer: Minimum length of randomly generated 
     sequence.
@@ -397,7 +397,7 @@ def gVariableLength(min_length, max_length, n,
         print(sequence)
     
 def shuffle(sequence):
-     '''!
+    '''!
     Function to shuffle a given sequence.
     
     Usage:
