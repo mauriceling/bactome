@@ -151,9 +151,9 @@ class RandomSequence(object):
         sequence = ''
         while len(sequence) < length:
             sequence = sequence + random.choice(self.sseq)
-            if not allow_start:
+            if allow_start == 'False' or not allow_start:
                 sequence = self._cleanStart(sequence)
-            if not allow_stop:
+            if allow_stop == 'False' or not allow_stop:
                 sequence = self._cleanStop(sequence)
         return sequence[:length]
 
