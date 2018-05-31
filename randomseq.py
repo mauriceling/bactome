@@ -272,7 +272,7 @@ def gFixedLength(length, n, allow_start=False, allow_stop=False,
                  source_seq='', fasta=True, prefix='Test'):
     '''!
     Function to generate one or more fixed length random sequences as 
-    per specificiation.
+    per specification.
     
     Usage:
 
@@ -336,7 +336,7 @@ def gVariableLength(min_length, max_length, n,
                     source_seq='', fasta=True, prefix='Test'):
     '''!
     Function to generate one or more variable length random sequences 
-    as per specificiation.
+    as per specification.
     
     Usage:
 
@@ -396,8 +396,23 @@ def gVariableLength(min_length, max_length, n,
             print('> %s' % title)
         print(sequence)
     
+def shuffle(sequence):
+     '''!
+    Function to shuffle a given sequence.
+    
+    Usage:
+
+        python randomseq.py shuffle --sequence=<sequence to shuffle>
+
+    @param sequence String: Sequence to shuffle
+    '''
+    sequence = list(sequence)
+    random.shuffle(sequence)
+    return ''.join(sequence)
+
 
 if __name__ == '__main__':
     exposed_functions = {'FLS': gFixedLength,
-                         'VLS': gVariableLength}
+                         'VLS': gVariableLength,
+                         'shuffle': shuffle}
     fire.Fire(exposed_functions)
