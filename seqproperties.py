@@ -21,7 +21,12 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 import random
-from Bio import SeqIO 
+
+from Bio import SeqIO
+from Bio.Alphabet import generic_dna
+from Bio.Alphabet import generic_rna
+from Bio.Seq import Seq
+from Bio.SeqUtils.ProtParam import ProteinAnalysis
 
 import fire
 
@@ -574,6 +579,269 @@ def percentAi(fastafile, i, j=3):
         data = ' : '.join([str(k), str(percent)])
         print(data)
 
+def _toPeptide(sequence, molecule, genetic_code=1, to_stop=True):
+    '''
+    Private function - Takes a sequence (DNA/RNA/amino acid) and 
+    process it according to return a ProteinAnalysis object.
+
+    @param sequence String: Nucleotide (DNA/RNA) or amino acid 
+    sequence.
+    @param molecule String: Defines the type of molecule. Three 
+    options are allowed: 'peptide' for amino acid sequences, 'DNA' for 
+    DNA sequences (requires transcription and translation), and 'RNA' 
+    for RNA sequence (requires translation).
+    @param genetic_code Integer: Genetic code number to be used for 
+    translation. Default = 1 (Standard Code). For more information, 
+    see <https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi>
+    @param to_stop Boolean: Flag to stop translation when first stop 
+    codon is encountered. Default = True.
+    @return: Bio.SeqUtils.ProtParam.ProteinAnalysis object
+    '''
+    if molecule.lower() == 'peptide':
+        peptide = ProteinAnalysis(sequence)
+    elif molecule.lower() == 'rna':
+        rna = str(sequence)
+        rna = Seq(rna, generic_rna)
+        peptide = rna.translate(genetic_code, to_stop=to_stop)
+        peptide = ProteinAnalysis(str(peptide))
+    elif molecule.lower() == 'dna':
+        dna = str(sequence)
+        dna = Seq(dna, generic_dna)
+        rna = dna.transcribe()
+        peptide = rna.translate(genetic_code, to_stop=to_stop)
+        peptide = ProteinAnalysis(str(peptide))
+    return peptide
+
+def molecularWeight(fastafile, molecule, genetic_code=1, to_stop=True):
+    '''!
+    Function to calculate the molecular weight by each FASTA record.
+
+    Usage:
+
+        python seqprop.py mw --molecule=<molecule type> --genetic_code=<genetic code number> --to_stop=<Boolean flag> --fastafile=<FASTA file path>
+
+    Options for genetic_code and to_stop are needed if molecule type 
+    is not peptide, as these options are needed for translation. The 
+    output will be in the format of
+
+        <sequence ID> : <molecular weight>
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    @param molecule String: Defines the type of molecule. Three 
+    options are allowed: 'peptide' for amino acid sequences, 'DNA' for 
+    DNA sequences (requires transcription and translation), and 'RNA' 
+    for RNA sequence (requires translation).
+    @param genetic_code Integer: Genetic code number to be used for 
+    translation. Default = 1 (Standard Code). For more information, 
+    see <https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi>
+    @param to_stop Boolean: Flag to stop translation when first stop 
+    codon is encountered. Default = True.
+    '''
+    o = CodonUsageBias()
+    o.addSequencesFromFasta(fastafile)
+    for k in o.seqNN:
+        sequence = _toPeptide(str(o.seqNN[k][0]), molecule, 
+                              genetic_code, to_stop)
+        result = '%0.2f' % sequence.molecular_weight()
+        data = [k, result]
+        data = ' : '.join([str(x) for x in data])
+        print(data)
+
+def aromaticity(fastafile, molecule, genetic_code=1, to_stop=True):
+    '''!
+    Function to calculate the aromaticity index by each FASTA record. 
+    This is calculated by BioPython library using method described in 
+    Lobry JR, Gautier C. 1994. Hydrophobicity, expressivity and 
+    aromaticity are the major trends of amino-acid usage in 999 
+    Escherichia coli chromosome-encoded genes, Nucleic Acids Research 
+    22(15):3174–3180. https://doi.org/10.1093/nar/22.15.3174
+
+    Usage:
+
+        python seqprop.py aromaticity --molecule=<molecule type> --genetic_code=<genetic code number> --to_stop=<Boolean flag> --fastafile=<FASTA file path>
+
+    Options for genetic_code and to_stop are needed if molecule type 
+    is not peptide, as these options are needed for translation. The 
+    output will be in the format of
+
+        <sequence ID> : <aromaticity index>
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    @param molecule String: Defines the type of molecule. Three 
+    options are allowed: 'peptide' for amino acid sequences, 'DNA' for 
+    DNA sequences (requires transcription and translation), and 'RNA' 
+    for RNA sequence (requires translation).
+    @param genetic_code Integer: Genetic code number to be used for 
+    translation. Default = 1 (Standard Code). For more information, 
+    see <https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi>
+    @param to_stop Boolean: Flag to stop translation when first stop 
+    codon is encountered. Default = True.
+    '''
+    o = CodonUsageBias()
+    o.addSequencesFromFasta(fastafile)
+    for k in o.seqNN:
+        sequence = _toPeptide(str(o.seqNN[k][0]), molecule, 
+                              genetic_code, to_stop)
+        result = '%0.6f' % sequence.aromaticity()
+        data = [k, result]
+        data = ' : '.join([str(x) for x in data])
+        print(data)
+
+def instability(fastafile, molecule, genetic_code=1, to_stop=True):
+    '''!
+    Function to calculate the instability index by each FASTA record. 
+    This is calculated by BioPython library using method described in 
+    Guruprasad et al. 1990. Correlation between stability of a protein 
+    and its dipeptide composition: a novel approach for predicting in 
+    vivo stability of a protein from its primary sequence, Protein 
+    Engineering, Design and Selection 4(2):155–161.
+
+    Usage:
+
+        python seqprop.py instability --molecule=<molecule type> --genetic_code=<genetic code number> --to_stop=<Boolean flag> --fastafile=<FASTA file path>
+
+    Options for genetic_code and to_stop are needed if molecule type 
+    is not peptide, as these options are needed for translation. The 
+    output will be in the format of
+
+        <sequence ID> : <instability index>
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    @param molecule String: Defines the type of molecule. Three 
+    options are allowed: 'peptide' for amino acid sequences, 'DNA' for 
+    DNA sequences (requires transcription and translation), and 'RNA' 
+    for RNA sequence (requires translation).
+    @param genetic_code Integer: Genetic code number to be used for 
+    translation. Default = 1 (Standard Code). For more information, 
+    see <https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi>
+    @param to_stop Boolean: Flag to stop translation when first stop 
+    codon is encountered. Default = True.
+    '''
+    o = CodonUsageBias()
+    o.addSequencesFromFasta(fastafile)
+    for k in o.seqNN:
+        sequence = _toPeptide(str(o.seqNN[k][0]), molecule, 
+                              genetic_code, to_stop)
+        result = '%0.3f' % sequence.instability_index()
+        data = [k, result]
+        data = ' : '.join([str(x) for x in data])
+        print(data)
+
+def isoelectric(fastafile, molecule, genetic_code=1, to_stop=True):
+    '''!
+    Function to calculate the isoelectric point (pI) by each FASTA 
+    record. This is calculated by BioPython library.
+
+    Usage:
+
+        python seqprop.py isoelectric --molecule=<molecule type> --genetic_code=<genetic code number> --to_stop=<Boolean flag> --fastafile=<FASTA file path>
+
+    Options for genetic_code and to_stop are needed if molecule type 
+    is not peptide, as these options are needed for translation. The 
+    output will be in the format of
+
+        <sequence ID> : <isoelectric point>
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    @param molecule String: Defines the type of molecule. Three 
+    options are allowed: 'peptide' for amino acid sequences, 'DNA' for 
+    DNA sequences (requires transcription and translation), and 'RNA' 
+    for RNA sequence (requires translation).
+    @param genetic_code Integer: Genetic code number to be used for 
+    translation. Default = 1 (Standard Code). For more information, 
+    see <https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi>
+    @param to_stop Boolean: Flag to stop translation when first stop 
+    codon is encountered. Default = True.
+    '''
+    o = CodonUsageBias()
+    o.addSequencesFromFasta(fastafile)
+    for k in o.seqNN:
+        sequence = _toPeptide(str(o.seqNN[k][0]), molecule, 
+                              genetic_code, to_stop)
+        result = '%0.2f' % sequence.isoelectric_point()
+        data = [k, result]
+        data = ' : '.join([str(x) for x in data])
+        print(data)
+
+def secondaryStructure(fastafile, molecule, genetic_code=1, 
+                       to_stop=True):
+    '''!
+    Function to calculate the secondary structure fractions by each 
+    FASTA record. This is calculated by BioPython library.
+
+    Usage:
+
+        python seqprop.py secstruct --molecule=<molecule type> --genetic_code=<genetic code number> --to_stop=<Boolean flag> --fastafile=<FASTA file path>
+
+    Options for genetic_code and to_stop are needed if molecule type 
+    is not peptide, as these options are needed for translation. The 
+    output will be in the format of
+
+        <sequence ID> : <helix fraction> : <turn fraction> : <sheet fraction>
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    @param molecule String: Defines the type of molecule. Three 
+    options are allowed: 'peptide' for amino acid sequences, 'DNA' for 
+    DNA sequences (requires transcription and translation), and 'RNA' 
+    for RNA sequence (requires translation).
+    @param genetic_code Integer: Genetic code number to be used for 
+    translation. Default = 1 (Standard Code). For more information, 
+    see <https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi>
+    @param to_stop Boolean: Flag to stop translation when first stop 
+    codon is encountered. Default = True.
+    '''
+    o = CodonUsageBias()
+    o.addSequencesFromFasta(fastafile)
+    for k in o.seqNN:
+        sequence = _toPeptide(str(o.seqNN[k][0]), molecule, 
+                              genetic_code, to_stop)
+        result = sequence.secondary_structure_fraction()
+        helix = '%0.4f' % result[0]
+        turn = '%0.4f' % result[1]
+        sheet = '%0.4f' % result[2]
+        data = [k, helix, turn, sheet]
+        data = ' : '.join([str(x) for x in data])
+        print(data)
+
+def gravy(fastafile, molecule, genetic_code=1, to_stop=True):
+    '''!
+    Function to calculate the hydropathy, also known as GRAVY (Grand 
+    Average of Hydropathy), by each FASTA record. This is calculated 
+    by BioPython library using method described in Kyte J and 
+    Doolittle RF. 1982. A simple method for displaying the hydropathic 
+    character of a protein. J. Mol. Biol. 157, 105-132.
+
+    Usage:
+
+        python seqprop.py gravy --molecule=<molecule type> --genetic_code=<genetic code number> --to_stop=<Boolean flag> --fastafile=<FASTA file path>
+
+    Options for genetic_code and to_stop are needed if molecule type 
+    is not peptide, as these options are needed for translation. The 
+    output will be in the format of
+
+        <sequence ID> : <GRAVY value>
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    @param molecule String: Defines the type of molecule. Three 
+    options are allowed: 'peptide' for amino acid sequences, 'DNA' for 
+    DNA sequences (requires transcription and translation), and 'RNA' 
+    for RNA sequence (requires translation).
+    @param genetic_code Integer: Genetic code number to be used for 
+    translation. Default = 1 (Standard Code). For more information, 
+    see <https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi>
+    @param to_stop Boolean: Flag to stop translation when first stop 
+    codon is encountered. Default = True.
+    '''
+    o = CodonUsageBias()
+    o.addSequencesFromFasta(fastafile)
+    for k in o.seqNN:
+        sequence = _toPeptide(str(o.seqNN[k][0]), molecule, 
+                              genetic_code, to_stop)
+        result = '%0.6f' % sequence.gravy()
+        data = [k, result]
+        data = ' : '.join([str(x) for x in data])
+        print(data)
+
 
 if __name__ == '__main__':
     exposed_functions = {'showIDs': sequenceIDs,
@@ -588,5 +856,11 @@ if __name__ == '__main__':
                          'a': percentA,
                          'gci': percentGCi,
                          'gi': percentGi,
-                         'ai': percentAi}
+                         'ai': percentAi,
+                         'mw': molecularWeight,
+                         'aromaticity': aromaticity,
+                         'instability': instability,
+                         'isoelectric': isoelectric,
+                         'secstruct': secondaryStructure,
+                         'gravy': gravy}
     fire.Fire(exposed_functions)
