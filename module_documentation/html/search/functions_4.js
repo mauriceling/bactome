@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['datafile',['datafile',['../d2/df0/namespaceoliver.html#a8c7973bde1b06a2c9050f80ad5005c1a',1,'oliver']]],
+  ['daub4',['daub4',['../dc/d97/namespacecopads_1_1nrpy.html#af1ec8c3749ef71b724f20892b8aae2f5',1,'copads::nrpy']]],
+  ['dawson',['dawson',['../dc/d97/namespacecopads_1_1nrpy.html#a654489bc04a00f8d0af1a8746f80b92e',1,'copads::nrpy']]],
+  ['dbrent',['dbrent',['../dc/d97/namespacecopads_1_1nrpy.html#af859425ca3f0befbf276cf8d47a90def',1,'copads::nrpy']]],
+  ['ddpoly',['ddpoly',['../dc/d97/namespacecopads_1_1nrpy.html#a51c2ef50a1220c2c9642aad8ad0e1a48',1,'copads::nrpy']]],
+  ['decchk',['decchk',['../dc/d97/namespacecopads_1_1nrpy.html#aa2ee054a4cd2a0eb05e72908d83a1746',1,'copads::nrpy']]],
+  ['decrement',['decrement',['../d2/dd3/namespacecopads_1_1lc__bf.html#a8965b4de6396ec665b9673093d556c53',1,'copads::lc_bf']]],
+  ['deletefixup',['deleteFixup',['../dd/d1a/classcopads_1_1tree_1_1_r_b_tree.html#aa472dd9151ec5a4a769c3a2d2ebe4ad4',1,'copads::tree::RBTree']]],
+  ['deletenode',['deleteNode',['../dd/d1a/classcopads_1_1tree_1_1_r_b_tree.html#a07d37cfb53334864c0baa99b95d1ddbf',1,'copads::tree::RBTree']]],
+  ['dennis',['Dennis',['../dc/d69/namespacecopads_1_1objectdistance.html#a2eb18d17926e71ef6605462e35752e2f',1,'copads::objectdistance']]],
+  ['des',['des',['../dc/d97/namespacecopads_1_1nrpy.html#a713f381fd59aa73c9fa2e13d9beefb7c',1,'copads::nrpy']]],
+  ['determinant',['determinant',['../db/d47/classcopads_1_1matrix_1_1_matrix.html#a866b26c3980d6dbbb19d185dbc58be16',1,'copads::matrix::Matrix']]],
+  ['df1dim',['df1dim',['../dc/d97/namespacecopads_1_1nrpy.html#a4c41c1763177a1081aeb95cbd2ce8ff7',1,'copads::nrpy']]],
+  ['dfpmin',['dfpmin',['../dc/d97/namespacecopads_1_1nrpy.html#a6c41ff4bbec95904f0e2af8f2053343e',1,'copads::nrpy']]],
+  ['dfridr',['dfridr',['../dc/d97/namespacecopads_1_1nrpy.html#a02192070f2e32f5feda3b2c8506225cb',1,'copads::nrpy']]],
+  ['dftint',['dftint',['../dc/d97/namespacecopads_1_1nrpy.html#ae684c305b57fd1f0e917e36f9ec5cf5f',1,'copads::nrpy']]],
+  ['dice',['Dice',['../dc/d69/namespacecopads_1_1objectdistance.html#a92cb91be5ccc5bf9077c7c008f818542',1,'copads::objectdistance']]],
+  ['dijkstra',['Dijkstra',['../d9/d49/classcopads_1_1graph_1_1_graph.html#a5724b795c5fa17751d9a49fa310a9b63',1,'copads::graph::Graph']]],
+  ['discard',['discard',['../d2/d81/classcopads_1_1set_1_1_set.html#a138c2d45530b0abf3f51e90c7ddb65d7',1,'copads::set::Set']]],
+  ['displayfeaturetypes',['displayFeatureTypes',['../d7/d34/namespacegenbank.html#a8ad66063ce75696f8444c393a93753a3',1,'genbank']]],
+  ['doubleexponentialdistribution',['DoubleExponentialDistribution',['../da/db7/namespacecopads_1_1statisticsdistribution.html#a7fc9f2df6313427315168bdf3dea8084',1,'copads::statisticsdistribution']]],
+  ['dubinwatsontest',['DubinWatsontest',['../dd/df2/namespacecopads_1_1hypothesis.html#ac30784d6ab428b83cbebe0d5f05fbc16',1,'copads::hypothesis']]]
+];

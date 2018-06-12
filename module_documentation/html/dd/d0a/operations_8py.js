@@ -1,0 +1,27 @@
+var operations_8py =
+[
+    [ "Modulus2", "d5/dc6/classcopads_1_1operations_1_1_modulus2.html", "d5/dc6/classcopads_1_1operations_1_1_modulus2" ],
+    [ "Boolean", "d3/d9b/classcopads_1_1operations_1_1_boolean.html", "d3/d9b/classcopads_1_1operations_1_1_boolean" ],
+    [ "asdict", "dd/d0a/operations_8py.html#ade7fa6ca976f6f63ff4c8ecfbbf35d26", null ],
+    [ "combination", "dd/d0a/operations_8py.html#a7d92365c9dc6479f955489680c902163", null ],
+    [ "contents", "dd/d0a/operations_8py.html#aafa39ba23bd33eb8b51744ee92f062ff", null ],
+    [ "count", "dd/d0a/operations_8py.html#a900a89268bab7516fb8a405264d147b6", null ],
+    [ "factorial", "dd/d0a/operations_8py.html#af93dac88f869b315171c183f4f84db2f", null ],
+    [ "fcmp", "dd/d0a/operations_8py.html#a0721fafc80d5c0a2bdcf4a9b269f7c2f", null ],
+    [ "fibonacci", "dd/d0a/operations_8py.html#a07b3cee439e3513b75cca3b91b52a74f", null ],
+    [ "indexesof", "dd/d0a/operations_8py.html#a0952f023eae69be67bf20131b4df2fe0", null ],
+    [ "intd", "dd/d0a/operations_8py.html#a3bed97783c34c013d7d742301a1a9024", null ],
+    [ "itemindex", "dd/d0a/operations_8py.html#a1ba81d09414a141d13de3d44e1a0c8f3", null ],
+    [ "items", "dd/d0a/operations_8py.html#a3f6d35ace9b08bfd0ddb9e59367cb2a9", null ],
+    [ "permutation", "dd/d0a/operations_8py.html#af3d0e132e5d071c388c86942ddbf6063", null ],
+    [ "product", "dd/d0a/operations_8py.html#af3514807ceb9e77c74f92e59c196cbb1", null ],
+    [ "safe_exp", "dd/d0a/operations_8py.html#a0a285dac43649e7e6cc722a7f334066f", null ],
+    [ "safe_log", "dd/d0a/operations_8py.html#a476a507b06db2b52607a18e2ba34208d", null ],
+    [ "safe_log2", "dd/d0a/operations_8py.html#ab6f6b260b560089185abd900adcaf405", null ],
+    [ "sample", "dd/d0a/operations_8py.html#a18f7a66f348ece1adf0711866d8d13d7", null ],
+    [ "sample_wr", "dd/d0a/operations_8py.html#afbc65a45935f98ed57725aed7a8824e9", null ],
+    [ "summation", "dd/d0a/operations_8py.html#a87b4458e54615b6363e54700ed4cc97c", null ],
+    [ "take", "dd/d0a/operations_8py.html#aa45e5ff50ebadc74edadcb7daf6fc4bf", null ],
+    [ "take_byfn", "dd/d0a/operations_8py.html#a1a1b1f15bf0fa6f16da143da94185ed2", null ],
+    [ "LOG2", "dd/d0a/operations_8py.html#acb6b5321d8b0ede800b3abfec693fcaa", null ]
+];

@@ -21,6 +21,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 import random
+import secrets
 
 import fire
 
@@ -73,7 +74,7 @@ class RandomSequence(object):
         for k in ndict:
             self.sseq = self.sseq + [k] * int(ndict[k])
             random.shuffle(self.sseq)
-        for i in range(10):
+        for i in range(100):
             random.shuffle(self.sseq)
 
     def initiateStart(self, start_codons='TTG,CTG,ATG'):
@@ -150,7 +151,7 @@ class RandomSequence(object):
         length = int(length)
         sequence = ''
         while len(sequence) < length:
-            sequence = sequence + random.choice(self.sseq)
+            sequence = sequence + secrets.choice(self.sseq)
             if allow_start == 'False' or not allow_start:
                 sequence = self._cleanStart(sequence)
             if allow_stop == 'False' or not allow_stop:
@@ -260,9 +261,9 @@ def _generate_sequence(o, min_length, max_length,
                  int((max_length - min_length) * random.random())
         sequence = sequence[:length+1]
     if cap_start:
-        sequence = random.choice(o.start_codons) + sequence
+        sequence = secrets.choice(o.start_codons) + sequence
     if cap_stop:
-        sequence = sequence + random.choice(o.stop_codons)
+        sequence = sequence + secrets.choice(o.stop_codons)
     return sequence
 
 def gFixedLength(length, n, allow_start=False, allow_stop=False, 
