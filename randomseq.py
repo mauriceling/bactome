@@ -260,9 +260,9 @@ def _generate_sequence(o, min_length, max_length,
         length = min_length + \
                  int((max_length - min_length) * random.random())
         sequence = sequence[:length+1]
-    if cap_start:
+    if cap_start.lower() == 'true' or cap_start == True:
         sequence = secrets.choice(o.start_codons) + sequence
-    if cap_stop:
+    if cap_stop.lower() == 'true' or cap_stop == True:
         sequence = sequence + secrets.choice(o.stop_codons)
     return sequence
 
@@ -493,16 +493,13 @@ def gMixedSequences(n, selection='A,250;T,250;G,250;C,250',
     Each part is then concatenated with semi-colon. Hence, the 
     definition, v(10,15,False,False,False,False);o(start);
     c(gtccg);v(10,15,False,False,False,False);o(stop), will generate a 
-    sequence of (1) a random region of 10 nucleotides and 5' capped 
-    with a start codon (forming 13 nucleotides), followed by (2) 
+    sequence of (1) a random region of 10 nucleotides, followed by (2) 
     another randomly selected start codon, followed by (3) a constant 
     region of gtccg, followed by (4) a random 20-30 nucleotide 
-    sequence and capped with stop codon at the 3' end, followed by (5) 
-    another randomly selected stop codon. The resulting sequence will 
-    be 3 (first start codon) + 10 to 15 (first variable region) + 3 (
-    second start codon) + 5 (constant region) + 20 to 30 (second 
-    variable region) + 3 (first stop codon) + 3 (second stop codon) = 
-    47 to 62 nucleotides long.
+    sequence, followed by (5) another randomly selected stop codon. 
+    The resulting sequence will be 10 to 15 (first variable region) + 
+    3 (start codon) + 5 (constant region) + 20 to 30 (second variable 
+    region) + 3 (stop codon) = 41 to 56 nucleotides long.
 
     @param n Integer: Number of random sequence(s) to generate.
     @param selection String: Definition of the atomic sequence(s), 
