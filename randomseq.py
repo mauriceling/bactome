@@ -430,7 +430,6 @@ def _process_mixed_dictionary(statement):
             options = [x.strip() for x in options.split(',')]
             d[k]['options'] = options
             d[k]['sequence'] = None
-    print(d)
     return d
 
 def _generate_MDseq(o, md):
