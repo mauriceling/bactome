@@ -152,9 +152,9 @@ class RandomSequence(object):
         sequence = ''
         while len(sequence) < length:
             sequence = sequence + secrets.choice(self.sseq)
-            if allow_start == 'False' or not allow_start:
+            if allow_start == 'false' or not allow_start:
                 sequence = self._cleanStart(sequence)
-            if allow_stop == 'False' or not allow_stop:
+            if allow_stop == 'false' or not allow_stop:
                 sequence = self._cleanStop(sequence)
         return sequence[:length]
 
@@ -428,8 +428,15 @@ def _process_mixed_dictionary(statement):
             d[k]['type'] = 'variable' 
             options = d[k]['statement'][2:-1]
             options = [x.strip() for x in options.split(',')]
+            options = [x.lower() for x in options]
             d[k]['options'] = options
             d[k]['sequence'] = None
+        elif d[k]['statement'].startswith('o'):
+            options = d[k]['statement'][2:-1]
+            if options.lower() == 'start':
+                d[k]['type'] = 'startcodon'
+            elif options.lower() == 'stop':
+                d[k]['type'] = 'stopcodon'
     return d
 
 def _generate_MDseq(o, md):
@@ -449,6 +456,10 @@ def _generate_MDseq(o, md):
                                       allow_start, allow_stop, 
                                       cap_start, cap_stop)
             md[k]['sequence'] = s
+        elif md[k]['type'] == 'startcodon':
+            md[k]['sequence'] = secrets.choice(o.start_codons)
+        elif md[k]['type'] == 'stopcodon':
+            md[k]['sequence'] = secrets.choice(o.stop_codons)
     keys = list(md.keys())
     keys.sort()
     sequence = [md[k]['sequence'] for k in keys]
@@ -468,7 +479,7 @@ def gMixedSequences(n, selection='A,250;T,250;G,250;C,250',
 
     Usage:
 
-        python randomseq.py MS --n=10 --start_codons='TTG,CTG,ATG' --stop_codons='TAA,TAG,TGA' --cap_start=True --cap_stop=True --selection=A,250;T,250;G,250;C,250 --fasta=True --prefix='Test' --statement='v(10,15,False,False,False,False);c(gtccg);v(10,15,False,False,False,False)'
+        python randomseq.py MS --n=10 --start_codons='TTG,CTG,ATG' --stop_codons='TAA,TAG,TGA' --cap_start=True --cap_stop=True --selection=A,250;T,250;G,250;C,250 --fasta=True --prefix='Test' --statement='v(10,15,False,False,False,False);o(start);c(gtccg);v(20,30,False,False,False,False);o(stop)'
 
     The statement is a specification describing the random sequence to 
     generate. Each part of the sequence is specified in the format of 
@@ -477,15 +488,21 @@ def gMixedSequences(n, selection='A,250;T,250;G,250;C,250',
     of 25-35 nucleotides, not allowing either start or stop codons 
     with the sequence but required capping the 5'-end of the sequence 
     with start codon is defined as v(25,35,False,False,True,False). A 
-    constant region, 5'-GAATTC-3', is defined as c(GAATTC). Each part 
-    is then concatenated with semi-colon. Hence, the definition, 
-    v(10,10,False,False,True,False);c(GAATTC); v(20,30,False,False, 
-    False,True), will generate a sequence of (1) a random region of 10 
-    nucleotides and 5' capped with a start codon (forming 13 
-    nucleotides), followed by (2) a constant region of GAATTC, 
-    followed by (3) a random 20-30 nucleotide sequence and capped with 
-    stop codon at the 3' end. The resulting sequence will be 13 + 6 + 
-    23 to 33 = 42 to 52 nucleotides long.
+    constant region, 5'-GAATTC-3', is defined as c(GAATTC). Start 
+    codon is defined as o(start) and stop codon is defined as o(stop). 
+    Each part is then concatenated with semi-colon. Hence, the 
+    definition, v(10,15,False,False,False,False);o(start);
+    c(gtccg);v(10,15,False,False,False,False);o(stop), will generate a 
+    sequence of (1) a random region of 10 nucleotides and 5' capped 
+    with a start codon (forming 13 nucleotides), followed by (2) 
+    another randomly selected start codon, followed by (3) a constant 
+    region of gtccg, followed by (4) a random 20-30 nucleotide 
+    sequence and capped with stop codon at the 3' end, followed by (5) 
+    another randomly selected stop codon. The resulting sequence will 
+    be 3 (first start codon) + 10 to 15 (first variable region) + 3 (
+    second start codon) + 5 (constant region) + 20 to 30 (second 
+    variable region) + 3 (first stop codon) + 3 (second stop codon) = 
+    47 to 62 nucleotides long.
 
     @param n Integer: Number of random sequence(s) to generate.
     @param selection String: Definition of the atomic sequence(s), 
