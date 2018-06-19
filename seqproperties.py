@@ -113,7 +113,7 @@ def sequenceIDs(fastafile):
 
     Usage:
 
-        python seqprop.py showIDs --fastafile=<FASTA file path>
+        python seqproperties.py showIDs --fastafile=<FASTA file path>
 
     The output will be in the format of
 
@@ -139,7 +139,7 @@ def sequenceDescriptions(fastafile):
 
     Usage:
 
-        python seqprop.py showDesc --fastafile=<FASTA file path>
+        python seqproperties.py showDesc --fastafile=<FASTA file path>
 
     The output will be in the format of
 
@@ -166,7 +166,7 @@ def translate(fastafile, genetic_code=1):
 
     Usage:
 
-        python seqprop.py translate --fastafile=<FASTA file path> 
+        python seqproperties.py translate --fastafile=<FASTA file path> 
         --genetic_code=<genetic code number>
 
     The output will be in the format of
@@ -196,7 +196,7 @@ def aminoacidCount(fastafile, genetic_code=1):
 
     Usage:
 
-        python seqprop.py aacount --fastafile=<FASTA file path> 
+        python seqproperties.py aacount --fastafile=<FASTA file path> 
         --genetic_code=<genetic code number>
 
     The output will be in the format of
@@ -240,7 +240,7 @@ def peptideLength(fastafile, genetic_code=1):
 
     Usage:
 
-        python seqprop.py plength --fastafile=<FASTA file path> 
+        python seqproperties.py plength --fastafile=<FASTA file path> 
         --genetic_code=<genetic code number>
 
      The output will be in the format of
@@ -269,7 +269,7 @@ def nucleotideLength(fastafile):
 
     Usage:
 
-        python seqprop.py nlength --fastafile=<FASTA file path> 
+        python seqproperties.py nlength --fastafile=<FASTA file path> 
 
      The output will be in the format of
 
@@ -325,7 +325,7 @@ def codonCount(fastafile, genetic_code=1):
 
     Usage:
 
-        python seqprop.py codoncount --fastafile=<FASTA file path> 
+        python seqproperties.py codoncount --fastafile=<FASTA file path> 
         --genetic_code=<genetic code number>
 
     The output will be in the format of
@@ -406,7 +406,7 @@ def percentGC(fastafile):
 
     Usage:
 
-        python seqprop.py gc --fastafile=<FASTA file path>
+        python seqproperties.py gc --fastafile=<FASTA file path>
 
     The output will be in the format of
 
@@ -431,7 +431,7 @@ def percentG(fastafile):
 
     Usage:
 
-        python seqprop.py g --fastafile=<FASTA file path>
+        python seqproperties.py g --fastafile=<FASTA file path>
 
     The output will be in the format of
 
@@ -455,7 +455,7 @@ def percentA(fastafile):
 
     Usage:
 
-        python seqprop.py a --fastafile=<FASTA file path>
+        python seqproperties.py a --fastafile=<FASTA file path>
 
     The output will be in the format of
 
@@ -480,7 +480,7 @@ def percentGCi(fastafile, i, j=3):
 
     Usage:
 
-        python seqprop.py gci --i=1 --j=3 --fastafile=<FASTA file path>
+        python seqproperties.py gci --i=1 --j=3 --fastafile=<FASTA file path>
 
     The output will be in the format of
 
@@ -516,7 +516,7 @@ def percentGi(fastafile, i, j=3):
 
     Usage:
 
-        python seqprop.py gi --i=1 --j=3 --fastafile=<FASTA file path>
+        python seqproperties.py gi --i=1 --j=3 --fastafile=<FASTA file path>
 
     The output will be in the format of
 
@@ -551,7 +551,7 @@ def percentAi(fastafile, i, j=3):
 
     Usage:
 
-        python seqprop.py ai --i=1 --j=3 --fastafile=<FASTA file path>
+        python seqproperties.py ai --i=1 --j=3 --fastafile=<FASTA file path>
 
     The output will be in the format of
 
@@ -618,7 +618,7 @@ def molecularWeight(fastafile, molecule, genetic_code=1, to_stop=True):
 
     Usage:
 
-        python seqprop.py mw --molecule=<molecule type> --genetic_code=<genetic code number> --to_stop=<Boolean flag> --fastafile=<FASTA file path>
+        python seqproperties.py mw --molecule=<molecule type> --genetic_code=<genetic code number> --to_stop=<Boolean flag> --fastafile=<FASTA file path>
 
     Options for genetic_code and to_stop are needed if molecule type 
     is not peptide, as these options are needed for translation. The 
@@ -658,7 +658,7 @@ def aromaticity(fastafile, molecule, genetic_code=1, to_stop=True):
 
     Usage:
 
-        python seqprop.py aromaticity --molecule=<molecule type> --genetic_code=<genetic code number> --to_stop=<Boolean flag> --fastafile=<FASTA file path>
+        python seqproperties.py aromaticity --molecule=<molecule type> --genetic_code=<genetic code number> --to_stop=<Boolean flag> --fastafile=<FASTA file path>
 
     Options for genetic_code and to_stop are needed if molecule type 
     is not peptide, as these options are needed for translation. The 
@@ -698,7 +698,7 @@ def instability(fastafile, molecule, genetic_code=1, to_stop=True):
 
     Usage:
 
-        python seqprop.py instability --molecule=<molecule type> --genetic_code=<genetic code number> --to_stop=<Boolean flag> --fastafile=<FASTA file path>
+        python seqproperties.py instability --molecule=<molecule type> --genetic_code=<genetic code number> --to_stop=<Boolean flag> --fastafile=<FASTA file path>
 
     Options for genetic_code and to_stop are needed if molecule type 
     is not peptide, as these options are needed for translation. The 
@@ -734,7 +734,7 @@ def isoelectric(fastafile, molecule, genetic_code=1, to_stop=True):
 
     Usage:
 
-        python seqprop.py isoelectric --molecule=<molecule type> --genetic_code=<genetic code number> --to_stop=<Boolean flag> --fastafile=<FASTA file path>
+        python seqproperties.py isoelectric --molecule=<molecule type> --genetic_code=<genetic code number> --to_stop=<Boolean flag> --fastafile=<FASTA file path>
 
     Options for genetic_code and to_stop are needed if molecule type 
     is not peptide, as these options are needed for translation. The 
@@ -771,7 +771,7 @@ def secondaryStructure(fastafile, molecule, genetic_code=1,
 
     Usage:
 
-        python seqprop.py secstruct --molecule=<molecule type> --genetic_code=<genetic code number> --to_stop=<Boolean flag> --fastafile=<FASTA file path>
+        python seqproperties.py secstruct --molecule=<molecule type> --genetic_code=<genetic code number> --to_stop=<Boolean flag> --fastafile=<FASTA file path>
 
     Options for genetic_code and to_stop are needed if molecule type 
     is not peptide, as these options are needed for translation. The 
@@ -813,7 +813,7 @@ def gravy(fastafile, molecule, genetic_code=1, to_stop=True):
 
     Usage:
 
-        python seqprop.py gravy --molecule=<molecule type> --genetic_code=<genetic code number> --to_stop=<Boolean flag> --fastafile=<FASTA file path>
+        python seqproperties.py gravy --molecule=<molecule type> --genetic_code=<genetic code number> --to_stop=<Boolean flag> --fastafile=<FASTA file path>
 
     Options for genetic_code and to_stop are needed if molecule type 
     is not peptide, as these options are needed for translation. The 
