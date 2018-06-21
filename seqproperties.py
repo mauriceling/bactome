@@ -682,10 +682,17 @@ def aromaticity(fastafile, molecule, genetic_code=1, to_stop=True):
     for k in o.seqNN:
         sequence = _toPeptide(str(o.seqNN[k][0]), molecule, 
                               genetic_code, to_stop)
-        result = '%0.6f' % sequence.aromaticity()
-        data = [k, result]
-        data = ' : '.join([str(x) for x in data])
-        print(data)
+        try:
+            result = '%0.6f' % sequence.aromaticity()
+            data = [k, result]
+            data = ' : '.join([str(x) for x in data])
+            print(data)
+        except ZeroDivisionError:
+            data = [k, 'undefined']
+            data = ' : '.join([str(x) for x in data])
+            print(data)
+        except KeyError:
+            pass
 
 def instability(fastafile, molecule, genetic_code=1, to_stop=True):
     '''!
@@ -722,10 +729,17 @@ def instability(fastafile, molecule, genetic_code=1, to_stop=True):
     for k in o.seqNN:
         sequence = _toPeptide(str(o.seqNN[k][0]), molecule, 
                               genetic_code, to_stop)
-        result = '%0.3f' % sequence.instability_index()
-        data = [k, result]
-        data = ' : '.join([str(x) for x in data])
-        print(data)
+        try:
+            result = '%0.3f' % sequence.instability_index()
+            data = [k, result]
+            data = ' : '.join([str(x) for x in data])
+            print(data)
+        except ZeroDivisionError:
+            data = [k, 'undefined']
+            data = ' : '.join([str(x) for x in data])
+            print(data)
+        except KeyError:
+            pass
 
 def isoelectric(fastafile, molecule, genetic_code=1, to_stop=True):
     '''!
@@ -758,10 +772,17 @@ def isoelectric(fastafile, molecule, genetic_code=1, to_stop=True):
     for k in o.seqNN:
         sequence = _toPeptide(str(o.seqNN[k][0]), molecule, 
                               genetic_code, to_stop)
-        result = '%0.2f' % sequence.isoelectric_point()
-        data = [k, result]
-        data = ' : '.join([str(x) for x in data])
-        print(data)
+        try:
+            result = '%0.2f' % sequence.isoelectric_point()
+            data = [k, result]
+            data = ' : '.join([str(x) for x in data])
+            print(data)
+        except ZeroDivisionError:
+            data = [k, 'undefined']
+            data = ' : '.join([str(x) for x in data])
+            print(data)
+        except KeyError:
+            pass
 
 def secondaryStructure(fastafile, molecule, genetic_code=1, 
                        to_stop=True):
@@ -837,11 +858,17 @@ def gravy(fastafile, molecule, genetic_code=1, to_stop=True):
     for k in o.seqNN:
         sequence = _toPeptide(str(o.seqNN[k][0]), molecule, 
                               genetic_code, to_stop)
-        result = '%0.6f' % sequence.gravy()
-        data = [k, result]
-        data = ' : '.join([str(x) for x in data])
-        print(data)
-
+        try:
+            result = '%0.6f' % sequence.gravy()
+            data = [k, result]
+            data = ' : '.join([str(x) for x in data])
+            print(data)
+        except ZeroDivisionError:
+            data = [k, 'undefined']
+            data = ' : '.join([str(x) for x in data])
+            print(data)
+        except KeyError:
+            pass
 
 if __name__ == '__main__':
     exposed_functions = {'showIDs': sequenceIDs,
