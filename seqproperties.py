@@ -688,11 +688,17 @@ def aromaticity(fastafile, molecule, genetic_code=1, to_stop=True):
             data = ' : '.join([str(x) for x in data])
             print(data)
         except ZeroDivisionError:
-            data = [k, 'undefined']
-            data = ' : '.join([str(x) for x in data])
+            data = ' : '.join([str(k), 'undefined'])
             print(data)
         except KeyError:
-            pass
+            data = ' : '.join([str(k), 'KeyError'])
+            print(data)
+        except IndexError:
+            data = ' : '.join([str(k), 'IndexError'])
+            print(data)
+        except:
+            data = ' : '.join([str(k), 'Error'])
+            print(data)
 
 def instability(fastafile, molecule, genetic_code=1, to_stop=True):
     '''!
@@ -735,11 +741,17 @@ def instability(fastafile, molecule, genetic_code=1, to_stop=True):
             data = ' : '.join([str(x) for x in data])
             print(data)
         except ZeroDivisionError:
-            data = [k, 'undefined']
-            data = ' : '.join([str(x) for x in data])
+            data = ' : '.join([str(k), 'undefined'])
             print(data)
         except KeyError:
-            pass
+            data = ' : '.join([str(k), 'KeyError'])
+            print(data)
+        except IndexError:
+            data = ' : '.join([str(k), 'IndexError'])
+            print(data)
+        except:
+            data = ' : '.join([str(k), 'Error'])
+            print(data)
 
 def isoelectric(fastafile, molecule, genetic_code=1, to_stop=True):
     '''!
@@ -778,11 +790,17 @@ def isoelectric(fastafile, molecule, genetic_code=1, to_stop=True):
             data = ' : '.join([str(x) for x in data])
             print(data)
         except ZeroDivisionError:
-            data = [k, 'undefined']
-            data = ' : '.join([str(x) for x in data])
+            data = ' : '.join([str(k), 'undefined'])
             print(data)
         except KeyError:
-            pass
+            data = ' : '.join([str(k), 'KeyError'])
+            print(data)
+        except IndexError:
+            data = ' : '.join([str(k), 'IndexError'])
+            print(data)
+        except:
+            data = ' : '.join([str(k), 'Error'])
+            print(data)
 
 def secondaryStructure(fastafile, molecule, genetic_code=1, 
                        to_stop=True):
@@ -864,11 +882,17 @@ def gravy(fastafile, molecule, genetic_code=1, to_stop=True):
             data = ' : '.join([str(x) for x in data])
             print(data)
         except ZeroDivisionError:
-            data = [k, 'undefined']
-            data = ' : '.join([str(x) for x in data])
+            data = ' : '.join([str(k), 'undefined'])
             print(data)
         except KeyError:
-            pass
+            data = ' : '.join([str(k), 'KeyError'])
+            print(data)
+        except IndexError:
+            data = ' : '.join([str(k), 'IndexError'])
+            print(data)
+        except:
+            data = ' : '.join([str(k), 'Error'])
+            print(data)
 
 if __name__ == '__main__':
     exposed_functions = {'showIDs': sequenceIDs,
