@@ -403,7 +403,7 @@ def shuffle(sequence):
     
     Usage:
 
-        python randomseq.py shuffle --sequence=<sequence to shuffle>
+        python randomseq.py shuffle --sequence='GTCCGTAGTCACTAGCTGACTAGTCGATCGATCGATGCTACGATGCATCAGTGCTAGCTGATGCTACGATCGATCGATGCTAGCA'
 
     @param sequence String: Sequence to shuffle
     '''
