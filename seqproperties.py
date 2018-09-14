@@ -189,15 +189,14 @@ def translate(fastafile, genetic_code=1):
         aaseq = o.seqNN[k][0].translate(genetic_code)
         print('%s : %s' % (k, str(aaseq)))
 
-def aminoacidCount(fastafile, genetic_code=1):
+def aminoacidCount(fastafile, molecule, genetic_code=1, to_stop=True):
     '''!
     Function to translate each nucleotide sequence (by FASTA record) 
     and generate a frequency table of the amino acids.
 
     Usage:
 
-        python seqproperties.py aacount --fastafile=<FASTA file path> 
-        --genetic_code=<genetic code number>
+        python seqproperties.py aacount --molecule=<molecule type> --genetic_code=<genetic code number> --to_stop=<Boolean flag> --fastafile=<FASTA file path>
 
     The output will be in the format of
 
@@ -213,9 +212,15 @@ def aminoacidCount(fastafile, genetic_code=1):
         example, A count is the number of alanine in the peptide
 
     @param fastafile String: Path to the FASTA file to be processed.
+    @param molecule String: Defines the type of molecule. Three 
+    options are allowed: 'peptide' for amino acid sequences, 'DNA' for 
+    DNA sequences (requires transcription and translation), and 'RNA' 
+    for RNA sequence (requires translation).
     @param genetic_code Integer: Genetic code number to be used for 
     translation. Default = 1 (Standard Code). For more information, 
     see <https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi>
+    @param to_stop Boolean: Flag to stop translation when first stop 
+    codon is encountered. Default = True.
     '''
     o = CodonUsageBias()
     o.addSequencesFromFasta(fastafile)
@@ -224,16 +229,33 @@ def aminoacidCount(fastafile, genetic_code=1):
         'W', 'Y'])
     print(header)
     for k in o.seqNN:
-        aaseq = o.seqNN[k][0].translate(genetic_code)
-        aaseq = [aaseq[i:1+i] for i in range(len(aaseq))]
-        data = [k]
-        for aa in ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 
-                   'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']:
-            data.append(len([str(x) for x in aaseq if str(x) == aa]))
-        data = ' : '.join([str(x) for x in data])
-        print(data)
+        sequence = _toPeptide(str(o.seqNN[k][0]), molecule, 
+                              genetic_code, to_stop)
+        aacount = sequence.count_amino_acids()
+        try:
+            data = [k]
+            for aa in ['A', 'C', 'D', 'E', 'F', 
+                       'G', 'H', 'I', 'K', 'L', 
+                       'M', 'N', 'P', 'Q', 'R', 
+                       'S', 'T', 'V', 'W', 'Y']:
+                data.append(aacount[aa])
+            data = ' : '.join([str(x) for x in data])
+            print(data)
+        except ZeroDivisionError:
+            data = ' : '.join([str(k), 'undefined'])
+            print(data)
+        except KeyError:
+            data = ' : '.join([str(k), 'KeyError'])
+            print(data)
+        except IndexError:
+            data = ' : '.join([str(k), 'IndexError'])
+            print(data)
+        except IOError:
+            data = ' : '.join([str(k), 'Error'])
+            print(data)
+        
 
-def peptideLength(fastafile, genetic_code=1):
+def peptideLength(fastafile):
     '''!
     Function to count the number of amino acids (peptide length) by 
     peptide FASTA record.
