@@ -235,13 +235,12 @@ def aminoacidCount(fastafile, genetic_code=1):
 
 def peptideLength(fastafile, genetic_code=1):
     '''!
-    Function to translate each nucleotide sequence (by FASTA record) 
-    and count the number of amino acids (peptide length).
+    Function to count the number of amino acids (peptide length) by 
+    peptide FASTA record.
 
     Usage:
 
         python seqproperties.py plength --fastafile=<FASTA file path> 
-        --genetic_code=<genetic code number>
 
      The output will be in the format of
 
@@ -252,14 +251,11 @@ def peptideLength(fastafile, genetic_code=1):
         - peptide length is the number of amino acids in the peptide
 
     @param fastafile String: Path to the FASTA file to be processed.
-    @param genetic_code Integer: Genetic code number to be used for 
-    translation. Default = 1 (Standard Code). For more information, 
-    see <https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi>
     '''
     o = CodonUsageBias()
     o.addSequencesFromFasta(fastafile)
     for k in o.seqNN:
-        aaseq = o.seqNN[k][0].translate(genetic_code)
+        aaseq = o.seqNN[k][0]
         print('%s : %s' % (k, str(len(str(aaseq)))))
 
 def nucleotideLength(fastafile):
