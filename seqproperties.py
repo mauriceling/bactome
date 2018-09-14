@@ -925,6 +925,65 @@ def gravy(fastafile, molecule, genetic_code=1, to_stop=True):
             data = ' : '.join([str(k), 'Error'])
             print(data)
 
+def _dictionaryGenerator(sequence, n):
+    '''!
+    Private method - Generates a dictionary of n-gram (as keys) 
+    based on sequence.
+
+    @param sequence List: Character sequence for n-gram generation.
+    @param n Integer: Size of n-gram. If n=2, bigram will be generated.
+    @return: Dictionary of n-grams where the keys will be the n-gram 
+    and values will be zero.
+    '''
+    import itertools
+    seqD = {}
+    n = int(n)
+    for seq in itertools.product(sequence, repeat=n):
+        seq = ''.join(seq)
+        seqD[seq] = 0
+    return seqD
+
+def nGram(fastafile, molecule, n):
+    '''!
+    Function to process n-grams by each FASTA record.
+
+    Usage:
+
+        python seqproperties.py ngram --fastafile=<FASTA file path> --molecule=<molecule type> --n=2
+
+    The output will be in the format of:
+
+        <sequence ID> : <list of n-gram counts> : 
+        <list of n-gram identities>
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    @param molecule String: Defines the type of molecule. Three 
+    options are allowed: 'peptide' for amino acid sequences, 'DNA' for 
+    DNA sequences, and 'RNA' for RNA sequence.
+    @param n Integer: Size of n-gram. If n=2, bigram will be generated.
+    '''
+    o = CodonUsageBias()
+    o.addSequencesFromFasta(fastafile)
+    if molecule == 'DNA':
+        sequence = ['A', 'T', 'G', 'C']
+    elif molecule == 'RNA':
+        sequence = ['A', 'U', 'G', 'C']
+    elif molecule == 'peptide':
+        sequence = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 
+                    'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 
+                    'T', 'V', 'W', 'Y']
+    for k in o.seqNN:
+        seq = o.seqNN[k][0]
+        seqD = _dictionaryGenerator(sequence, n)
+        for i in range(len(seq)-n):
+            s = seq[i:i+n]
+            seqD[s] = seqD[s] + 1
+        table = list(seqD.keys())
+        table.sort()
+        result = ' : '.join([str(seqD[t]) for t in table])
+        table = ' : '.join(table)
+        print('%s : %s : %s' % (k, result, table))
+
 if __name__ == '__main__':
     exposed_functions = {'showIDs': sequenceIDs,
                          'showDesc': sequenceDescriptions,
@@ -944,5 +1003,6 @@ if __name__ == '__main__':
                          'instability': instability,
                          'isoelectric': isoelectric,
                          'secstruct': secondaryStructure,
-                         'gravy': gravy}
+                         'gravy': gravy,
+                         'ngram': nGram}
     fire.Fire(exposed_functions)
