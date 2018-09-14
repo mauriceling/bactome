@@ -640,12 +640,25 @@ def molecularWeight(fastafile, molecule, genetic_code=1, to_stop=True):
     o = CodonUsageBias()
     o.addSequencesFromFasta(fastafile)
     for k in o.seqNN:
-        sequence = _toPeptide(str(o.seqNN[k][0]), molecule, 
-                              genetic_code, to_stop)
-        result = '%0.2f' % sequence.molecular_weight()
-        data = [k, result]
-        data = ' : '.join([str(x) for x in data])
-        print(data)
+        try:
+            sequence = _toPeptide(str(o.seqNN[k][0]), molecule, 
+                                  genetic_code, to_stop)
+            result = '%0.2f' % sequence.molecular_weight()
+            data = [k, result]
+            data = ' : '.join([str(x) for x in data])
+            print(data)
+        except ZeroDivisionError:
+            data = ' : '.join([str(k), 'undefined'])
+            print(data)
+        except KeyError:
+            data = ' : '.join([str(k), 'KeyError'])
+            print(data)
+        except IndexError:
+            data = ' : '.join([str(k), 'IndexError'])
+            print(data)
+        except:
+            data = ' : '.join([str(k), 'Error'])
+            print(data)
 
 def aromaticity(fastafile, molecule, genetic_code=1, to_stop=True):
     '''!
