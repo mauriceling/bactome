@@ -925,7 +925,7 @@ def gravy(fastafile, molecule, genetic_code=1, to_stop=True):
             data = ' : '.join([str(k), 'Error'])
             print(data)
 
-def _dictionaryGenerator(sequence, n):
+def _dictionaryGenerator(sequence, n, suffix=''):
     '''!
     Private method - Generates a dictionary of n-gram (as keys) 
     based on sequence.
@@ -937,9 +937,9 @@ def _dictionaryGenerator(sequence, n):
     '''
     import itertools
     seqD = {}
-    n = int(n)
+    n = int(n) - len(suffix)
     for seq in itertools.product(sequence, repeat=n):
-        seq = ''.join(seq)
+        seq = suffix.join(seq)
         seqD[seq] = 0
     return seqD
 
