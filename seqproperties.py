@@ -984,6 +984,58 @@ def nGram(fastafile, molecule, n):
         table = ' : '.join(table)
         print('%s : %s : %s' % (k, result, table))
 
+def hasReverse(fastafile, molecule, min, max, suffix=''):
+    '''!
+    Function to process each FASTA record for the presence of 
+    a sub-sequence and its reverse. For example, this is to see 
+    if a DNA sequence has both GATCTA and ATCTAG in its sequence.
+
+    Usage:
+
+        python seqproperties.py reverse --fastafile=<FASTA file path> --molecule=<molecule type> --suffix=<substring to start sequence with> --min=3 --max=5
+
+    The output will be in the format of:
+
+        <sequence ID> : <length of reverse> : <sequence> : 
+        <reversed sequence>
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    @param molecule String: Defines the type of molecule. Three 
+    options are allowed: 'peptide' for amino acid sequences, 'DNA' for 
+    DNA sequences, and 'RNA' for RNA sequence.
+    @param min Integer: Minimum length of sub-sequence (including 
+    suffix).
+    @param max Integer: Maximum length of sub-sequence (including 
+    suffix).
+    @param suffix String: Defining the starting portion of the 
+    sub-sequence - this is to enable the search for longer sub-
+    sequence without running out of memory. Default = ''.
+    '''
+    def _generateReverseSequence(k, n, nonEmpty):
+        for item in nonEmpty:
+            rItem = ''.join(reversed(item))
+            if rItem in nonEmpty:
+                print('%s : %s : %s : %s' % (k, n, item, rItem))
+    o = CodonUsageBias()
+    o.addSequencesFromFasta(fastafile)
+    if molecule == 'DNA':
+        sequence = ['A', 'T', 'G', 'C', '*']
+    elif molecule == 'RNA':
+        sequence = ['A', 'U', 'G', 'C', '*']
+    elif molecule == 'peptide':
+        sequence = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 
+                    'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 
+                    'T', 'V', 'W', 'Y', '*']
+    for k in o.seqNN:
+        for n in range(min, max+1):
+            seq = o.seqNN[k][0]
+            seqD = _dictionaryGenerator(sequence, n, suffix)
+            for i in range(len(seq)-n):
+                s = seq[i:i+n]
+                seqD[s] = seqD[s] + 1
+            nonEmpty = [k1 for k1 in seqD if seqD[k1] > 0]
+            _generateReverseSequence(k, n, nonEmpty)
+
 if __name__ == '__main__':
     exposed_functions = {'showIDs': sequenceIDs,
                          'showDesc': sequenceDescriptions,
@@ -1004,5 +1056,6 @@ if __name__ == '__main__':
                          'isoelectric': isoelectric,
                          'secstruct': secondaryStructure,
                          'gravy': gravy,
-                         'ngram': nGram}
+                         'ngram': nGram,
+                         'reverse': hasReverse}
     fire.Fire(exposed_functions)
