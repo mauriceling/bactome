@@ -965,13 +965,13 @@ def nGram(fastafile, molecule, n):
     o = CodonUsageBias()
     o.addSequencesFromFasta(fastafile)
     if molecule == 'DNA':
-        sequence = ['A', 'T', 'G', 'C']
+        sequence = ['A', 'T', 'G', 'C', '*']
     elif molecule == 'RNA':
-        sequence = ['A', 'U', 'G', 'C']
+        sequence = ['A', 'U', 'G', 'C', '*']
     elif molecule == 'peptide':
         sequence = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 
                     'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 
-                    'T', 'V', 'W', 'Y']
+                    'T', 'V', 'W', 'Y', '*']
     for k in o.seqNN:
         seq = o.seqNN[k][0]
         seqD = _dictionaryGenerator(sequence, n)
