@@ -1036,6 +1036,71 @@ def hasReverse(fastafile, molecule, min, max, suffix=''):
             nonEmpty = [k1 for k1 in seqD if seqD[k1] > 0]
             _generateReverseSequence(k, n, nonEmpty)
 
+def _readDiPFreq(datafile, separator=','):
+    '''!
+    Private function to read and process dipeptide frequency data 
+    file to dictionary. The dipeptide frequency file should be in 
+    the format of:
+
+        <dipeptide>, <count>
+
+    @param datafile String: Path to the dipeptide frequency file 
+    (usually as comma-delimited file) to process.
+    @param separator String: Separator in dipeptide frequency file. 
+    Default=','.
+    @return: Dictionary of dipeptides as keys and frequencies as 
+    values.
+    '''
+    separator = str(separator)
+    dataTable = {}
+    data = open(datafile, 'r').readlines()
+    if header:
+        data = data[1:]
+    data = [x[:-1].split(separator) for x in data]
+    data = [[str(x[0].strip()), int(x[1].strip())] 
+            for x in data]
+    for freq in data:
+        dataTable[freq[0]] = freq[1]
+    return dataTable
+
+def asymmetricFrequency(datafile, separator=',', header=False):
+    '''!
+    Function to process dipeptide frequency data file to asymmetric 
+    frequency or C190 (Carugo O. 2013. Frequency of dipeptides and 
+    antidipeptides. Computational and Structural Biotechnology 
+    Journal 8, e201308001. doi:10.5936/csbj.201308001).
+
+    Usage:
+
+        python seqproperties.py asymfreq --datafile=<CSV file to process> --separator=<separator> --header=True
+
+    The dipeptide frequency file should be in the format of:
+
+        <dipeptide>, <count>
+
+    The output will be in the format of:
+
+        <dipeptide> : <antidipeptide> : <C190 score>
+
+    @param datafile String: Path to the dipeptide frequency file 
+    (usually as comma-delimited file) to process.
+    @param separator String: Separator in dipeptide frequency file. 
+    Default=','.
+    @param header Boolean: Flag to indicate header row in dipeptide 
+    frequency file. True, if the first row in the dipeptide 
+    frequency file is header row. Default=False.
+    '''
+    dataTable = _readDiPFreq(datafile, separator)
+    for seq in dataTable:
+        dipeptideF = dataTable[seq]
+        antiseq = seq[1] + seq[0]
+        antidipeptideF = dataTable[antiseq]
+        numerator = abs(dipeptideF - antidipeptideF)
+        denominator = (dipeptideF + antidipeptideF) / 2
+        result = numerator / denominator
+        print('%s : %s : %s' % (seq, antiseq, result))
+
+
 if __name__ == '__main__':
     exposed_functions = {'showIDs': sequenceIDs,
                          'showDesc': sequenceDescriptions,
@@ -1057,5 +1122,6 @@ if __name__ == '__main__':
                          'secstruct': secondaryStructure,
                          'gravy': gravy,
                          'ngram': nGram,
-                         'reverse': hasReverse}
+                         'reverse': hasReverse,
+                         'asymfreq': asymmetricFrequency}
     fire.Fire(exposed_functions)
