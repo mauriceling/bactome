@@ -1100,6 +1100,50 @@ def asymmetricFrequency(datafile, separator=',', header=False):
         result = numerator / denominator
         print('%s : %s : %s' % (seq, antiseq, result))
 
+def propensity(datafile, separator=',', header=False):
+    '''!
+    Function to process dipeptide frequency data file to propensity 
+    (Carugo O. 2013. Frequency of dipeptides and antidipeptides. 
+    Computational and Structural Biotechnology Journal 8, 
+    e201308001. doi:10.5936/csbj.201308001).
+
+    Usage:
+
+        python seqproperties.py propensity --datafile=<CSV file to process> --separator=<separator> --header=True
+
+    The dipeptide frequency file should be in the format of:
+
+        <dipeptide>, <count>
+
+    The output will be in the format of:
+
+        <dipeptide> : <propensity score>
+
+    @param datafile String: Path to the dipeptide frequency file 
+    (usually as comma-delimited file) to process.
+    @param separator String: Separator in dipeptide frequency file. 
+    Default=','.
+    @param header Boolean: Flag to indicate header row in dipeptide 
+    frequency file. True, if the first row in the dipeptide 
+    frequency file is header row. Default=False.
+    '''
+    dataTable = _readDiPFreq(datafile, separator)
+    nXX = 0
+    for seq in dataTable:
+        nXX = nXX + int(dataTable[seq])
+    for seq in dataTable:
+        nAB = dataTable[seq]
+        nAX = 0
+        for seq2 in dataTable:
+            if seq[0] = seq2[0]:
+                nAX = nAX + dataTable[seq2]
+        nXB = 0
+        for seq2 in dataTable:
+            if seq[1] = seq2[1]:
+                nXB = nXB + dataTable[seq2]
+        result = (nAB / nXB) / (nAX / nXX)
+        print('%s : %s' % (seq, result))
+
 
 if __name__ == '__main__':
     exposed_functions = {'showIDs': sequenceIDs,
@@ -1123,5 +1167,6 @@ if __name__ == '__main__':
                          'gravy': gravy,
                          'ngram': nGram,
                          'reverse': hasReverse,
-                         'asymfreq': asymmetricFrequency}
+                         'asymfreq': asymmetricFrequency,
+                         'propensity': propensity}
     fire.Fire(exposed_functions)
