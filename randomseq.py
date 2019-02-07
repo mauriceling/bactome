@@ -260,9 +260,9 @@ def _generate_sequence(o, min_length, max_length,
         length = min_length + \
                  int((max_length - min_length) * random.random())
         sequence = sequence[:length+1]
-    if cap_start.lower() == 'true' or cap_start == True:
+    if str(cap_start).lower() == 'true' or cap_start == True:
         sequence = secrets.choice(o.start_codons) + sequence
-    if cap_stop.lower() == 'true' or cap_stop == True:
+    if str(cap_stop).lower() == 'true' or cap_stop == True:
         sequence = sequence + secrets.choice(o.stop_codons)
     return sequence
 
