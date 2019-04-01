@@ -1205,7 +1205,7 @@ if __name__ == '__main__':
                          'mw': molecularWeight,
                          'ngram': nGram,
                          'nlength': nucleotideLength,
-                         'palign': pairwise_alignment
+                         'palign': pairwise_alignment,
                          'plength': peptideLength,
                          'propensity': propensity,
                          'reverse': hasReverse,
