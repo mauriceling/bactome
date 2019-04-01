@@ -1135,11 +1135,11 @@ def propensity(datafile, separator=',', header=False):
         nAB = dataTable[seq]
         nAX = 0
         for seq2 in dataTable:
-            if seq[0] = seq2[0]:
+            if seq[0] == seq2[0]:
                 nAX = nAX + dataTable[seq2]
         nXB = 0
         for seq2 in dataTable:
-            if seq[1] = seq2[1]:
+            if seq[1] == seq2[1]:
                 nXB = nXB + dataTable[seq2]
         result = (nAB / nXB) / (nAX / nXX)
         print('%s : %s' % (seq, result))
