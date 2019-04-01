@@ -1174,6 +1174,7 @@ def pairwise_alignment(fastafile, algorithm='local'):
     o.addSequencesFromFasta(fastafile)
     aligner = Align.PairwiseAligner()
     aligner.mode = str(algorithm)
+    print(aligner)
     count = 1
     reduced_set = [k for k in o.seqNN]
     for k in o.seqNN:
