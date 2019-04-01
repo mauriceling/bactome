@@ -22,6 +22,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 import random
 
+from Bio import Align
 from Bio import SeqIO
 from Bio.Alphabet import generic_dna
 from Bio.Alphabet import generic_rna
@@ -1144,6 +1145,47 @@ def propensity(datafile, separator=',', header=False):
         result = (nAB / nXB) / (nAX / nXX)
         print('%s : %s' % (seq, result))
 
+def pairwise_alignment(fastafile, algorithm='local'):
+    '''!
+    Function to take a FASTA file and calculate pairwise alignments 
+    between all the sequences in the file
+
+    Usage:
+
+        python seqproperties.py palign --fastafile=<FASTA file path> --algorithm=local
+
+    The output will be in the format of
+
+        <count> : <alignment score> : <sequence ID 1> : <sequence ID 2>
+
+    where 
+        - count is the numeric running order
+        - alignment score is the calculated pairwise alignment 
+        score
+        - sequence ID 1 and 2 are the sequence IDs of the 2 FASTA 
+        records used for pairwise alignment
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    @param algorithm String: Type of pairwise alignment algorithm to 
+    use. Allowable values are 'local' (Smith-Waterman algorithm) 
+    and 'global' (Needleman-Wunsch algorithm). Default = local.
+    '''
+    o = CodonUsageBias()
+    o.addSequencesFromFasta(fastafile)
+    aligner = Align.PairwiseAligner()
+    aligner.mode = str(algorithm)
+    count = 1
+    reduced_set = [k for k in o.seqNN]
+    for k in o.seqNN:
+        reduced_set = [k1 for k1 in reduced_set if k1 != k]
+        for k1 in reduced_set:
+            sequenceA = str(o.seqNN[k][0])
+            sequenceB = str(o.seqNN[k1][0])
+            score = aligner.score(sequenceA, sequenceB)
+            print('%s : %s : %s : %s' % (str(count), str(score), 
+                                         str(k), str(k1)))
+            count = count + 1
+
 
 if __name__ == '__main__':
     exposed_functions = {'showIDs': sequenceIDs,
@@ -1168,5 +1210,6 @@ if __name__ == '__main__':
                          'ngram': nGram,
                          'reverse': hasReverse,
                          'asymfreq': asymmetricFrequency,
-                         'propensity': propensity}
+                         'propensity': propensity,
+                         'palign': pairwise_alignment}
     fire.Fire(exposed_functions)
