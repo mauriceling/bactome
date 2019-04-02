@@ -22,14 +22,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 import random
 
-from Bio import Align
-from Bio import SeqIO
-from Bio.Alphabet import generic_dna
-from Bio.Alphabet import generic_rna
-from Bio.Seq import Seq
-from Bio.SeqUtils.ProtParam import ProteinAnalysis
+try: 
+    from Bio import Align
+    from Bio import SeqIO
+    from Bio.Alphabet import generic_dna
+    from Bio.Alphabet import generic_rna
+    from Bio.Seq import Seq
+    from Bio.SeqUtils.ProtParam import ProteinAnalysis
+except ImportError:
+    subprocess.check_call([sys.executable, '-m', 'pip', 
+                           'install', 'biopython'])
 
-import fire
+
+try: 
+    import fire
+except ImportError:
+    subprocess.check_call([sys.executable, '-m', 'pip', 
+                           'install', 'fire'])
 
 
 class CodonUsageBias(object):
