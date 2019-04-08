@@ -22,8 +22,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 import random
 import secrets
+import subprocess
+import sys
 
-import fire
+try: 
+    import fire
+except ImportError:
+    subprocess.check_call([sys.executable, '-m', 'pip', 
+                           'install', 'fire'])
+    import fire
 
 class RandomSequence(object):
     '''!

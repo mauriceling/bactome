@@ -21,6 +21,8 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 import random
+import subprocess
+import sys
 
 try: 
     from Bio import Align
@@ -32,6 +34,12 @@ try:
 except ImportError:
     subprocess.check_call([sys.executable, '-m', 'pip', 
                            'install', 'biopython'])
+    from Bio import Align
+    from Bio import SeqIO
+    from Bio.Alphabet import generic_dna
+    from Bio.Alphabet import generic_rna
+    from Bio.Seq import Seq
+    from Bio.SeqUtils.ProtParam import ProteinAnalysis
 
 
 try: 
@@ -39,6 +47,7 @@ try:
 except ImportError:
     subprocess.check_call([sys.executable, '-m', 'pip', 
                            'install', 'fire'])
+    import fire
 
 
 class CodonUsageBias(object):
