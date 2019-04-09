@@ -273,6 +273,43 @@ def aminoacidCount(fastafile, molecule, genetic_code=1, to_stop=True):
             data = ' : '.join([str(k), 'Error'])
             print(data)
         
+def genericCount(fastafile):
+    '''!
+    Function to count the frequency of each character in each 
+    nucleotide sequence (by FASTA record) and generate a frequency 
+    table.
+
+    Usage:
+
+        python seqproperties.py count --fastafile=<FASTA file path>
+
+    The output will be in the format of
+
+        <sequence ID> : <length of sequence> : [list of counts delimited by " : "]
+
+    where 
+        - sequence ID is the sequence ID of the FASTA record
+        - the counts are the number of the respective characters
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    '''
+    o = CodonUsageBias()
+    o.addSequencesFromFasta(fastafile)
+    char_set = set()
+    for k in o.seqNN:
+        sequence = [x for x in str(o.seqNN[k][0])]
+        char_set.update(sequence)
+    char_set = list(char_set)
+    char_set.sort()
+    header = ['SequenceID'] + char_set
+    header = ' : '.join(header)
+    print(header)
+    for k in o.seqNN:
+        sequence = str(o.seqNN[k][0])
+        data = [k, len(sequence)] + \
+               [sequence.count(c) for c in char_set]
+        data = ' : '.join([str(x) for x in data])
+        print(data)
 
 def peptideLength(fastafile):
     '''!
@@ -1279,6 +1316,7 @@ if __name__ == '__main__':
                          'aromaticity': aromaticity,
                          'asymfreq': asymmetricFrequency,
                          'codoncount': codonCount,
+                         'count': genericCount,
                          'g': percentG,
                          'gc': percentGC,
                          'gci': percentGCi,
