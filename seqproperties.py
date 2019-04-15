@@ -1251,7 +1251,7 @@ def pairwise_alignment2(queryfile, dbfile,
 
     Usage:
 
-        python seqproperties.py palign --queryfile=<FASTA file path> -dbfile=<FASTA file path> --algorithm=local --output=summarize
+        python seqproperties.py palign2 --queryfile=<FASTA file path> -dbfile=<FASTA file path> --algorithm=local --output=summarize
 
     The output will be in the format of
 
@@ -1285,6 +1285,13 @@ def pairwise_alignment2(queryfile, dbfile,
     aligner.mode = str(algorithm)
     print(aligner)
     count = 1
+    if outfmt == 'full':
+        print(' : '.join(['Count', 'Score', 'QuerySeqID', 
+                          'DatabaseSeqID']))
+    elif outfmt == 'summarize':
+        print(' : '.join(['Count', 'Minimum Score', 'Average Score', 
+                          'SD Score', 'Maximum Score', 'QuerySeqID', 
+                          'DatabaseSeqID']))
     for qk in q.seqNN:
         querySeq = str(q.seqNN[qk][0])
         if outfmt == 'full':
@@ -1301,9 +1308,9 @@ def pairwise_alignment2(queryfile, dbfile,
             max_score = max(scores)
             avg_score = sum(scores) / len(scores)
             sd_score = [(s-avg_score) ** 2 for s in scores]
-            sd_score = sum(numerator) / len(scores)
+            sd_score = sum(sd_scorenumerator) / len(scores)
             sd_score = sd_score ** 0.5
-            print('%s : %s : %s : %s : %s' % \
+            print('%s : %s : %s : %s : %s : %s' % \
                   (str(count), str(min_score), str(avg_score),
                     str(sd_score), str(max_score), str(qk)))
             count = count + 1
