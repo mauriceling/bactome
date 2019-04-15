@@ -301,7 +301,7 @@ def genericCount(fastafile):
         char_set.update(sequence)
     char_set = list(char_set)
     char_set.sort()
-    header = ['SequenceID'] + char_set
+    header = ['SequenceID', 'Length'] + [c.upper() for c in char_set]
     header = ' : '.join(header)
     print(header)
     for k in o.seqNN:
