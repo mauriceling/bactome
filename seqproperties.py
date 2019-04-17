@@ -1308,7 +1308,7 @@ def pairwise_alignment2(queryfile, dbfile,
             max_score = max(scores)
             avg_score = sum(scores) / len(scores)
             sd_score = [(s-avg_score) ** 2 for s in scores]
-            sd_score = sum(sd_scorenumerator) / len(scores)
+            sd_score = sum(sd_score) / len(scores)
             sd_score = sd_score ** 0.5
             print('%s : %s : %s : %s : %s : %s' % \
                   (str(count), str(min_score), str(avg_score),
