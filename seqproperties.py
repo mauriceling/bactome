@@ -273,6 +273,43 @@ def aminoacidCount(fastafile, molecule, genetic_code=1, to_stop=True):
             data = ' : '.join([str(k), 'Error'])
             print(data)
         
+def genericCount(fastafile):
+    '''!
+    Function to count the frequency of each character in each 
+    nucleotide sequence (by FASTA record) and generate a frequency 
+    table.
+
+    Usage:
+
+        python seqproperties.py count --fastafile=<FASTA file path>
+
+    The output will be in the format of
+
+        <sequence ID> : <length of sequence> : [list of counts delimited by " : "]
+
+    where 
+        - sequence ID is the sequence ID of the FASTA record
+        - the counts are the number of the respective characters
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    '''
+    o = CodonUsageBias()
+    o.addSequencesFromFasta(fastafile)
+    char_set = set()
+    for k in o.seqNN:
+        sequence = [x for x in str(o.seqNN[k][0])]
+        char_set.update(sequence)
+    char_set = list(char_set)
+    char_set.sort()
+    header = ['SequenceID', 'Length'] + [c.upper() for c in char_set]
+    header = ' : '.join(header)
+    print(header)
+    for k in o.seqNN:
+        sequence = str(o.seqNN[k][0])
+        data = [k, len(sequence)] + \
+               [sequence.count(c) for c in char_set]
+        data = ' : '.join([str(x) for x in data])
+        print(data)
 
 def peptideLength(fastafile):
     '''!
@@ -1166,7 +1203,7 @@ def propensity(datafile, separator=',', header=False):
 def pairwise_alignment(fastafile, algorithm='local'):
     '''!
     Function to take a FASTA file and calculate pairwise alignments 
-    between all the sequences in the file
+    between all the sequences in the file.
 
     Usage:
 
@@ -1205,6 +1242,79 @@ def pairwise_alignment(fastafile, algorithm='local'):
                                          str(k), str(k1)))
             count = count + 1
 
+def pairwise_alignment2(queryfile, dbfile, 
+                        outfmt='summarize', algorithm='local'):
+    '''!
+    Function to take 2 FASTA files (a query FASTA file and a database 
+    FASTA file) and calculate pairwise alignments in FASTA file to 
+    database FASTA file.
+
+    Usage:
+
+        python seqproperties.py palign2 --queryfile=<FASTA file path> -dbfile=<FASTA file path> --algorithm=local --output=summarize
+
+    The output will be in the format of
+
+        <count> : <alignment score> : <sequence ID from query> : <sequence ID from database>
+
+    for full output format or the following for summarized output
+
+        <count> : <minimum alignment score> : <average alignment score> : <standard deviation of alignment score> : <maximum alignment score> : <sequence ID from query>
+
+    where 
+        - count is the numeric running order
+        - minimum, average, standard deviation, and maximum alignment 
+        scores are calculated from pairwise alignment scores
+        - sequence ID(s) is/are the sequence ID(s) of the FASTA 
+        record(s) used for pairwise alignment
+
+    @param queryfile String: Path to the FASTA file to be used as query.
+    @param dbfile String: Path to the FASTA file to be used as database.
+    @param outfmt String: Output format. Allowable values are 'full' 
+    (one result line per comparison) and 'summarize' (one result line 
+    per query FASTA record). Default = summarize.
+    @param algorithm String: Type of pairwise alignment algorithm to 
+    use. Allowable values are 'local' (Smith-Waterman algorithm) 
+    and 'global' (Needleman-Wunsch algorithm). Default = local.
+    '''
+    q = CodonUsageBias()
+    q.addSequencesFromFasta(queryfile)
+    db = CodonUsageBias()
+    db.addSequencesFromFasta(dbfile)
+    aligner = Align.PairwiseAligner()
+    aligner.mode = str(algorithm)
+    print(aligner)
+    count = 1
+    if outfmt == 'full':
+        print(' : '.join(['Count', 'Score', 'QuerySeqID', 
+                          'DatabaseSeqID']))
+    elif outfmt == 'summarize':
+        print(' : '.join(['Count', 'Minimum Score', 'Average Score', 
+                          'SD Score', 'Maximum Score', 'QuerySeqID', 
+                          'DatabaseSeqID']))
+    for qk in q.seqNN:
+        querySeq = str(q.seqNN[qk][0])
+        if outfmt == 'full':
+            for dbk in db.seqNN:
+                dbSeq = str(db.seqNN[dbk][0])
+                score = aligner.score(querySeq, dbSeq)
+                print('%s : %s : %s : %s' % (str(count), str(score), 
+                                             str(qk), str(dbk)))
+                count = count + 1
+        elif outfmt == 'summarize':
+            scores = [aligner.score(querySeq, str(db.seqNN[dbk][0])) 
+                      for dbk in db.seqNN]
+            min_score = min(scores)
+            max_score = max(scores)
+            avg_score = sum(scores) / len(scores)
+            sd_score = [(s-avg_score) ** 2 for s in scores]
+            sd_score = sum(sd_scorenumerator) / len(scores)
+            sd_score = sd_score ** 0.5
+            print('%s : %s : %s : %s : %s : %s' % \
+                  (str(count), str(min_score), str(avg_score),
+                    str(sd_score), str(max_score), str(qk)))
+            count = count + 1
+
 
 if __name__ == '__main__':
     exposed_functions = {'a': percentA,
@@ -1213,6 +1323,7 @@ if __name__ == '__main__':
                          'aromaticity': aromaticity,
                          'asymfreq': asymmetricFrequency,
                          'codoncount': codonCount,
+                         'count': genericCount,
                          'g': percentG,
                          'gc': percentGC,
                          'gci': percentGCi,
@@ -1224,6 +1335,7 @@ if __name__ == '__main__':
                          'ngram': nGram,
                          'nlength': nucleotideLength,
                          'palign': pairwise_alignment,
+                         'palign2': pairwise_alignment2,
                          'plength': peptideLength,
                          'propensity': propensity,
                          'reverse': hasReverse,
