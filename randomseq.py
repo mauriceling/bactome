@@ -1,4 +1,4 @@
-'''!
+"""!
 Random Amino Acid and Nucleotide Sequence Generator
 
 Date created: 8th May 2018
@@ -19,7 +19,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 import random
 import secrets
 import subprocess
@@ -28,12 +28,12 @@ import sys
 try: 
     import fire
 except ImportError:
-    subprocess.check_call([sys.executable, '-m', 'pip', 
-                           'install', 'fire'])
+    subprocess.check_call([sys.executable, "-m", "pip", 
+                           "install", "fire"])
     import fire
 
 class RandomSequence(object):
-    '''!
+    """!
     Class to generate random sequences based on input parameters. 
     Although the initial intention is to generate DNA/RNA sequences, 
     it can be used to generate other random sequences; such as, 
@@ -42,50 +42,50 @@ class RandomSequence(object):
     Basic example:
 
         >>> s = RandomSequence()
-        >>> selection = {'A':25, 'U':25, 'G':25, 'C':25}
+        >>> selection = {"A":25, "U":25, "G":25, "C":25}
         >>> s.initiateNucleotide(selection)
         >>> s.generateSequence(50, True, True)
-        'AGAUCCCCCGGACAGGUUAUGGAUAAGUGUCCACCUCUAACUAUUUCUGC'
+        "AGAUCCCCCGGACAGGUUAUGGAUAAGUGUCCACCUCUAACUAUUUCUGC"
 
     Example without start and stop:
 
         >>> s = RandomSequence()
-        >>> selection = {'A':25, 'T':25, 'G':25, 'C':25}
+        >>> selection = {"A":25, "T":25, "G":25, "C":25}
         >>> s.initiateNucleotide(selection)
-        >>> s.initiateStart('TTG,CTG,ATG')
-        >>> s.initiateStop('TAA,TAG,TGA')
+        >>> s.initiateStart("TTG,CTG,ATG")
+        >>> s.initiateStop("TAA,TAG,TGA")
         >>> s.generateSequence(50, False, False)
-        'AATCCGGACAAATCAAGCACAGGCAGTTTATTCAAGGGGTACCCCAGAAC'
-    '''
+        "AATCCGGACAAATCAAGCACAGGCAGTTTATTCAAGGGGTACCCCAGAAC"
+    """
 
     def __init__(self):
-        '''!
+        """!
         Constructor method.
-        '''
+        """
         self.start_codons = []
         self.stop_codons = []
         self.sseq = []
 
     def initiateNucleotide(self, ndict):
-        '''!
+        """!
         Initialize the object with a bag of items (atomic sequence), 
         defined as a dictionary, for random sequence generation. The 
         atomic sequences will be randomized.
 
         @param ndict Dictionary: Represents a bag of items where the 
         key is the atomic sequence and the value is the relative 
-        occurrence. For example, {'A':20, 'T':20, 'G':30, 'C':30} 
+        occurrence. For example, {"A":20, "T":20, "G":30, "C":30} 
         will initialize for the generation of a random sequence with 
         60% GC.
-        '''
+        """
         for k in ndict:
             self.sseq = self.sseq + [k] * int(ndict[k])
             random.shuffle(self.sseq)
         for i in range(100):
             random.shuffle(self.sseq)
 
-    def initiateStart(self, start_codons='TTG,CTG,ATG'):
-        '''!
+    def initiateStart(self, start_codons="TTG,CTG,ATG"):
+        """!
         Initialize a list of start codons. This is used for two 
         purposes. Firstly, it can be used to check the randomly 
         generated sequence to ensure that there is no start codons 
@@ -93,14 +93,19 @@ class RandomSequence(object):
         start of a newly generated sequence.
 
         @param start_codons String: A comma-delimited list to 
-        represent start codons. Default = 'TTG,CTG,ATG'.
-        '''
-        start_codons = start_codons.strip()
-        start_codons = [x.strip() for x in start_codons.split(',')]
+        represent start codons. Default = "TTG,CTG,ATG".
+        """
+        if type(start_codons) is str:
+            start_codons = start_codons.strip()
+            start_codons = [x.strip() 
+                            for x in start_codons.split(",")]
+        elif type(start_codons) is tuple or \
+            type(start_codons) is list:
+            start_codons = [x.strip() for x in start_codons]
         self.start_codons = start_codons
 
-    def initiateStop(self, stop_codons='TAA,TAG,TGA'):
-        '''!
+    def initiateStop(self, stop_codons="TAA,TAG,TGA"):
+        """!
         Initialize a list of stop codons. This is used for two 
         purposes. Firstly, it can be used to check the randomly 
         generated sequence to ensure that there is no stop codons 
@@ -108,41 +113,44 @@ class RandomSequence(object):
         end of a newly generated sequence.
 
         @param stop_codons String: A comma-delimited list to 
-        represent start codons. Default = 'TAA,TAG,TGA'.
-        '''
-        stop_codons = stop_codons.strip()
-        stop_codons = [x.strip() for x in stop_codons.split(',')]
+        represent start codons. Default = "TAA,TAG,TGA".
+        """
+        if type(stop_codons) is str:
+            stop_codons = stop_codons.strip()
+            stop_codons = [x.strip() for x in stop_codons.split(",")]
+        elif type(stop_codons) is tuple or type(stop_codons) is list:
+            stop_codons = [x.strip() for x in stop_codons]
         self.stop_codons = stop_codons
 
     def _cleanStop(self, seq):
-        '''!
+        """!
         Private method - to remove all occurrences of stop codons 
         in a sequence.
 
         @param seq String: Sequence to clean of all stop codons.
 
         @return Cleaned sequence.
-        '''
+        """
         for stop in self.stop_codons:
-            seq = seq.replace(stop, '')
+            seq = seq.replace(stop, "")
         return seq
 
     def _cleanStart(self, seq):
-        '''!
+        """!
         Private method - to remove all occurrences of start codons 
         in a sequence.
 
         @param seq String: Sequence to clean of all start codons.
 
         @return Cleaned sequence.
-        '''
+        """
         for start in self.start_codons:
-            seq = seq.replace(start, '')
+            seq = seq.replace(start, "")
         return seq
 
     def generateSequence(self, length, allow_start=False,
                          allow_stop=False):
-        '''!
+        """!
         Generate a random sequence.
 
         @param length Integer: Length of random sequence to generate. 
@@ -154,19 +162,19 @@ class RandomSequence(object):
         = False.
 
         @return Randomly generated sequence of specified length.
-        '''
+        """
         length = int(length)
-        sequence = ''
+        sequence = ""
         while len(sequence) < length:
             sequence = sequence + secrets.choice(self.sseq)
-            if allow_start == 'false' or not allow_start:
+            if allow_start == "false" or not allow_start:
                 sequence = self._cleanStart(sequence)
-            if allow_stop == 'false' or not allow_stop:
+            if allow_stop == "false" or not allow_stop:
                 sequence = self._cleanStop(sequence)
         return sequence[:length]
 
 def selectionGenerator(selection):
-    '''!
+    """!
     Function to convert a string-based atomic sequence(s) definition 
     into a dictionary, suitable as parameter for 
     RandomSequence.initiateNucleotide() function.
@@ -174,10 +182,10 @@ def selectionGenerator(selection):
     @param selection String: Definition of the atomic sequence(s), 
     defined as a semi-colon delimited definition of comma-delimited 
     definition, used for random sequence generation.
-    '''
+    """
     selection = str(selection)
-    selection = [pair.strip() for pair in selection.split(';')]
-    selection = [[pair.split(',')[0], pair.split(',')[1]] 
+    selection = [pair.strip() for pair in selection.split(";")]
+    selection = [[pair.split(",")[0], pair.split(",")[1]] 
                  for pair in selection]
     selection = [[pair[0].strip(), pair[1].strip()] 
                  for pair in selection]
@@ -188,7 +196,7 @@ def selectionGenerator(selection):
 
 def _initial_RandomSequence(start_codons, stop_codons,
                             selection, source_seq):
-    '''!
+    """!
     Private method - Instantiate a RandomSequence object based on 
     parameters. Main requirement is either selection or source_seq. 
     If both selection and source_seq are given (not empty) strings, 
@@ -204,7 +212,7 @@ def _initial_RandomSequence(start_codons, stop_codons,
     used to check the randomly generated sequence to ensure that there 
     is no stop codons within the sequence. Secondly, it can be used 
     to cap the stop of a newly generated sequence.Default = 
-    'TAA,TAG,TGA'.
+    "TAA,TAG,TGA".
     @param selection String: Definition of the atomic sequence(s), 
     defined as a semi-colon delimited definition of comma-delimited 
     definition, used for random sequence generation.
@@ -215,11 +223,11 @@ def _initial_RandomSequence(start_codons, stop_codons,
     character is determined by the occurrence in the sequence.
 
     @return RandomSequence object.
-    '''
+    """
     o = RandomSequence()
     o.initiateStart(start_codons)
     o.initiateStop(stop_codons)
-    if source_seq == '':
+    if source_seq == "":
         ndict = selectionGenerator(selection)
     else:
         source_seq = [x for x in source_seq]
@@ -232,7 +240,7 @@ def _initial_RandomSequence(start_codons, stop_codons,
 def _generate_sequence(o, min_length, max_length, 
                        allow_start, allow_stop,
                        cap_start, cap_stop):
-    '''!
+    """!
     Private method - Generates a fixed or variable length random 
     sequence based on given RandomSequence object. For fixed length 
     random sequence generation, min_length == max_length. If 
@@ -255,7 +263,7 @@ def _generate_sequence(o, min_length, max_length,
     end of the randomly generated sequence with a stop codon. 
 
     @return Generated random sequence.
-    '''
+    """
     min_length = int(min_length)
     max_length = int(max_length)
     if min_length == max_length:
@@ -267,24 +275,24 @@ def _generate_sequence(o, min_length, max_length,
         length = min_length + \
                  int((max_length - min_length) * random.random())
         sequence = sequence[:length+1]
-    if str(cap_start).lower() == 'true' or cap_start == True:
+    if str(cap_start).lower() == "true" or cap_start == True:
         sequence = secrets.choice(o.start_codons) + sequence
-    if str(cap_stop).lower() == 'true' or cap_stop == True:
+    if str(cap_stop).lower() == "true" or cap_stop == True:
         sequence = sequence + secrets.choice(o.stop_codons)
     return sequence
 
 def gFixedLength(length, n, allow_start=False, allow_stop=False, 
-                 start_codons='TTG,CTG,ATG', cap_start=False,
-                 stop_codons='TAA,TAG,TGA', cap_stop=False,
-                 selection='A,250;T,250;G,250;C,250', 
-                 source_seq='', fasta=True, prefix='Test'):
-    '''!
+                 start_codons="TTG,CTG,ATG", cap_start=False,
+                 stop_codons="TAA,TAG,TGA", cap_stop=False,
+                 selection="A,250;T,250;G,250;C,250", 
+                 source_seq="", fasta=True, prefix="Test"):
+    """!
     Function to generate one or more fixed length random sequences as 
     per specification.
     
     Usage:
 
-        python randomseq.py FLS --length=100 --n=10 --allow_start=False --allow_stop=False --start_codons='TTG,CTG,ATG' --stop_codons='TAA,TAG,TGA' --cap_start=True --cap_stop=True --selection=A,250;T,250;G,250;C,250 --fasta=True --prefix='Test'
+        python randomseq.py FLS --length=100 --n=10 --allow_start=False --allow_stop=False --start_codons="TTG,CTG,ATG" --stop_codons="TAA,TAG,TGA" --cap_start=True --cap_stop=True --selection="A,250;T,250;G,250;C,250" --fasta=True --prefix="Test"
 
     @param length Integer: Length of random sequence to generate. 
     @param n Integer: Number of random sequence(s) to generate.
@@ -297,7 +305,7 @@ def gFixedLength(length, n, allow_start=False, allow_stop=False,
     used to check the randomly generated sequence to ensure that there 
     is no start codons within the sequence. Secondly, it can be used 
     to cap the start of a newly generated sequence.Default = 
-    'TTG,CTG,ATG'.
+    "TTG,CTG,ATG".
     @param cap_start Boolean: Flag to determine whether to cap the 
     start of the randomly generated sequence with a start codon. 
     Default = False.
@@ -306,15 +314,15 @@ def gFixedLength(length, n, allow_start=False, allow_stop=False,
     used to check the randomly generated sequence to ensure that there 
     is no stop codons within the sequence. Secondly, it can be used 
     to cap the stop of a newly generated sequence.Default = 
-    'TAA,TAG,TGA'.
+    "TAA,TAG,TGA".
     @param cap_stop Boolean: Flag to determine whether to cap the 
     end of the randomly generated sequence with a stop codon. 
     Default = False.
     @param selection String: Definition of the atomic sequence(s), 
     defined as a semi-colon delimited definition of comma-delimited 
     definition, used for random sequence generation. Default = 
-    'A,250;T,250;G,250;C,250' which means that the list of atomic 
-    sequences is defined as 250 'A', 250 'T', 250 'G', and 250 'C'.
+    "A,250;T,250;G,250;C,250" which means that the list of atomic 
+    sequences is defined as 250 "A", 250 "T", 250 "G", and 250 "C".
     @param source_seq String: A sequence to be used to generate the 
     atomic sequence(s), used for random sequence generation. The 
     atomic sequence(s) is/are essentially an single-character 
@@ -324,31 +332,31 @@ def gFixedLength(length, n, allow_start=False, allow_stop=False,
     be formatted as a FASTA file. Default = True.
     @param prefix String: Prefix to the running number for the 
     sequence name, if the output is to be a FASTA format. Default = 
-    'Test'.
-    '''
+    "Test".
+    """
     o = _initial_RandomSequence(start_codons, stop_codons,
                                 selection, source_seq)
     for i in range(int(n)):
         sequence = _generate_sequence(o, length, length, allow_start, 
                                       allow_stop, cap_start, cap_stop)
         if fasta:
-            title = '_'.join([str(prefix), str(i+1)])
-            print('> %s' % title)
+            title = "_".join([str(prefix), str(i+1)])
+            print("> %s" % title)
         print(sequence)
 
 def gVariableLength(min_length, max_length, n, 
                     allow_start=False, allow_stop=False, 
-                    start_codons='TTG,CTG,ATG', cap_start=False,
-                    stop_codons='TAA,TAG,TGA', cap_stop=False,
-                    selection='A,250;T,250;G,250;C,250', 
-                    source_seq='', fasta=True, prefix='Test'):
-    '''!
+                    start_codons="TTG,CTG,ATG", cap_start=False,
+                    stop_codons="TAA,TAG,TGA", cap_stop=False,
+                    selection="A,250;T,250;G,250;C,250", 
+                    source_seq="", fasta=True, prefix="Test"):
+    """!
     Function to generate one or more variable length random sequences 
     as per specification.
     
     Usage:
 
-        python randomseq.py VLS --min_length=90 --max_length=110 --n=10 --allow_start=False --allow_stop=False --start_codons='TTG,CTG,ATG' --stop_codons='TAA,TAG,TGA' --cap_start=True --cap_stop=True --selection=A,250;T,250;G,250;C,250 --fasta=True --prefix='Test'
+        python randomseq.py VLS --min_length=90 --max_length=110 --n=10 --allow_start=False --allow_stop=False --start_codons="TTG,CTG,ATG" --stop_codons="TAA,TAG,TGA" --cap_start=True --cap_stop=True --selection="A,250;T,250;G,250;C,250" --fasta=True --prefix="Test"
 
     @param min_length Integer: Minimum length of randomly generated 
     sequence.
@@ -364,7 +372,7 @@ def gVariableLength(min_length, max_length, n,
     used to check the randomly generated sequence to ensure that there 
     is no start codons within the sequence. Secondly, it can be used 
     to cap the start of a newly generated sequence.Default = 
-    'TTG,CTG,ATG'.
+    "TTG,CTG,ATG".
     @param cap_start Boolean: Flag to determine whether to cap the 
     start of the randomly generated sequence with a start codon. 
     Default = False.
@@ -373,15 +381,15 @@ def gVariableLength(min_length, max_length, n,
     used to check the randomly generated sequence to ensure that there 
     is no stop codons within the sequence. Secondly, it can be used 
     to cap the stop of a newly generated sequence.Default = 
-    'TAA,TAG,TGA'.
+    "TAA,TAG,TGA".
     @param cap_stop Boolean: Flag to determine whether to cap the 
     end of the randomly generated sequence with a stop codon. 
     Default = False.
     @param selection String: Definition of the atomic sequence(s), 
     defined as a semi-colon delimited definition of comma-delimited 
     definition, used for random sequence generation. Default = 
-    'A,250;T,250;G,250;C,250' which means that the list of atomic 
-    sequences is defined as 250 'A', 250 'T', 250 'G', and 250 'C'.
+    "A,250;T,250;G,250;C,250" which means that the list of atomic 
+    sequences is defined as 250 "A", 250 "T", 250 "G", and 250 "C".
     @param source_seq String: A sequence to be used to generate the 
     atomic sequence(s), used for random sequence generation. The 
     atomic sequence(s) is/are essentially an single-character 
@@ -391,8 +399,8 @@ def gVariableLength(min_length, max_length, n,
     be formatted as a FASTA file. Default = True.
     @param prefix String: Prefix to the running number for the 
     sequence name, if the output is to be a FASTA format. Default = 
-    'Test'.
-    '''
+    "Test".
+    """
     o = _initial_RandomSequence(start_codons, stop_codons,
                                 selection, source_seq)
     for i in range(int(n)):
@@ -400,84 +408,84 @@ def gVariableLength(min_length, max_length, n,
                                       allow_start, allow_stop, 
                                       cap_start, cap_stop)
         if fasta:
-            title = '_'.join([str(prefix), str(i+1)])
-            print('> %s' % title)
+            title = "_".join([str(prefix), str(i+1)])
+            print("> %s" % title)
         print(sequence)
     
 def shuffle(sequence):
-    '''!
+    """!
     Function to shuffle a given sequence.
     
     Usage:
 
-        python randomseq.py shuffle --sequence='GTCCGTAGTCACTAGCTGACTAGTCGATCGATCGATGCTACGATGCATCAGTGCTAGCTGATGCTACGATCGATCGATGCTAGCA'
+        python randomseq.py shuffle --sequence="GTCCGTAGTCACTAGCTGACTAGTCGATCGATCGATGCTACGATGCATCAGTGCTAGCTGATGCTACGATCGATCGATGCTAGCA"
 
     @param sequence String: Sequence to shuffle
-    '''
+    """
     sequence = list(sequence)
     random.shuffle(sequence)
-    return ''.join(sequence)
+    return "".join(sequence)
 
 def _process_mixed_dictionary(statement):
-    '''
+    """
     Private method - Process the sequence specification statement 
     from gMixedSequences() function into a dictionary.
-    '''
-    statement = [s.strip() for s in statement.split(';')]
+    """
+    statement = [s.strip() for s in statement.split(";")]
     d = {}
     for i in range(len(statement)):
-        d[i] = {'statement': statement[i]}
+        d[i] = {"statement": statement[i]}
     for k in d:
-        if d[k]['statement'].startswith('c'):
-            d[k]['type'] = 'constant'
-            d[k]['sequence'] = d[k]['statement'][2:-1]
-        elif d[k]['statement'].startswith('v'):
-            d[k]['type'] = 'variable' 
-            options = d[k]['statement'][2:-1]
-            options = [x.strip() for x in options.split(',')]
+        if d[k]["statement"].startswith("c("):
+            d[k]["type"] = "constant"
+            d[k]["sequence"] = d[k]["statement"][2:-1]
+        elif d[k]["statement"].startswith("v("):
+            d[k]["type"] = "variable" 
+            options = d[k]["statement"][2:-1]
+            options = [x.strip() for x in options.split(",")]
             options = [x.lower() for x in options]
-            d[k]['options'] = options
-            d[k]['sequence'] = None
-        elif d[k]['statement'].startswith('o'):
-            options = d[k]['statement'][2:-1]
-            if options.lower() == 'start':
-                d[k]['type'] = 'startcodon'
-            elif options.lower() == 'stop':
-                d[k]['type'] = 'stopcodon'
+            d[k]["options"] = options
+            d[k]["sequence"] = None
+        elif d[k]["statement"].startswith("o("):
+            options = d[k]["statement"][2:-1]
+            if options.lower() == "start":
+                d[k]["type"] = "startcodon"
+            elif options.lower() == "stop":
+                d[k]["type"] = "stopcodon"
     return d
 
 def _generate_MDseq(o, md):
-    '''
+    """
     Private method - Used by gMixedSequences() function to generate 
     the required random sequences. 
-    '''
+    """
     for k in md:
-        if md[k]['type'] == 'variable':
-            min_length = md[k]['options'][0]
-            max_length = md[k]['options'][1]
-            allow_start = md[k]['options'][2]
-            allow_stop = md[k]['options'][3]
-            cap_start = md[k]['options'][4]
-            cap_stop = md[k]['options'][5]
+        if md[k]["type"] == "variable":
+            min_length = md[k]["options"][0]
+            max_length = md[k]["options"][1]
+            allow_start = md[k]["options"][2]
+            allow_stop = md[k]["options"][3]
+            cap_start = md[k]["options"][4]
+            cap_stop = md[k]["options"][5]
             s = _generate_sequence(o, min_length, max_length, 
                                       allow_start, allow_stop, 
                                       cap_start, cap_stop)
-            md[k]['sequence'] = s
-        elif md[k]['type'] == 'startcodon':
-            md[k]['sequence'] = secrets.choice(o.start_codons)
-        elif md[k]['type'] == 'stopcodon':
-            md[k]['sequence'] = secrets.choice(o.stop_codons)
+            md[k]["sequence"] = s
+        elif md[k]["type"] == "startcodon":
+            md[k]["sequence"] = secrets.choice(o.start_codons)
+        elif md[k]["type"] == "stopcodon":
+            md[k]["sequence"] = secrets.choice(o.stop_codons)
     keys = list(md.keys())
     keys.sort()
-    sequence = [md[k]['sequence'] for k in keys]
-    return ''.join(sequence)
+    sequence = [md[k]["sequence"] for k in keys]
+    return "".join(sequence)
 
-def gMixedSequences(n, selection='A,250;T,250;G,250;C,250',
-                    start_codons='TTG,CTG,ATG', cap_start=False,
-                    stop_codons='TAA,TAG,TGA', cap_stop=False,
-                    source_seq='', fasta=True, prefix='Test',
-                    statement='v(10,15,False,False,False,False);c(gtccg);v(10,15,False,False,False,False)'):
-    '''!
+def gMixedSequences(n, selection="A,250;T,250;G,250;C,250",
+                    start_codons="TTG,CTG,ATG", cap_start=False,
+                    stop_codons="TAA,TAG,TGA", cap_stop=False,
+                    source_seq="", fasta=True, prefix="Test",
+                    statement="v(10,15,False,False,False,False);c(gtccg);v(10,15,False,False,False,False)"):
+    """!
     Function to generate a mixed sequence, which can take many forms. 
     For example, this function can be used to generate a random 
     sequence of 30-40 nucleotides, followed by a 10-nucleotide 
@@ -486,16 +494,16 @@ def gMixedSequences(n, selection='A,250;T,250;G,250;C,250',
 
     Usage:
 
-        python randomseq.py MS --n=10 --start_codons='TTG,CTG,ATG' --stop_codons='TAA,TAG,TGA' --cap_start=True --cap_stop=True --selection=A,250;T,250;G,250;C,250 --fasta=True --prefix='Test' --statement='v(10,15,False,False,False,False);o(start);c(gtccg);v(20,30,False,False,False,False);o(stop)'
+        python randomseq.py MS --n=10 --start_codons="TTG,CTG,ATG" --stop_codons="TAA,TAG,TGA" --cap_start=True --cap_stop=True --selection="A,250;T,250;G,250;C,250" --fasta=True --prefix="Test" --statement="v(10,15,False,False,False,False);o(start);c(gtccg);v(20,30,False,False,False,False);o(stop)""
 
     The statement is a specification describing the random sequence to 
     generate. Each part of the sequence is specified in the format of 
     v(<min length>, <max length>, <allow start>, <allow stop>, <cap 
     start>, <cap stop>) or c(<constant sequence>). A random sequence 
     of 25-35 nucleotides, not allowing either start or stop codons 
-    with the sequence but required capping the 5'-end of the sequence 
+    with the sequence but required capping the 5"-end of the sequence 
     with start codon is defined as v(25,35,False,False,True,False). A 
-    constant region, 5'-GAATTC-3', is defined as c(GAATTC). Start 
+    constant region, 5"-GAATTC-3", is defined as c(GAATTC). Start 
     codon is defined as o(start) and stop codon is defined as o(stop). 
     Each part is then concatenated with semi-colon. Hence, the 
     definition, v(10,15,False,False,False,False);o(start);
@@ -512,14 +520,14 @@ def gMixedSequences(n, selection='A,250;T,250;G,250;C,250',
     @param selection String: Definition of the atomic sequence(s), 
     defined as a semi-colon delimited definition of comma-delimited 
     definition, used for random sequence generation. Default = 
-    'A,250;T,250;G,250;C,250' which means that the list of atomic 
-    sequences is defined as 250 'A', 250 'T', 250 'G', and 250 'C'.
+    "A,250;T,250;G,250;C,250" which means that the list of atomic 
+    sequences is defined as 250 "A", 250 "T", 250 "G", and 250 "C".
     @param start_codons String: A comma-delimited list to represent 
     start codons. This is used for two purposes. Firstly, it can be 
     used to check the randomly generated sequence to ensure that there 
     is no start codons within the sequence. Secondly, it can be used 
     to cap the start of a newly generated sequence.Default = 
-    'TTG,CTG,ATG'.
+    "TTG,CTG,ATG".
     @param cap_start Boolean: Flag to determine whether to cap the 
     start of the randomly generated sequence with a start codon. 
     Default = False.
@@ -528,7 +536,7 @@ def gMixedSequences(n, selection='A,250;T,250;G,250;C,250',
     used to check the randomly generated sequence to ensure that there 
     is no stop codons within the sequence. Secondly, it can be used 
     to cap the stop of a newly generated sequence.Default = 
-    'TAA,TAG,TGA'.
+    "TAA,TAG,TGA".
     @param cap_stop Boolean: Flag to determine whether to cap the 
     end of the randomly generated sequence with a stop codon. 
     Default = False.
@@ -541,26 +549,26 @@ def gMixedSequences(n, selection='A,250;T,250;G,250;C,250',
     be formatted as a FASTA file. Default = True.
     @param prefix String: Prefix to the running number for the 
     sequence name, if the output is to be a FASTA format. Default = 
-    'Test'.
+    "Test".
     @param statement String: Specification statement of the random 
     sequence to generate. Please see above description. Default = 
-    'v(10,15,False,False,False,False);c(gtccg); 
-    v(10,15,False,False,False,False)'
-    '''
+    "v(10,15,False,False,False,False);c(gtccg); 
+    v(10,15,False,False,False,False)"
+    """
     o = _initial_RandomSequence(start_codons, stop_codons,
                                 selection, source_seq)
     md = _process_mixed_dictionary(statement)
     for i in range(int(n)):
         sequence = _generate_MDseq(o, md)
         if fasta:
-            title = '_'.join([str(prefix), str(i+1)])
-            print('> %s' % title)
+            title = "_".join([str(prefix), str(i+1)])
+            print("> %s" % title)
         print(sequence)
 
 
-if __name__ == '__main__':
-    exposed_functions = {'FLS': gFixedLength,
-                         'VLS': gVariableLength,
-                         'MS': gMixedSequences,
-                         'shuffle': shuffle}
+if __name__ == "__main__":
+    exposed_functions = {"FLS": gFixedLength,
+                         "VLS": gVariableLength,
+                         "MS": gMixedSequences,
+                         "shuffle": shuffle}
     fire.Fire(exposed_functions)
