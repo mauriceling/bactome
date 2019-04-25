@@ -1315,7 +1315,7 @@ def pairwise_alignment2(queryfile, dbfile,
                     str(sd_score), str(max_score), str(qk)))
             count = count + 1
 
-def findORF(fastafile, min_length=33, max_length=105000, 
+def findORF(fastafile, min_length=33, max_length=105000, outfmt="CSV", 
             start_codons="TTG,CTG,ATG", stop_codons="TAA,TAG,TGA"):
     '''!
     Function to find open reading frames (ORF) for each FASTA record 
@@ -1324,15 +1324,22 @@ def findORF(fastafile, min_length=33, max_length=105000,
 
     Usage:
 
-        python seqproperties.py orf --start_codons="TTG,CTG,ATG" --stop_codons="TAA,TAG,TGA" --fastafile=<fasta file path> --min_length=33 --max_length=105000
+        python seqproperties.py orf --start_codons="TTG,CTG,ATG" --stop_codons="TAA,TAG,TGA" --fastafile=<fasta file path> --min_length=33 --max_length=105000 --outfmt=CSV
 
-    The output will be in the format of:
+    The CSV output will be in the format of:
 
         <count> : <sequence ID> : <start position> : <stop position> : <strand> : <length of ORF> : <sequence of ORF>
+
+    The description line for FASTA output will be:
+
+        <count>|<sequence ID>|<start position>|<stop position>|<strand>|<length of ORF> : 
 
     @param fastafile String: Path to the FASTA file to be processed.
     @param min_length Integer: Minimum length of ORF. Default = 33.
     @param max_length Integer: Maximum length of ORF. Default = 105000.
+    @param output String: Defines type of output. Allowable types are 
+    "CSV" (comma-separated file) or "FASTA" (FASTA format). Default = 
+    "CSV".
     @param start_codons String: A comma-delimited list to represent 
     start codons. This is used for two purposes. Firstly, it can be 
     used to check the randomly generated sequence to ensure that there 
@@ -1380,7 +1387,8 @@ def findORF(fastafile, min_length=33, max_length=105000,
                 stop_location = stop_location + start + 3
                 return (start, stop_location)
     count = 1
-    print("Count : SequenceID : Start : Stop : Strand : Length : Sequence")
+    if outfmt.upper() == 'CSV':
+        print("Count : SequenceID : Start : Stop : Strand : Length : Sequence")
     for k in q.seqNN:
         seq = str(q.seqNN[k][0])
         start_locations = [list(find_all(seq, start)) 
@@ -1393,9 +1401,15 @@ def findORF(fastafile, min_length=33, max_length=105000,
         coordinates = [coord for coord in coordinates 
                         if coord != None]
         for coord in coordinates:
-            print("%s: %s : %s : %s : forward : %s : %s" % \
-                (str(count), k, str(coord[0]), str(coord[1]), 
-                 str(coord[1]-coord[0]), seq[coord[0]:coord[1]]))
+            if outfmt.upper() == 'CSV':
+                print("%s : %s : %s : %s : forward : %s : %s" % \
+                    (str(count), k, str(coord[0]), str(coord[1]), 
+                     str(coord[1]-coord[0]), seq[coord[0]:coord[1]]))
+            if outfmt.upper() == 'FASTA':
+                print("> %s|%s|%s|%s|forward|%s" % \
+                    (str(count), k, str(coord[0]), str(coord[1]), 
+                     str(coord[1]-coord[0])))
+                print(seq[coord[0]:coord[1]])
             count = count + 1
         rev_seq = str(Seq(seq, generic_dna).reverse_complement())
         start_locations = [list(find_all(rev_seq, start)) 
@@ -1408,9 +1422,16 @@ def findORF(fastafile, min_length=33, max_length=105000,
         coordinates = [coord for coord in coordinates 
                         if coord != None]
         for coord in coordinates:
-            print("%s: %s : %s : %s : reverse : %s : %s" % \
-                (str(count), k, str(coord[0]), str(coord[1]), 
-                 str(coord[1]-coord[0]), rev_seq[coord[0]:coord[1]]))
+            if outfmt.upper() == 'CSV':
+                print("%s : %s : %s : %s : reverse : %s : %s" % \
+                    (str(count), k, str(coord[0]), str(coord[1]), 
+                     str(coord[1]-coord[0]), 
+                     rev_seq[coord[0]:coord[1]]))
+            if outfmt.upper() == 'FASTA':
+                print("> %s|%s|%s|%s|reverse|%s" % \
+                    (str(count), k, str(coord[0]), str(coord[1]), 
+                     str(coord[1]-coord[0])))
+                print(seq[coord[0]:coord[1]])
             count = count + 1
 
 
