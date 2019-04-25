@@ -1315,6 +1315,104 @@ def pairwise_alignment2(queryfile, dbfile,
                     str(sd_score), str(max_score), str(qk)))
             count = count + 1
 
+def findORF(fastafile, min_length=33, max_length=105000, 
+            start_codons="TTG,CTG,ATG", stop_codons="TAA,TAG,TGA"):
+    '''!
+    Function to find open reading frames (ORF) for each FASTA record 
+    in a given FASTA file. An ORF is basically computed as a stretch 
+    of sequence flanked by a start and stop codon.
+
+    Usage:
+
+        python seqproperties.py orf --start_codons="TTG,CTG,ATG" --stop_codons="TAA,TAG,TGA" --fastafile=<fasta file path> --min_length=33 --max_length=105000
+
+    The output will be in the format of:
+
+        <count> : <sequence ID> : <start position> : <stop position> : <strand> : <length of ORF> : <sequence of ORF>
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    @param min_length Integer: Minimum length of ORF. Default = 33.
+    @param max_length Integer: Maximum length of ORF. Default = 105000.
+    @param start_codons String: A comma-delimited list to represent 
+    start codons. This is used for two purposes. Firstly, it can be 
+    used to check the randomly generated sequence to ensure that there 
+    is no start codons within the sequence. Secondly, it can be used 
+    to cap the start of a newly generated sequence.Default = 
+    "TTG,CTG,ATG".
+    @param stop_codons String: A comma-delimited list to represent 
+    stop codons. This is used for two purposes. Firstly, it can be 
+    used to check the randomly generated sequence to ensure that there 
+    is no stop codons within the sequence. Secondly, it can be used 
+    to cap the stop of a newly generated sequence.Default = 
+    "TAA,TAG,TGA".
+    '''
+    q = CodonUsageBias()
+    q.addSequencesFromFasta(fastafile)
+    if type(start_codons) is str:
+        start_codons = start_codons.strip()
+        start_codons = [x.strip() for x in start_codons.split(",")]
+    elif type(start_codons) is tuple or type(start_codons) is list:
+        start_codons = [x.strip() for x in start_codons]
+    if type(stop_codons) is str:
+        stop_codons = stop_codons.strip()
+        stop_codons = [x.strip() for x in stop_codons.split(",")]
+    elif type(stop_codons) is tuple or type(stop_codons) is list:
+        stop_codons = [x.strip() for x in stop_codons]
+    def find_all(string, substring):
+        start = 0
+        while True:
+            start = string.find(substring, start)
+            if start == -1: return
+            yield start
+            start = start + len(substring)
+    def chunkstring(string, length):
+        return (string[0+i:length+i] 
+                for i in range(0, len(string), length))
+    def find_coordinates(seq, start, stop_codons, 
+                         min_length, max_length):
+        s = list(chunkstring(seq[start:], 3))
+        stop_location = [index for index in range(len(s)) 
+                            if s[index] in stop_codons]
+        if len(stop_location) > 0:
+            stop_location = min(stop_location) * 3
+            if stop_location >= min_length and \
+                stop_location <= max_length:
+                stop_location = stop_location + start + 3
+                return (start, stop_location)
+    count = 1
+    print("Count : SequenceID : Start : Stop : Strand : Length : Sequence")
+    for k in q.seqNN:
+        seq = str(q.seqNN[k][0])
+        start_locations = [list(find_all(seq, start)) 
+                           for start in start_codons]
+        start_locations = [item for sublist in start_locations 
+                            for item in sublist]
+        coordinates = [find_coordinates(seq, start, stop_codons, 
+                                        min_length, max_length)
+                       for start in start_locations]
+        coordinates = [coord for coord in coordinates 
+                        if coord != None]
+        for coord in coordinates:
+            print("%s: %s : %s : %s : forward : %s : %s" % \
+                (str(count), k, str(coord[0]), str(coord[1]), 
+                 str(coord[1]-coord[0]), seq[coord[0]:coord[1]]))
+            count = count + 1
+        rev_seq = str(Seq(seq, generic_dna).reverse_complement())
+        start_locations = [list(find_all(rev_seq, start)) 
+                           for start in start_codons]
+        start_locations = [item for sublist in start_locations 
+                            for item in sublist]
+        coordinates = [find_coordinates(rev_seq, start, stop_codons, 
+                                        min_length, max_length)
+                       for start in start_locations]
+        coordinates = [coord for coord in coordinates 
+                        if coord != None]
+        for coord in coordinates:
+            print("%s: %s : %s : %s : reverse : %s : %s" % \
+                (str(count), k, str(coord[0]), str(coord[1]), 
+                 str(coord[1]-coord[0]), rev_seq[coord[0]:coord[1]]))
+            count = count + 1
+
 
 if __name__ == '__main__':
     exposed_functions = {'a': percentA,
@@ -1334,6 +1432,7 @@ if __name__ == '__main__':
                          'mw': molecularWeight,
                          'ngram': nGram,
                          'nlength': nucleotideLength,
+                         'orf': findORF,
                          'palign': pairwise_alignment,
                          'palign2': pairwise_alignment2,
                          'plength': peptideLength,
