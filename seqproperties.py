@@ -1324,11 +1324,11 @@ def findORF(fastafile, min_length=33, max_length=105000, outfmt="CSV",
 
     Usage:
 
-        python seqproperties.py orf --start_codons="TTG,CTG,ATG" --stop_codons="TAA,TAG,TGA" --fastafile=<fasta file path> --min_length=33 --max_length=105000 --outfmt=CSV
+        python seqproperties.py orf --start_codons="TTG,CTG,ATG" --stop_codons="TAA,TAG,TGA" --fastafile=<fasta file path> --min_length=33 --max_length=105000 --outfmt=CSV-NS
 
     The CSV output will be in the format of:
 
-        <count> : <sequence ID> : <start position> : <stop position> : <strand> : <length of ORF> : <sequence of ORF>
+        <count> : <sequence ID> : <start position> : <stop position> : <strand> : <length of ORF> : [<sequence of ORF>]
 
     The description line for FASTA output will be:
 
@@ -1338,8 +1338,8 @@ def findORF(fastafile, min_length=33, max_length=105000, outfmt="CSV",
     @param min_length Integer: Minimum length of ORF. Default = 33.
     @param max_length Integer: Maximum length of ORF. Default = 105000.
     @param output String: Defines type of output. Allowable types are 
-    "CSV" (comma-separated file) or "FASTA" (FASTA format). Default = 
-    "CSV".
+    "CSV" (comma-separated file with sequence), "CSV-NS" (comma-separated 
+    file without sequence) or "FASTA" (FASTA format). Default = "CSV".
     @param start_codons String: A comma-delimited list to represent 
     start codons. This is used for two purposes. Firstly, it can be 
     used to check the randomly generated sequence to ensure that there 
@@ -1389,6 +1389,8 @@ def findORF(fastafile, min_length=33, max_length=105000, outfmt="CSV",
     count = 1
     if outfmt.upper() == 'CSV':
         print("Count : SequenceID : Start : Stop : Strand : Length : Sequence")
+    elif outfmt.upper() == 'CSV-NS':
+        print("Count : SequenceID : Start : Stop : Strand : Length")
     for k in q.seqNN:
         seq = str(q.seqNN[k][0])
         start_locations = [list(find_all(seq, start)) 
@@ -1405,7 +1407,11 @@ def findORF(fastafile, min_length=33, max_length=105000, outfmt="CSV",
                 print("%s : %s : %s : %s : forward : %s : %s" % \
                     (str(count), k, str(coord[0]), str(coord[1]), 
                      str(coord[1]-coord[0]), seq[coord[0]:coord[1]]))
-            if outfmt.upper() == 'FASTA':
+            elif outfmt.upper() == 'CSV-NS':
+                print("%s : %s : %s : %s : forward : %s" % \
+                    (str(count), k, str(coord[0]), str(coord[1]), 
+                     str(coord[1]-coord[0])))
+            elif outfmt.upper() == 'FASTA':
                 print("> %s|%s|%s|%s|forward|%s" % \
                     (str(count), k, str(coord[0]), str(coord[1]), 
                      str(coord[1]-coord[0])))
@@ -1427,7 +1433,11 @@ def findORF(fastafile, min_length=33, max_length=105000, outfmt="CSV",
                     (str(count), k, str(coord[0]), str(coord[1]), 
                      str(coord[1]-coord[0]), 
                      rev_seq[coord[0]:coord[1]]))
-            if outfmt.upper() == 'FASTA':
+            elif outfmt.upper() == 'CSV-NS':
+                print("%s : %s : %s : %s : reverse : %s" % \
+                    (str(count), k, str(coord[0]), str(coord[1]), 
+                     str(coord[1]-coord[0])))
+            elif outfmt.upper() == 'FASTA':
                 print("> %s|%s|%s|%s|reverse|%s" % \
                     (str(count), k, str(coord[0]), str(coord[1]), 
                      str(coord[1]-coord[0])))
