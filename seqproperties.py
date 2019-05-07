@@ -1470,11 +1470,11 @@ def random_selection(fastafile, n=250, with_replacement=True):
         seq = [str(s[1]) for s in q.seqNN]
     else:
         while len(seq) < int(n):
-            s = random.sample(q.seqNN.items(), k=1)
+            s[0] = random.sample(q.seqNN.items(), k=1)
             if str(with_replacement) == "True" and (s not in seq):
-                seq.append(str(s[1]))
+                seq.append(str(s[1][0]))
             else:
-                seq.append(str(s[1]))
+                seq.append(str(s[1][0]))
     count = 1
     for s in seq:
         print("%s : %s" % (str(count), s))
