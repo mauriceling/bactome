@@ -1467,14 +1467,14 @@ def random_selection(fastafile, n=250, with_replacement=True):
     q.addSequencesFromFasta(fastafile)
     seq = []
     if len(q.seqNN) < int(n):
-        seq = [s[1] for s in q.seqNN]
+        seq = [str(s[1]) for s in q.seqNN]
     else:
         while len(seq) < int(n):
             s = random.sample(q.seqNN.items(), k=1)
             if str(with_replacement) == "True" and (s not in seq):
-                seq.append(s)
+                seq.append(str(s[1]))
             else:
-                seq.append(s)
+                seq.append(str(s[1]))
     count = 1
     for s in seq:
         print("%s : %s" % (str(count), s))
