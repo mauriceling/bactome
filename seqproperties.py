@@ -361,6 +361,29 @@ def nucleotideLength(fastafile):
         nnseq = o.seqNN[k][0]
         print('%s : %s' % (k, str(len(str(nnseq)))))
 
+def complement(fastafile):
+    '''!
+    Function to generate the complement sequence of each FASTA record. 
+    This is done using reverse_complement function in Biopython - each 
+    FASTA sequence is assumed to be in 5'-->3', this function will 
+    generate the complementary sequence in 5'-->3' orientation rather 
+    than 3'<--5' orientation.
+
+    Usage:
+
+        python seqproperties.py complement --fastafile=<FASTA file path> 
+
+     The output will be in FASTA format.
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    '''
+    o = CodonUsageBias()
+    o.addSequencesFromFasta(fastafile)
+    for k in o.seqNN:
+        nnseq = o.seqNN[k][0]
+        print("> %s" % k)
+        print(str(nnseq.reverse_complement()))
+
 def flattenCodonCount(CC):
     '''!
     Function to flatten the codon usage / frequency table by 
@@ -1590,6 +1613,7 @@ if __name__ == '__main__':
                          'aromaticity': aromaticity,
                          'asymfreq': asymmetricFrequency,
                          'codoncount': codonCount,
+                         'complement': complement,
                          'extinction': extinction_coefficient,
                          'count': genericCount,
                          'flexibility': flexibility,
