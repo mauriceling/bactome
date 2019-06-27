@@ -981,6 +981,57 @@ def gravy(fastafile, molecule, genetic_code=1, to_stop=True):
             data = ' : '.join([str(k), 'Error'])
             print(data)
 
+def flexibility(fastafile, molecule, genetic_code=1, to_stop=True):
+    '''!
+    Function to calculate the flexibility by each FASTA record. This 
+    is calculated by BioPython library using method described in 
+    Vihinen, et al. 1994. Accuracy of protein flexibility predictions. 
+    Proteins, 19: 141-149.
+
+    Usage:
+
+        python seqproperties.py flexibility --molecule=<molecule type> --genetic_code=<genetic code number> --to_stop=<Boolean flag> --fastafile=<FASTA file path>
+
+    Options for genetic_code and to_stop are needed if molecule type 
+    is not peptide, as these options are needed for translation. The 
+    output will be in the format of
+
+        <sequence ID> : <flexibility value>
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    @param molecule String: Defines the type of molecule. Three 
+    options are allowed: 'peptide' for amino acid sequences, 'DNA' for 
+    DNA sequences (requires transcription and translation), and 'RNA' 
+    for RNA sequence (requires translation).
+    @param genetic_code Integer: Genetic code number to be used for 
+    translation. Default = 1 (Standard Code). For more information, 
+    see <https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi>
+    @param to_stop Boolean: Flag to stop translation when first stop 
+    codon is encountered. Default = True.
+    '''
+    o = CodonUsageBias()
+    o.addSequencesFromFasta(fastafile)
+    for k in o.seqNN:
+        sequence = _toPeptide(str(o.seqNN[k][0]), molecule, 
+                              genetic_code, to_stop)
+        try:
+            result = '%0.6f' % sequence.flexibility()
+            data = [k, result]
+            data = ' : '.join([str(x) for x in data])
+            print(data)
+        except ZeroDivisionError:
+            data = ' : '.join([str(k), 'undefined'])
+            print(data)
+        except KeyError:
+            data = ' : '.join([str(k), 'KeyError'])
+            print(data)
+        except IndexError:
+            data = ' : '.join([str(k), 'IndexError'])
+            print(data)
+        except:
+            data = ' : '.join([str(k), 'Error'])
+            print(data)
+
 def _dictionaryGenerator(sequence, n, suffix=''):
     '''!
     Private method - Generates a dictionary of n-gram (as keys) 
@@ -1488,6 +1539,7 @@ if __name__ == '__main__':
                          'asymfreq': asymmetricFrequency,
                          'codoncount': codonCount,
                          'count': genericCount,
+                         'flexibility': flexibility,
                          'g': percentG,
                          'gc': percentGC,
                          'gci': percentGCi,
