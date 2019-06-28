@@ -711,7 +711,8 @@ def _toPeptide(sequence, molecule, genetic_code=1, to_stop=True):
 
 def molecularWeight(fastafile, molecule, genetic_code=1, to_stop=True):
     '''!
-    Function to calculate the molecular weight by each FASTA record.
+    Function to calculate the molecular weight, using Biopython, by 
+    each FASTA record.
 
     Usage:
 
@@ -1458,7 +1459,7 @@ def findORF(fastafile, min_length=33, max_length=105000, outfmt="CSV",
 
     The description line for FASTA output will be:
 
-        <count>|<sequence ID>|<start position>|<stop position>|<strand>|<length of ORF> : 
+        <count>|<sequence ID>|<start position>|<stop position>|<strand>|<length of ORF>
 
     @param fastafile String: Path to the FASTA file to be processed.
     @param min_length Integer: Minimum length of ORF. Default = 33.
