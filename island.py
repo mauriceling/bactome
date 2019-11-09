@@ -166,7 +166,7 @@ def generate_population(parameterfile, populationfile,
 
     Usage:
     
-        python island.py gpop --populationfile=test_pop.pop --ploidy=2 --generation_count=0 --population_size=10 --parameterfile=island_parameter.csv
+        python island.py gpop --populationfile=test_pop --ploidy=2 --generation_count=0 --population_size=10 --parameterfile=island_parameter.csv
 
     @param parameterfile String: Relative or absolute path to the 
     simulation parameter file.
@@ -258,7 +258,7 @@ def simulate_simple(populationfile, generations, organisms, headerData):
     """
     for gen_count in range(int(generations)):
         gen_count = gen_count + 1
-        outputfile = '.'.join([populationfile, str(gen_count)]) + '.pop'
+        outputfile = '.'.join([populationfile, str(gen_count)])
         # Generating crossovers
         for organism in organisms:
             position = random.randint(0, len(organisms[organism]['genome'][0])-1)
@@ -300,7 +300,7 @@ def simulate_population(populationfile, simulation_type='simple',
 
     Usage:
     
-        python island.py simulate --populationfile=test_pop.pop --simulation_type=simple --generations=10
+        python island.py simulate --populationfile=test_pop --simulation_type=simple --generations=10
 
     @param populationfile String: Relative or absolute path of the 
     population file for simulation.
@@ -376,7 +376,7 @@ def tabulate_allelic_counts(populationfile, ploidy=2):
 
     Usage:
     
-        python island.py tabulateCount --ploidy=2 --populationfile=test_pop.pop
+        python island.py tabulateCount --ploidy=2 --populationfile=test_pop
 
     @param populationfile String: Relative or absolute path of the 
     population file to tabulate.
