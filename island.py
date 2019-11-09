@@ -226,6 +226,61 @@ def simulate_simple(populationfile, generations, organisms, headerData):
         _simulation_writeout(outputfile, new_organisms, headerData)
         organisms = new_organisms
 
+def read_population_file(populationfile, cmdline=True):
+    """!
+    Function to read/prepare population file for simulation.
+
+    Usage:
+
+        python island.py readpop --populationfile=test_pop.pop
+
+    @param populationfile String: Relative or absolute path of the 
+    population file.
+    @param cmdline Boolean: Flag to use this function as a command-line 
+    function, which means results are not returned. Default = True 
+    (results are not returned).
+    """
+    populationfile = os.path.abspath(populationfile)
+    inputfile = open(populationfile, "r").readlines()
+    inputfile = [x[:-1] for x in inputfile]
+    geneData = inputfile[0]
+    alleleData = [x for x in inputfile if x.startswith("A")]
+    organismData = [x for x in inputfile if x.startswith("O")]
+    organismData = [[x.split(">")[1].split("|"), 
+                     x.split(">")[2].split(";")] 
+                    for x in organismData]
+    organismData = [[x[0], [ploid.split("|") for ploid in x[1]]] 
+                    for x in organismData]
+    organisms = {}
+    for organism in organismData:
+        org = {'organism': str(organism[0][0]),
+               'generation': str(organism[0][1]),
+               'parentA': str(organism[0][2]),
+               'parentB': str(organism[0][3]),
+               'genome': organism[1]}
+        organisms[org['organism']] = org
+    if cmdline:
+        print("Gene Names : %s" % geneData.split(">")[0])
+        print("Number of Alleles : %s" % geneData.split(">")[1])
+        print("")
+        print("Allelic Frequencies ...")
+        for allele in alleleData:
+            print("%s : %s" % (allele.split(">")[1], 
+                               allele.split(">")[2]))
+        print("")
+        print("Organism Data ...")
+        for org in organisms:
+            print("Organism = %s; Generation = %s; ParentA = %s; ParentB = %s" % \
+                (str(organisms[org]['organism']),
+                 str(organisms[org]['generation']),
+                 str(organisms[org]['parentA']),
+                 str(organisms[org]['parentB'])))
+            for i in range(len(organisms[org]['genome'])):
+                print("Polyloid %i = %s" % \
+                    (i, "|".join(organisms[org]['genome'][i])))
+    else:
+        return (geneData, alleleData, organismData, organisms)
+
 def simulate_population(populationfile, simulation_type='simple',
                         generations=10):
     """!
@@ -248,24 +303,9 @@ def simulate_population(populationfile, simulation_type='simple',
     50, the generation count in the results file will begin with 1. 
     Default = 10.
     """
-    populationfile = os.path.abspath(populationfile)
-    inputfile = open(populationfile, "r").readlines()
-    inputfile = [x[:-1] for x in inputfile]
-    headerData = [x for x in inputfile if not x.startswith("O")]
-    organismData = [x for x in inputfile if x.startswith("O")]
-    organismData = [[x.split(">")[1].split("|"), 
-                     x.split(">")[2].split(";")] 
-                    for x in organismData]
-    organismData = [[x[0], [ploid.split("|") for ploid in x[1]]] 
-                    for x in organismData]
-    organisms = {}
-    for organism in organismData:
-        org = {'organism': str(organism[0][0]),
-               'generation': str(organism[0][1]),
-               'parentA': str(organism[0][2]),
-               'parentB': str(organism[0][3]),
-               'genome': organism[1]}
-        organisms[org['organism']] = org
+    (geneData, alleleData, organismData, organisms) = \
+        read_population_file(populationfile, False)
+    headerData = [geneData] + alleleData
     if simulation_type.upper() == 'SIMPLE':
         simulate_simple(populationfile, generations, 
                         organisms, headerData)
@@ -275,6 +315,7 @@ if __name__ == '__main__':
     exposed_functions = {
         'gpop': generate_population,
         'readpf': read_parameter_file,
+        'readpop': read_population_file,
         'simulate': simulate_population
         }
     fire.Fire(exposed_functions)
