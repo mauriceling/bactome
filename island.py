@@ -322,6 +322,91 @@ def simulate_population(populationfile, simulation_type='simple',
 ######################################################################
 # Section 4: Analyze population operations
 ######################################################################
+def _generate_expected_allelic_counts(alleleData, pop_size, ploidy):
+    """!
+    Private function to generate expected allelic counts from allelic 
+    frequencies.
+
+    @param alleleData List: List of allele data from population file.
+    @param pop_size Integer: Population size.
+    @param ploidy Integer: Number of chromosome sets.
+    """
+    alleleData = [[x.split(">")[1].strip(), x.split(">")[2].strip()] 
+                  for x in alleleData]
+    allele_counts = {}
+    for allele in alleleData:
+        counts = [float(x) * pop_size * ploidy 
+                  for x in allele[1].split("|")]
+        allele_counts[allele[0]] = counts
+    # print(allele_counts)
+    return allele_counts
+
+def _generate_observed_allelic_counts(organisms, geneData):
+    """!
+    Private function to tabulate observed allelic counts from population.
+
+    @param organisms Dictionary: Dictionary of organisms.
+    @param geneData String: Gene Names and the corresponding number of 
+    alleles, which is the first row of population file.
+    """
+    geneData = geneData.split(">")
+    geneNames = [x.strip() for x in geneData[0].split("|")]
+    geneAlleles = [x.strip() for x in geneData[1].split("|")]
+    geneData = [x for x in zip(geneNames, geneAlleles)]
+    allele_counts = {}
+    for pair in geneData:
+        allele_counts[pair[0]] = [0] * int(pair[1])
+    # print(allele_counts)
+    for position in range(len(geneNames)):
+        alleles = [int(organisms[org]['genome'][ploid][position])
+                   for org in organisms
+                        for ploid in range(len(organisms[org]['genome']))]
+        # print(alleles)
+        geneName = geneNames[position]
+        # print(geneName, allele_counts[geneName])
+        for allele in alleles:
+            allele_counts[geneName][allele-1] = allele_counts[geneName][allele-1] + 1
+    # print(allele_counts)
+    return allele_counts
+
+def tabulate_allelic_counts(populationfile, ploidy=2):
+    """!
+    Function to tabulate the expected and actual allelic counts from 
+    the population and reports Chi-Square statistic.
+
+    Usage:
+    
+        python island.py tabulateCount --ploidy=2 --populationfile=test_pop.pop
+
+    @param populationfile String: Relative or absolute path of the 
+    population file to tabulate.
+    @param ploidy Integer: Number of chromosome sets. Default = 2 
+    (diploid).
+    """
+    (geneData, alleleData, organismData, organisms) = \
+        read_population_file(populationfile, False)
+    pop_size = len(organisms)
+    exp_allele_counts = _generate_expected_allelic_counts(alleleData, 
+                                                          pop_size, 
+                                                          ploidy)
+    obs_allele_counts = _generate_observed_allelic_counts(organisms, 
+                                                          geneData)
+    chiSq = 0
+    df = -1
+    print("Gene Name : Allele : Expected Count : Observed Count")
+    for gene in exp_allele_counts:
+        for allele in range(len(exp_allele_counts[gene])):
+            print("%s : %s : %s : %s" % \
+                (str(gene), str(allele),
+                 str(exp_allele_counts[gene][allele]),
+                 str(obs_allele_counts[gene][allele])))
+            df = df + 1
+            chiSq = chiSq + \
+                (((obs_allele_counts[gene][allele] - \
+                    exp_allele_counts[gene][allele]) ** 2)  / \
+                exp_allele_counts[gene][allele])
+    print("Chi Square Statistic : %s" % str(chiSq))
+    print("Degrees of Freedom : %i" % df)
 
 ######################################################################
 # Section 5: Command-line executor
@@ -331,6 +416,7 @@ if __name__ == '__main__':
         'gpop': generate_population,
         'readpf': read_parameter_file,
         'readpop': read_population_file,
-        'simulate': simulate_population
+        'simulate': simulate_population,
+        'tabulateCount': tabulate_allelic_counts
         }
     fire.Fire(exposed_functions)
