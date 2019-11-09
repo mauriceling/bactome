@@ -142,7 +142,7 @@ def read_population_file(populationfile, cmdline=True):
         return (geneData, alleleData, organismData, organisms)
 
 ######################################################################
-# Section 2: Generatio population from parameters operations
+# Section 2: Generate population from parameters operations
 ######################################################################
 def _generate_organism(pop_param, gene_sequence, ploidy):
     organism = []
