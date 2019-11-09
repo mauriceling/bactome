@@ -233,16 +233,30 @@ def _simulation_writeout(filename, organisms, headerData):
         outputfile.write(stdout + "\n")
     outputfile.close()
 
-def simulate_simple(populationfile, generations, organisms, headerData):
+def simulate_simple(populationfile, generations, organisms, 
+                    population_size, headerData):
     """!
     Function to perform simple simulation (simulation type = simple). 
     The features of this simulation types are:
 
         - assumes diploid (only the first 2 sets of chromosomes are used)
         - one random crossover per chromosome pair
+        - crossover is generated prior to mating to simulate random haploid
         - no mutations
         - random mating with possibility of self-mating
         - mating only within generation
+        - population size may be changed
+
+    Required options are:
+
+        - populationfile
+        - simulation_type
+        - population_size
+        - generations
+
+    Usage:
+
+        python island.py simulate --populationfile=test_pop --simulation_type=simple --population_size=10 --generations=10
 
     @param populationfile String: Relative or absolute path of the 
     population file for simulation.
@@ -252,6 +266,10 @@ def simulate_simple(populationfile, generations, organisms, headerData):
     50, the generation count in the results file will begin with 1. 
     @param organisms Dictionary: Dictionary of organisms from 
     simulate_population() function.
+    @param population_size Integer: Population size. If the population 
+    size in the population file is lesser than the required population 
+    size, this function will expand the population size to the required 
+    population size at the first generation.
     @param headerData List: Header data of population file (consisting 
     of gene list and allelic frequencies) from simulate_population() 
     function, to enable write out of simulated populations.
@@ -259,51 +277,55 @@ def simulate_simple(populationfile, generations, organisms, headerData):
     for gen_count in range(int(generations)):
         gen_count = gen_count + 1
         outputfile = '.'.join([populationfile, str(gen_count)])
-        # Generating crossovers
-        for organism in organisms:
-            position = random.randint(0, len(organisms[organism]['genome'][0])-1)
-            print("Generation count = %s; Organism = %s; Crossover position = %s" % \
-                (str(gen_count), str(organism), str(position)))
-            chromosomeA = organisms[organism]['genome'][0][0:position] + organisms[organism]['genome'][1][position:]
-            chromosomeB = organisms[organism]['genome'][1][0:position] + organisms[organism]['genome'][0][position:]
-            print("Orginal Polyploid A: %s" % "|".join(organisms[organism]['genome'][0]))
-            print("Orginal Polyploid B: %s" % "|".join(organisms[organism]['genome'][1]))
-            organisms[organism]['genome'][0] = chromosomeA
-            organisms[organism]['genome'][1] = chromosomeB
-            print("Crossed Polyploid A: %s" % "|".join(organisms[organism]['genome'][0]))
-            print("Crossed Polyploid B: %s" % "|".join(organisms[organism]['genome'][1]))
         # Generating next generation
         organismList = list(organisms.keys())
         new_organisms = {}
-        for i in range(len(organisms)):
+        i = 0
+        while i < int(population_size):
             parentA = random.choice(organismList)
             parentB = random.choice(organismList)
-            chromosomeA = organisms[parentA]['genome'][random.choice([0, 1])]
-            chromosomeB = organisms[parentB]['genome'][random.choice([0, 1])]
+
+            chromosomeA1 = organisms[parentA]['genome'][0]
+            chromosomeA2 = organisms[parentA]['genome'][1]
+            chromosomeB1 = organisms[parentB]['genome'][0]
+            chromosomeB2 = organisms[parentB]['genome'][1]
+            position = random.randint(0, len(chromosomeA1))
+            genomeA = [chromosomeA1[0:position] + chromosomeA2[position:],
+                       chromosomeA2[0:position] + chromosomeA1[position:]]
+            genomeB = [chromosomeB1[0:position] + chromosomeB2[position:],
+                       chromosomeB2[0:position] + chromosomeB1[position:]]
             org = {'organism': str(i),
                    'generation': str(gen_count),
                    'parentA': str(parentA),
                    'parentB': str(parentB),
                    'polyploid': 2,
-                   'genome': [chromosomeA, chromosomeB]}
+                   'genome': [genomeA[random.randint(0, 1)], 
+                              genomeB[random.randint(0, 1)]]}
             new_organisms[str(i)] = org
+            i = i + 1
         _simulation_writeout(outputfile, new_organisms, headerData)
         organisms = new_organisms
 
-def simulate_population(populationfile, simulation_type='simple',
+def simulate_population(populationfile, 
+                        population_size, 
+                        simulation_type='simple',
                         generations=10):
     """!
     Function to simulate population over generations, given a 
     population. Allowable simulation types are simple. For more 
-    description of the simulation types, please read documentation 
-    in simulate_<simulation type>() function.
+    description of the simulation types and the corresponding options 
+    required for each simulation (as not all simulation types will 
+    require the same set of options), please read documentation in 
+    simulate_<simulation type>() function.
 
     Usage:
     
-        python island.py simulate --populationfile=test_pop --simulation_type=simple --generations=10
+        python island.py simulate --populationfile=test_pop --simulation_type=simple --population_size=10 --generations=10
 
     @param populationfile String: Relative or absolute path of the 
     population file for simulation.
+    @param population_size Integer: Population size / number of 
+    organisms to generate. Default = 10.
     @param simulation_type String: Type of simulation to run. Default 
     = simple.
     @param generations Integer: Number of generations to simulate. 
@@ -316,8 +338,8 @@ def simulate_population(populationfile, simulation_type='simple',
         read_population_file(populationfile, False)
     headerData = [geneData] + alleleData
     if simulation_type.upper() == 'SIMPLE':
-        simulate_simple(populationfile, generations, 
-                        organisms, headerData)
+        simulate_simple(populationfile, generations, organisms, 
+                        population_size, headerData)
 
 ######################################################################
 # Section 4: Analyze population operations
