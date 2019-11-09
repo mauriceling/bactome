@@ -127,37 +127,62 @@ def _simulation_writeout(filename, organisms, headerData):
         outputfile.write(stdout + "\n")
     outputfile.close()
 
-def _simulate_one_generation(populationfile, gen_count, organisms, headerData):
-    filename = '.'.join([populationfile, str(gen_count)]) + '.pop'
-    # Generating crossovers
-    for organism in organisms:
-        position = random.randint(0, len(organisms[organism]['genome'][0])-1)
-        print("Generation count = %s; Organism = %s; Crossover position = %s" % \
-            (str(gen_count), str(organism), str(position)))
-        chromosomeA = organisms[organism]['genome'][0][0:position] + organisms[organism]['genome'][1][position:]
-        chromosomeB = organisms[organism]['genome'][1][0:position] + organisms[organism]['genome'][0][position:]
-        print("Orginal Polyploid A: %s" % "|".join(organisms[organism]['genome'][0]))
-        print("Orginal Polyploid B: %s" % "|".join(organisms[organism]['genome'][1]))
-        organisms[organism]['genome'][0] = chromosomeA
-        organisms[organism]['genome'][1] = chromosomeB
-        print("Crossed Polyploid A: %s" % "|".join(organisms[organism]['genome'][0]))
-        print("Crossed Polyploid B: %s" % "|".join(organisms[organism]['genome'][1]))
-    organismList = list(organisms.keys())
-    new_organisms = {}
-    for i in range(len(organisms)):
-        parentA = random.choice(organismList)
-        parentB = random.choice(organismList)
-        chromosomeA = organisms[parentA]['genome'][random.choice([0, 1])]
-        chromosomeB = organisms[parentB]['genome'][random.choice([0, 1])]
-        org = {'organism': str(i),
-               'generation': str(gen_count),
-               'parentA': str(parentA),
-               'parentB': str(parentB),
-               'polyploid': 2,
-               'genome': [chromosomeA, chromosomeB]}
-        new_organisms[str(i)] = org
-    _simulation_writeout(filename, new_organisms, headerData)
-    return new_organisms
+def simulate_simple(populationfile, generations, organisms, headerData):
+    """!
+    Function to perform simple simulation (simulation type = simple). 
+    The features of this simulation types are:
+
+        - assumes diploid (only the first 2 sets of chromosomes are used)
+        - one random crossover per chromosome pair
+        - no mutations
+        - random mating with possibility of self-mating
+        - mating only within generation
+
+    @param populationfile String: Relative or absolute path of the 
+    population file for simulation.
+    @param generations Integer: Number of generations to simulate. 
+    Note that generation count is not incremental from population, 
+    which means that despite the generation in population file may be 
+    50, the generation count in the results file will begin with 1. 
+    @param organisms Dictionary: Dictionary of organisms from 
+    simulate_population() function.
+    @param headerData List: Header data of population file (consisting 
+    of gene list and allelic frequencies) from simulate_population() 
+    function, to enable write out of simulated populations.
+    """
+    for gen_count in range(int(generations)):
+        gen_count = gen_count + 1
+        outputfile = '.'.join([populationfile, str(gen_count)]) + '.pop'
+        # Generating crossovers
+        for organism in organisms:
+            position = random.randint(0, len(organisms[organism]['genome'][0])-1)
+            print("Generation count = %s; Organism = %s; Crossover position = %s" % \
+                (str(gen_count), str(organism), str(position)))
+            chromosomeA = organisms[organism]['genome'][0][0:position] + organisms[organism]['genome'][1][position:]
+            chromosomeB = organisms[organism]['genome'][1][0:position] + organisms[organism]['genome'][0][position:]
+            print("Orginal Polyploid A: %s" % "|".join(organisms[organism]['genome'][0]))
+            print("Orginal Polyploid B: %s" % "|".join(organisms[organism]['genome'][1]))
+            organisms[organism]['genome'][0] = chromosomeA
+            organisms[organism]['genome'][1] = chromosomeB
+            print("Crossed Polyploid A: %s" % "|".join(organisms[organism]['genome'][0]))
+            print("Crossed Polyploid B: %s" % "|".join(organisms[organism]['genome'][1]))
+        # Generating next generation
+        organismList = list(organisms.keys())
+        new_organisms = {}
+        for i in range(len(organisms)):
+            parentA = random.choice(organismList)
+            parentB = random.choice(organismList)
+            chromosomeA = organisms[parentA]['genome'][random.choice([0, 1])]
+            chromosomeB = organisms[parentB]['genome'][random.choice([0, 1])]
+            org = {'organism': str(i),
+                   'generation': str(gen_count),
+                   'parentA': str(parentA),
+                   'parentB': str(parentB),
+                   'polyploid': 2,
+                   'genome': [chromosomeA, chromosomeB]}
+            new_organisms[str(i)] = org
+        _simulation_writeout(outputfile, new_organisms, headerData)
+        organisms = new_organisms
 
 def simulate_population(populationfile, simulation_type='simple',
                         generations=10):
@@ -185,12 +210,9 @@ def simulate_population(populationfile, simulation_type='simple',
                'parentB': str(organism[0][3]),
                'genome': organism[1]}
         organisms[org['organism']] = org
-    for gen_count in range(int(generations)):
-        if simulation_type.upper() == 'SIMPLE':
-            organisms = _simulate_one_generation(populationfile, 
-                                                 gen_count+1, 
-                                                 organisms, 
-                                                 headerData)
+    if simulation_type.upper() == 'SIMPLE':
+        simulate_simple(populationfile, generations, 
+                        organisms, headerData)
 
 
 if __name__ == '__main__':
