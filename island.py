@@ -323,6 +323,9 @@ def simulate_population(populationfile, simulation_type='simple',
 # Section 4: Analyze population operations
 ######################################################################
 
+######################################################################
+# Section 5: Command-line executor
+######################################################################
 if __name__ == '__main__':
     exposed_functions = {
         'gpop': generate_population,
