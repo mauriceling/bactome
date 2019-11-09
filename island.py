@@ -431,10 +431,56 @@ def tabulate_allelic_counts(populationfile, ploidy=2):
     print("Degrees of Freedom : %i" % df)
 
 ######################################################################
-# Section 5: Command-line executor
+# Section 5: Utility operations
+######################################################################
+def combine_populations(populationfile1, populationfile2, outputfile):
+    """!
+    Function to combine the organisms in 2 population files into a 
+    single population file. This function assumes that the gene names 
+    and allelic frequency table are identical in both population files.
+
+    Usage:
+
+        python island.py combinepop --populationfile1=test_pop.2 --populationfile2=test_pop.3 --outputfile=test_pop.comb
+
+    @param populationfile1 String: Relative or absolute path of the 
+    first population file to combine.
+    @param populationfile2 String: Relative or absolute path of the 
+    second population file to combine.
+    @param putputfile String: Relative or absolute path for writing 
+    out the combined population file.
+    """
+    populationfile1 = os.path.abspath(populationfile1)
+    populationfile2 = os.path.abspath(populationfile2)
+    outputfile = os.path.abspath(outputfile)
+    outputfile = open(outputfile, "w")
+    (geneData1, alleleData1, organismData1, _) = \
+        read_population_file(populationfile1, False)
+    (_, _, organismData2, _) = \
+        read_population_file(populationfile2, False)
+    outputfile.write(geneData1 + "\n")
+    print(geneData1)
+    for allele in alleleData1:
+        outputfile.write(allele + "\n")
+    print(alleleData1)
+    count = 0
+    for org in organismData1 + organismData2:
+        genome = ["|".join(org[1][i]) for i in range(len(org[1]))]
+        genome = ";".join(genome)
+        org[0][0] = str(count)
+        organism = "|".join(["O"] + org[0])
+        organismData = ">".join([organism, genome])
+        outputfile.write(organismData + "\n")
+        print(organismData)
+        count = count + 1
+    outputfile.close()
+
+######################################################################
+# Section 6: Command-line executor
 ######################################################################
 if __name__ == '__main__':
     exposed_functions = {
+        'combinepop': combine_populations,
         'gpop': generate_population,
         'readpf': read_parameter_file,
         'readpop': read_population_file,
