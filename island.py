@@ -34,10 +34,27 @@ except ImportError:
 
 def read_parameter_file(parameterfile, cmdline=True):
     """!
+    Function to read a simulation parameter file containing the 
+    allelic frequencies of all genes and print out the data for 
+    checking.
+
+    The simulation parameter file is a comma-delimited file, consisting 
+    of a header row followed by row(s) of allelic frequencies. Each 
+    allelic frequency is defined as <Gene Name>, [<Allelic Frequency 1>, 
+    <Allelic Frequency 2>, ...]. Each Gene can have a different number 
+    of alleles but the sum of all allelic frequencies for a specific 
+    gene must add up to 1. A sample of simulation parameter file is 
+    given as island_parameter.csv.
 
     Usage:
         
         python island.py readpf --parameterfile=island_parameter.csv
+
+    @param parameterfile String: Relative or absolute path to the 
+    simulation parameter file.
+    @param cmdline Boolean: Flag to use this function as a command-line 
+    function, which means results are not returned. Default = True 
+    (results are not returned).
     """
     parameterfile = os.path.abspath(parameterfile)
     pfile = open(parameterfile, 'r').readlines()
@@ -83,10 +100,23 @@ def generate_population(parameterfile, populationfile,
                         population_size=10, ploidy=2, 
                         generation_count=0):
     """!
+    Function to generate the population file, which will be used as 
+    input for simulation, from the simulation parameter file.
 
     Usage:
     
         python island.py gpop --populationfile=test_pop.pop --ploidy=2 --generation_count=0 --population_size=10 --parameterfile=island_parameter.csv
+
+    @param parameterfile String: Relative or absolute path to the 
+    simulation parameter file.
+    @param populationfile String: Relative or absolute path for writing 
+    out the population file for simulation.
+    @param population_size Integer: Population size / number of 
+    organisms to generate. Default = 10.
+    @param ploidy Integer: Number of chromosome sets. Default = 2 
+    (diploid).
+    @param generation_count Integer: The base generation count. 
+    Default = 0.
     """
     populationfile = os.path.abspath(populationfile)
     parameterfile = os.path.abspath(parameterfile)
@@ -115,6 +145,18 @@ def generate_population(parameterfile, populationfile,
     pop_file.close()
 
 def _simulation_writeout(filename, organisms, headerData):
+    """!
+    Private function called by simulate_<simulation type>() functions 
+    to write out the corresponding population files for each generation.
+
+    @param filename String: Relative or absolute path of the new
+    population file.
+    @param organisms Dictionary: Dictionary of organisms from 
+    simulate_<simulation type>() functions to be written out.
+    @param headerData List: Header data of population file (consisting 
+    of gene list and allelic frequencies) from simulate_<simulation 
+    type>() functions, to enable write out of simulated populations.
+    """
     outputfile = open(filename, "w")
     for header in headerData:
         outputfile.write(header + "\n")
@@ -187,10 +229,24 @@ def simulate_simple(populationfile, generations, organisms, headerData):
 def simulate_population(populationfile, simulation_type='simple',
                         generations=10):
     """!
+    Function to simulate population over generations, given a 
+    population. Allowable simulation types are simple. For more 
+    description of the simulation types, please read documentation 
+    in simulate_<simulation type>() function.
 
     Usage:
     
         python island.py simulate --populationfile=test_pop.pop --simulation_type=simple --generations=10
+
+    @param populationfile String: Relative or absolute path of the 
+    population file for simulation.
+    @param simulation_type String: Type of simulation to run. Default 
+    = simple.
+    @param generations Integer: Number of generations to simulate. 
+    Note that generation count is not incremental from population, 
+    which means that despite the generation in population file may be 
+    50, the generation count in the results file will begin with 1. 
+    Default = 10.
     """
     populationfile = os.path.abspath(populationfile)
     inputfile = open(populationfile, "r").readlines()
