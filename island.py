@@ -80,8 +80,8 @@ def _generate_organism(pop_param, gene_sequence, ploidy):
     return organism
 
 def generate_population(parameterfile, populationfile,
-                        ploidy=2, generation_count=0,
-                        population_size=10):
+                        population_size=10, ploidy=2, 
+                        generation_count=0):
     """!
 
     Usage:
