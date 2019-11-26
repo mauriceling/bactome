@@ -306,7 +306,10 @@ def simulate_simple(populationfile, generations, organisms,
                    'genome': [genomeA[random.randint(0, 1)], 
                               genomeB[random.randint(0, 1)]]}
             new_organisms[str(i)] = org
+            if i % 100 == 0:
+                print("%s organisms produced" % str(i))
             i = i + 1
+        print("Total %s organisms produced" % str(i))
         _simulation_writeout(outputfile, new_organisms, headerData)
         organisms = new_organisms
 
