@@ -433,6 +433,7 @@ def tabulate_allelic_counts(populationfile, ploidy=2):
                 exp_allele_counts[gene][allele])
     print("Chi Square Statistic : %s" % str(chiSq))
     print("Degrees of Freedom : %i" % df)
+    print("Normalized Chi Square Statistic : %s" % str(chiSq / (df + 1)))
 
 ######################################################################
 # Section 5: Utility operations
