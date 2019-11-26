@@ -186,7 +186,8 @@ def generate_population(parameterfile, populationfile,
     allele_count = [str(len(pop_param[gene])) for gene in gene_sequence]
     stdout = '%s>%s' % ("|".join(gene_sequence), "|".join(allele_count))
     pop_file.write(stdout + "\n")
-    print(stdout)
+    # print(stdout)
+    print("Number of Genes = %i" % len(gene_sequence))
     for gene in gene_sequence:
         allelic_frequency = ["%.5f" % pop_param[gene][0]] + \
             ["%.5f" % (pop_param[gene][i] - pop_param[gene][i-1]) 
@@ -194,7 +195,7 @@ def generate_population(parameterfile, populationfile,
         stdout = "A>%s>" % gene
         stdout = stdout + "|".join([str(af) for af in allelic_frequency])
         pop_file.write(stdout + "\n")
-        print(stdout)
+        # print(stdout)
     for organism_count in range(int(population_size)):
         organism = _generate_organism(pop_param, gene_sequence, ploidy)
         stdout = "O>%s|%s|0|0>%s" % \
@@ -202,7 +203,10 @@ def generate_population(parameterfile, populationfile,
              ";".join(["|".join([str(allele) for allele in ploid]) 
                         for ploid in organism]))
         pop_file.write(stdout + "\n")
-        print(stdout)
+        # print(stdout)
+        if (organism_count + 1) % 100 == 0:
+            print("%i organisms generated" % organism_count + 1)
+    print("Total %i organisms generated" % organism_count + 1)
     pop_file.close()
 
 ######################################################################
