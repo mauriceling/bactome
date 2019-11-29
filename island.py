@@ -508,14 +508,16 @@ def randomly_select_population(populationfile, outputfile, n):
     """
     populationfile = os.path.abspath(populationfile)
     outputfile = os.path.abspath(outputfile)
+    print("Sample %s organisms from %s into %s" % \
+        (str(int(n)), populationfile, outputfile))
     outputfile = open(outputfile, "w")
     (geneData, alleleData, organismData, _) = \
         read_population_file(populationfile, False)
     outputfile.write(geneData + "\n")
-    print(geneData)
+    # print(geneData)
     for allele in alleleData:
         outputfile.write(allele + "\n")
-    print(alleleData)
+    # print(alleleData)
     random.shuffle(organismData)
     for org in organismData[:int(n)]:
         genome = ["|".join(org[1][i]) for i in range(len(org[1]))]
@@ -523,7 +525,7 @@ def randomly_select_population(populationfile, outputfile, n):
         organism = "O>" + "|".join(org[0])
         organismData = ">".join([organism, genome])
         outputfile.write(organismData + "\n")
-        print(organismData)
+        # print(organismData)
     outputfile.close()
 ######################################################################
 # Section 6: Command-line executor
