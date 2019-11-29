@@ -465,8 +465,11 @@ def combine_populations(populationfile1, populationfile2, outputfile):
     """
     populationfile1 = os.path.abspath(populationfile1)
     populationfile2 = os.path.abspath(populationfile2)
+    outputmapfile = outputfile + ".map"
     outputfile = os.path.abspath(outputfile)
     outputfile = open(outputfile, "w")
+    outputmapfile = os.path.abspath(outputmapfile)
+    outputmapfile = open(outputmapfile, "w")
     print("Read population file %s" % str(populationfile1))
     (geneData1, alleleData1, organismData1, _) = \
         read_population_file(populationfile1, False)
@@ -480,9 +483,24 @@ def combine_populations(populationfile1, populationfile2, outputfile):
         outputfile.write(allele + "\n")
     # print(alleleData1)
     count = 0
-    for org in organismData1 + organismData2:
+    for org in organismData1:
         genome = ["|".join(org[1][i]) for i in range(len(org[1]))]
         genome = ";".join(genome)
+        mapdata = "%s:%s>%s" % (populationfile1, str(org[0][0]), str(count))
+        print(mapdata)
+        outputmapfile.write(mapdata + "\n")
+        org[0][0] = str(count)
+        organism = "O>" + "|".join(org[0])
+        organismData = ">".join([organism, genome])
+        outputfile.write(organismData + "\n")
+        # print(organismData)
+        count = count + 1
+    for org in organismData2:
+        genome = ["|".join(org[1][i]) for i in range(len(org[1]))]
+        genome = ";".join(genome)
+        mapdata = "%s:%s>%s" % (populationfile2, str(org[0][0]), str(count))
+        print(mapdata)
+        outputmapfile.write(mapdata + "\n")
         org[0][0] = str(count)
         organism = "O>" + "|".join(org[0])
         organismData = ">".join([organism, genome])
@@ -491,6 +509,7 @@ def combine_populations(populationfile1, populationfile2, outputfile):
         count = count + 1
     print("Total number of combined organisms = %s" % \
         str(count))
+    outputmapfile.close()
     outputfile.close()
 
 def randomly_select_population(populationfile, outputfile, n):
