@@ -205,8 +205,8 @@ def generate_population(parameterfile, populationfile,
         pop_file.write(stdout + "\n")
         # print(stdout)
         if (organism_count + 1) % 100 == 0:
-            print("%i organisms generated" % organism_count + 1)
-    print("Total %i organisms generated" % organism_count + 1)
+            print("%s organisms generated" % str(organism_count + 1))
+    print("Total %s organisms generated" % str(organism_count + 1))
     pop_file.close()
 
 ######################################################################
