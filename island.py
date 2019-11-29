@@ -462,15 +462,18 @@ def combine_populations(populationfile1, populationfile2, outputfile):
     populationfile2 = os.path.abspath(populationfile2)
     outputfile = os.path.abspath(outputfile)
     outputfile = open(outputfile, "w")
+    print("Read population file %s" % str(populationfile1))
     (geneData1, alleleData1, organismData1, _) = \
         read_population_file(populationfile1, False)
+    print("Read population file %s" % str(populationfile2))
     (_, _, organismData2, _) = \
         read_population_file(populationfile2, False)
+    print("Combine populations")
     outputfile.write(geneData1 + "\n")
-    print(geneData1)
+    # print(geneData1)
     for allele in alleleData1:
         outputfile.write(allele + "\n")
-    print(alleleData1)
+    # print(alleleData1)
     count = 0
     for org in organismData1 + organismData2:
         genome = ["|".join(org[1][i]) for i in range(len(org[1]))]
@@ -481,6 +484,8 @@ def combine_populations(populationfile1, populationfile2, outputfile):
         outputfile.write(organismData + "\n")
         print(organismData)
         count = count + 1
+    print("Total number of combined organisms = %s" % \
+        str(count))
     outputfile.close()
 
 def randomly_select_population(populationfile, outputfile, n):
