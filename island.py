@@ -485,7 +485,7 @@ def combine_populations(populationfile1, populationfile2, outputfile):
         organism = "O>" + "|".join(org[0])
         organismData = ">".join([organism, genome])
         outputfile.write(organismData + "\n")
-        print(organismData)
+        # print(organismData)
         count = count + 1
     print("Total number of combined organisms = %s" % \
         str(count))
