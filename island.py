@@ -539,6 +539,8 @@ def randomly_select_population(populationfile, outputfile, n):
     for allele in alleleData:
         outputfile.write(allele + "\n")
     # print(alleleData)
+    if int(n) > len(organismData):
+        n = len(organismData)
     random.shuffle(organismData)
     for org in organismData[:int(n)]:
         genome = ["|".join(org[1][i]) for i in range(len(org[1]))]
