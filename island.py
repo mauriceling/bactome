@@ -483,6 +483,40 @@ def combine_populations(populationfile1, populationfile2, outputfile):
         count = count + 1
     outputfile.close()
 
+def randomly_select_population(populationfile, outputfile, n):
+    """!
+    Function to randomly select n organisms from a population file into 
+    another population file.
+
+    Usage:
+
+        python island.py random --populationfile=test_pop --outputfile=test_pop.rand --n=30
+
+    @param populationfile String: Relative or absolute path of the 
+    population file to randomly select population from.
+    @param putputfile String: Relative or absolute path for writing 
+    out the randomly selected population file.
+    @param n Integer: Number of organisms to select.
+    """
+    populationfile = os.path.abspath(populationfile)
+    outputfile = os.path.abspath(outputfile)
+    outputfile = open(outputfile, "w")
+    (geneData, alleleData, organismData, _) = \
+        read_population_file(populationfile, False)
+    outputfile.write(geneData + "\n")
+    print(geneData)
+    for allele in alleleData:
+        outputfile.write(allele + "\n")
+    print(alleleData)
+    random.shuffle(organismData)
+    for org in organismData[:int(n)]:
+        genome = ["|".join(org[1][i]) for i in range(len(org[1]))]
+        genome = ";".join(genome)
+        organism = "O>" + "|".join(org[0])
+        organismData = ">".join([organism, genome])
+        outputfile.write(organismData + "\n")
+        print(organismData)
+    outputfile.close()
 ######################################################################
 # Section 6: Command-line executor
 ######################################################################
@@ -490,6 +524,7 @@ if __name__ == '__main__':
     exposed_functions = {
         'combinepop': combine_populations,
         'gpop': generate_population,
+        'random': randomly_select_population,
         'readpf': read_parameter_file,
         'readpop': read_population_file,
         'simulate': simulate_population,
