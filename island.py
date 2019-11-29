@@ -250,7 +250,7 @@ def simulate_simple(populationfile, generations, organisms,
         - one random crossover per chromosome pair
         - crossover is generated prior to mating to simulate random haploid
         - no mutations
-        - random mating with possibility of self-mating
+        - random mating without possibility of self-mating
         - mating only within generation
         - population size may be changed
 
@@ -289,9 +289,11 @@ def simulate_simple(populationfile, generations, organisms,
         new_organisms = {}
         i = 0
         while i < int(population_size):
-            parentA = random.choice(organismList)
-            parentB = random.choice(organismList)
-
+            parentA = 0
+            parentB = 0
+            while parentA == parentB:
+                parentA = random.choice(organismList)
+                parentB = random.choice(organismList)
             chromosomeA1 = organisms[parentA]['genome'][0]
             chromosomeA2 = organisms[parentA]['genome'][1]
             chromosomeB1 = organisms[parentB]['genome'][0]
@@ -309,7 +311,7 @@ def simulate_simple(populationfile, generations, organisms,
                    'genome': [genomeA[random.randint(0, 1)], 
                               genomeB[random.randint(0, 1)]]}
             new_organisms[str(i)] = org
-            if i % 100 == 0:
+            if i+1 % 100 == 0:
                 print("%s organisms produced" % str(i))
             i = i + 1
         print("Total %s organisms produced" % str(i))
