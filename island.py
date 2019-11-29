@@ -476,7 +476,7 @@ def combine_populations(populationfile1, populationfile2, outputfile):
         genome = ["|".join(org[1][i]) for i in range(len(org[1]))]
         genome = ";".join(genome)
         org[0][0] = str(count)
-        organism = "|".join(["O"] + org[0])
+        organism = "O>" + "|".join(org[0])
         organismData = ">".join([organism, genome])
         outputfile.write(organismData + "\n")
         print(organismData)
