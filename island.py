@@ -231,9 +231,12 @@ def _simulation_writeout(filename, organisms, headerData):
     for organism in organisms:
         genome = ["|".join(organisms[organism]['genome'][i]) 
                   for i in range(organisms[organism]['polyploid'])]
-        stdout = "O>%s|%s|0|0>%s" % (str(organisms[organism]['organism']), 
-                                     str(organisms[organism]['generation']), 
-                                     str(";".join(genome)))
+        stdout = "O>%s|%s|%s|%s>%s" % \
+            (str(organisms[organism]['organism']), 
+             str(organisms[organism]['generation']), 
+             str(organisms[organism]['parentA']),
+             str(organisms[organism]['parentB']),
+             str(";".join(genome)))
         outputfile.write(stdout + "\n")
     outputfile.close()
 
