@@ -351,7 +351,7 @@ def nucleotideLength(fastafile):
 
     where 
         - sequence ID is the sequence ID of the FASTA record
-        - nucleotide length is the number of bases in the peptide
+        - nucleotide length is the number of bases in the sequence
 
     @param fastafile String: Path to the FASTA file to be processed.
     '''
@@ -373,7 +373,7 @@ def complement(fastafile):
 
         python seqproperties.py complement --fastafile=<FASTA file path> 
 
-     The output will be in FASTA format.
+    The output will be in FASTA format.
 
     @param fastafile String: Path to the FASTA file to be processed.
     '''
