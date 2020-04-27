@@ -1571,40 +1571,46 @@ def findORF(fastafile, min_length=33, max_length=105000, outfmt="CSV",
                 print(seq[coord[0]:coord[1]])
             count = count + 1
 
-def random_selection(fastafile, n=250, with_replacement=True):
+def random_selection(fastafile, n=250, with_replacement=True, 
+                     outfmt='fasta'):
     '''!
     Function to select a random set of sequences from a given FASTA 
     file.
 
     Usage:
 
-        python seqproperties.py rselect --fastafile=<fasta file path> --n=250 --with_replacement=True
+        python seqproperties.py rselect --fastafile=<fasta file path> --n=250 --with_replacement=True --outfmt=fasta
 
-    The output format will be:
+    The linear output format will be:
 
-        <count> : <sequence>
+        <count> : <sequence ID> : <sequence>
 
     @param fastafile String: Path to the FASTA file to be processed.
     @param n Integer: Number of sequences to select. Default = 250.
     @param with_replacement String: Flag to indicate whether duplicated 
     selection is allowed. Allowable options are "True" (no duplicates 
     allowed) or "False" (duplicates allowed). Default = "True".
+    @param outfmt String: Type of output. Allowable options are "linear" 
+    (ID line and sequence in the same line) or "fasta" (FASTA format). 
+    Default = 'fasta'
     '''
     q = CodonUsageBias()
     q.addSequencesFromFasta(fastafile)
-    seq = []
-    if len(q.seqNN) < int(n):
-        seq = [str(s[1]) for s in q.seqNN]
-    else:
-        while len(seq) < int(n):
-            s[0] = random.sample(q.seqNN.items(), k=1)
-            if str(with_replacement) == "True" and (s not in seq):
-                seq.append(str(s[1][0]))
-            else:
-                seq.append(str(s[1][0]))
+    selection = []
+    while len(selection) < int(n):
+        s = random.sample(list(q.seqNN), k=1)[0]
+        if str(with_replacement) == "True" and (s not in selection):
+            selection.append((s, q.seqNN[s]))
+        else:
+            selection.append((s, q.seqNN[s]))
+ 
     count = 1
-    for s in seq:
-        print("%s : %s" % (str(count), s))
+    for s in selection:
+        if outfmt.lower() == 'linear':
+            print("%s : %s : %s" % (str(count), s[0], s[1][0]))
+        elif outfmt.lower() == 'fasta':
+            print("> %s" % s[0])
+            print(s[1][0])
         count = count + 1
 
 if __name__ == '__main__':
