@@ -1472,7 +1472,7 @@ def findORF(fastafile, min_length=33, max_length=105000, outfmt="CSV",
     used to check the randomly generated sequence to ensure that there 
     is no start codons within the sequence. Secondly, it can be used 
     to cap the start of a newly generated sequence.Default = 
-    "TTG,CTG,ATG" (PMID 26010086).
+    "TTG,CTG,ATG" (PMID 9278503).
     @param stop_codons String: A comma-delimited list to represent 
     stop codons. This is used for two purposes. Firstly, it can be 
     used to check the randomly generated sequence to ensure that there 
