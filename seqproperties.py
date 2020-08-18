@@ -185,8 +185,7 @@ def translate(fastafile, genetic_code=1):
 
     Usage:
 
-        python seqproperties.py translate --fastafile=<FASTA file path> 
-        --genetic_code=<genetic code number>
+        python seqproperties.py translate --fastafile=<FASTA file path> --genetic_code=<genetic code number>
 
     The output will be in the format of
 
@@ -219,11 +218,7 @@ def aminoacidCount(fastafile, molecule, genetic_code=1, to_stop=True):
 
     The output will be in the format of
 
-        <sequence ID> : <A count> : <C count> : <D count> : <E count> 
-        : <F count> : <G count> : <H count> : <I count> : <K count> : 
-        <L count> : <M count> : <N count> : <P count> : <Q count> : 
-        <R count> : <S count> : <T count> : <V count> : <W count> : 
-        <Y count>
+        <sequence ID> : <A count> : <C count> : <D count> : <E count> : <F count> : <G count> : <H count> : <I count> : <K count> : <L count> : <M count> : <N count> : <P count> : <Q count> : <R count> : <S count> : <T count> : <V count> : <W count> : <Y count>
 
     where 
         - sequence ID is the sequence ID of the FASTA record
@@ -422,28 +417,11 @@ def codonCount(fastafile, genetic_code=1):
 
     Usage:
 
-        python seqproperties.py codoncount --fastafile=<FASTA file path> 
-        --genetic_code=<genetic code number>
+        python seqproperties.py codoncount --fastafile=<FASTA file path> --genetic_code=<genetic code number>
 
     The output will be in the format of
 
-        <sequence ID> : <AAA count> : <AAC count> : <AAG count> : 
-        <AAT count> : <ACA count> : <ACC count> : <ACG count> : 
-        <ACT count> : <AGA count> : <AGC count> : <AGG count> : 
-        <AGT count> : <ATA count> : <ATC count> : <ATG count> : 
-        <ATT count> : <CAA count> : <CAC count> : <CAG count> : 
-        <CAT count> : <CCA count> : <CCC count> : <CCG count> : 
-        <CCT count> : <CGA count> : <CGC count> : <CGG count> : 
-        <CGT count> : <CTA count> : <CTC count> : <CTG count> : 
-        <CTT count> : <GAA count> : <GAC count> : <GAG count> : 
-        <GAT count> : <GCA count> : <GCC count> : <GCG count> : 
-        <GCT count> : <GGA count> : <GGC count> : <GGG count> : 
-        <GGT count> : <GTA count> : <GTC count> : <GTG count> : 
-        <GTT count> : <TAA count> : <TAC count> : <TAG count> : 
-        <TAT count> : <TCA count> : <TCC count> : <TCG count> : 
-        <TCT count> : <TGA count> : <TGC count> : <TGG count> : 
-        <TGT count> : <TTA count> : <TTC count> : <TTG count> : 
-        <TTT count>
+        <sequence ID> : <AAA count> : <AAC count> : <AAG count> : <AAT count> : <ACA count> : <ACC count> : <ACG count> : <ACT count> : <AGA count> : <AGC count> : <AGG count> : <AGT count> : <ATA count> : <ATC count> : <ATG count> : <ATT count> : <CAA count> : <CAC count> : <CAG count> : <CAT count> : <CCA count> : <CCC count> : <CCG count> : <CCT count> : <CGA count> : <CGC count> : <CGG count> : <CGT count> : <CTA count> : <CTC count> : <CTG count> : <CTT count> : <GAA count> : <GAC count> : <GAG count> : <GAT count> : <GCA count> : <GCC count> : <GCG count> : <GCT count> : <GGA count> : <GGC count> : <GGG count> : <GGT count> : <GTA count> : <GTC count> : <GTG count> : <GTT count> : <TAA count> : <TAC count> : <TAG count> : <TAT count> : <TCA count> : <TCC count> : <TCG count> : <TCT count> : <TGA count> : <TGC count> : <TGG count> : <TGT count> : <TTA count> : <TTC count> : <TTG count> : <TTT count>
 
      where 
         - sequence ID is the sequence ID of the FASTA record
@@ -1070,9 +1048,7 @@ def extinction_coefficient(fastafile, molecule, genetic_code=1,
     is not peptide, as these options are needed for translation. The 
     output will be in the format of
 
-        <sequence ID> : <extinction coefficient assuming reduced 
-        cysteine> : <extinction coefficient assuming non-reduced 
-        cysteine>
+        <sequence ID> : <extinction coefficient assuming reduced cysteine> : <extinction coefficient assuming non-reduced cysteine>
 
     @param fastafile String: Path to the FASTA file to be processed.
     @param molecule String: Defines the type of molecule. Three 
@@ -1136,8 +1112,7 @@ def nGram(fastafile, molecule, n):
 
     The output will be in the format of:
 
-        <sequence ID> : <list of n-gram counts> : 
-        <list of n-gram identities>
+        <sequence ID> : <list of n-gram counts> : <list of n-gram identities>
 
     @param fastafile String: Path to the FASTA file to be processed.
     @param molecule String: Defines the type of molecule. Three 
@@ -1179,8 +1154,7 @@ def hasReverse(fastafile, molecule, min, max, suffix=''):
 
     The output will be in the format of:
 
-        <sequence ID> : <length of reverse> : <sequence> : 
-        <reversed sequence>
+        <sequence ID> : <length of reverse> : <sequence> : <reversed sequence>
 
     @param fastafile String: Path to the FASTA file to be processed.
     @param molecule String: Defines the type of molecule. Three 
