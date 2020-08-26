@@ -127,6 +127,34 @@ def showClassificationReport(Y_test, Y_pred):
     print("------------- End of Classification Report ----------")
     print("")
 
+def cross_validate(classifier, X, Y, fold):
+    """!
+    Internal function - Cross validation of classifier
+
+    @param classifier Object: Generated classifier object.
+    @param X Array: Array of independent variables.
+    @param Y Array: Array of dependent variable.
+    @param fold Integer: Number of folds for cross validation
+    """
+    from sklearn import metrics
+    from sklearn.model_selection import cross_val_score
+    fold = int(fold)
+    print("------------ Cross Validation Report ----------------")
+    print("%s fold cross validation" % str(fold))
+    print("")
+    scores = cross_val_score(classifier, X, Y, cv=fold, scoring="precision")
+    print("Precision: %0.2f (sigma = %0.3f)" % (scores.mean()*100, scores.std()*100))
+    scores = cross_val_score(classifier, X, Y, cv=fold, scoring="recall")
+    print("Recall: %0.2f (+/- %0.3f)" % (scores.mean()*100, scores.std()*100))
+    scores = cross_val_score(classifier, X, Y, cv=fold, scoring="f1")
+    print("F1 score: %0.2f (+/- %0.3f)" % (scores.mean()*100, scores.std()*100))
+    scores = cross_val_score(classifier, X, Y, cv=fold, scoring="roc_auc")
+    print("Area Under the Receiver Operating Characteristic Curve: %0.2f (+/- %0.3f)" % (scores.mean()*100, scores.std()*100))
+    scores = cross_val_score(classifier, X, Y, cv=fold, scoring="accuracy")
+    print("Accuracy: %0.2f (+/- %0.3f)" % (scores.mean()*100, scores.std()*100))
+    print("Note: Values are shown as percentage.")
+    print("--------- End of Cross Validation Report ------------")
+
 def recycle(infile, intype, outfile, outtype):
     """!
     Function to read in and write out a classifier. This can be used to update the serialization protocol or to change the change the type of serialization; such as, from pickle to joblib.
@@ -172,13 +200,14 @@ def generateANN(datafile, label,
                 verbose=False,
                 classparam=True, 
                 confusion=True, 
-                classreport=True):
+                classreport=True,
+                cross_validation=5):
     """!
     Function to generate an artificial neural network (multi-layer perceptron classifier) from given data. 
 
     Usage:
         
-        python bactclass.py genANN --datafile=classifier_train.csv --label=Class --oclass=classifier_ANN.pickle --otype=pickle --hidden_layer_sizes=100 --activation=relu --solver=adam --learning_rate=constant --learning_rate_init=0.001 --power_t=0.5 --max_iteration=200 --shuffle=True --tolerance=0.0001 --momentum=0.9 --nesterovs_momentum=True --beta_1=0.9 --beta_2=0.999 --epsilon=1e-8 --n_iter_no_change=10 --verbose=False --classparam=True --confusion=True --classreport=True
+        python bactclass.py genANN --datafile=classifier_train.csv --label=Class --oclass=classifier_ANN.pickle --otype=pickle --hidden_layer_sizes=100 --activation=relu --solver=adam --learning_rate=constant --learning_rate_init=0.001 --power_t=0.5 --max_iteration=200 --shuffle=True --tolerance=0.0001 --momentum=0.9 --nesterovs_momentum=True --beta_1=0.9 --beta_2=0.999 --epsilon=1e-8 --n_iter_no_change=10 --verbose=False --classparam=True --confusion=True --classreport=True --cross_validation=5
 
     @param datafile String: Path to CSV data file used to generate SVM.
     @param label String: Column (field) name in the data file to indicate the class label.
@@ -203,6 +232,7 @@ def generateANN(datafile, label,
     @param classparam Boolean: Flag to indicate whether to print out SVM parameters. Default = True
     @param confusion Boolean: Flag to indicate whether to print out confusion matrix. Default = True
     @param classreport Boolean: Flag to indicate whether to print out classification report. Default = True
+    @param cross_validation Integer: Number of cross validation (if any) to perform. If less than 2, cross validation will not be carried out. Default = 5
     """
     from sklearn.neural_network import MLPClassifier
     print("")
@@ -260,6 +290,8 @@ def generateANN(datafile, label,
         showConfusionMatrix(Y_test, Y_pred)
     if classreport:
         showClassificationReport(Y_test, Y_pred)
+    if cross_validation > 1:
+        cross_validate(classifier, X, Y, int(cross_validation))
     print("===================== ANN Generated =====================")
 
 def useANN(datafile, classfile, classtype, resultfile):
@@ -302,13 +334,14 @@ def generateSVM(datafile, label,
                 break_ties=False,
                 classparam=True, 
                 confusion=True, 
-                classreport=True):
+                classreport=True,
+                cross_validation=5):
     """!
     Function to generate a support vector machine from given data. 
 
     Usage:
         
-        python bactclass.py genSVM --datafile=classifier_train.csv --label=Class --oclass=classifier_SVM.pickle --otype=pickle --kernel=linear --degree=3 --gamma=scale --coef0=0.0 --decision_function_shape=ovr --tolerance=0.001 --max_iteration=-1 --break_ties=False --classparam=True --confusion=True --classreport=True
+        python bactclass.py genSVM --datafile=classifier_train.csv --label=Class --oclass=classifier_SVM.pickle --otype=pickle --kernel=linear --degree=3 --gamma=scale --coef0=0.0 --decision_function_shape=ovr --tolerance=0.001 --max_iteration=-1 --break_ties=False --classparam=True --confusion=True --classreport=True --cross_validation=5
 
     @param datafile String: Path to CSV data file used to generate SVM.
     @param label String: Column (field) name in the data file to indicate the class label.
@@ -325,6 +358,7 @@ def generateSVM(datafile, label,
     @param classparam Boolean: Flag to indicate whether to print out SVM parameters. Default = True
     @param confusion Boolean: Flag to indicate whether to print out confusion matrix. Default = True
     @param classreport Boolean: Flag to indicate whether to print out classification report. Default = True
+    @param cross_validation Integer: Number of cross validation (if any) to perform. If less than 2, cross validation will not be carried out. Default = 5
     """
     from sklearn.svm import SVC
     print("")
@@ -362,6 +396,8 @@ def generateSVM(datafile, label,
         showConfusionMatrix(Y_test, Y_pred)
     if classreport:
         showClassificationReport(Y_test, Y_pred)
+    if cross_validation > 1:
+        cross_validate(classifier, X, Y, int(cross_validation))
     print("===================== SVM Generated =====================")
 
 def useSVM(datafile, classfile, classtype, resultfile):
