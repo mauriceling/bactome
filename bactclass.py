@@ -149,7 +149,7 @@ def cross_validate(classifier, X, Y, fold):
     scores = cross_val_score(classifier, X, Y, cv=fold, scoring="f1")
     print("F1 score: %0.2f (+/- %0.3f)" % (scores.mean()*100, scores.std()*100))
     scores = cross_val_score(classifier, X, Y, cv=fold, scoring="roc_auc")
-    print("Area Under the Receiver Operating Characteristic Curve: %0.2f (+/- %0.3f)" % (scores.mean()*100, scores.std()*100))
+    print("Area Under the Receiver Operating Characteristic Curve: %0.2f (sigma = %0.3f)" % (scores.mean()*100, scores.std()*100))
     scores = cross_val_score(classifier, X, Y, cv=fold, scoring="accuracy")
     print("Accuracy: %0.2f (+/- %0.3f)" % (scores.mean()*100, scores.std()*100))
     print("Note: Values are shown as percentage.")
