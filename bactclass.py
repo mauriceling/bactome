@@ -154,6 +154,22 @@ def recycle(infile, intype, outfile, outtype):
 def generateANN(datafile, label, 
                 oclass="classifier_ANN.pickle", 
                 otype="pickle",
+                hidden_layer_sizes="100",
+                activation="relu",
+                solver="adam",
+                learning_rate="constant",
+                learning_rate_init=0.001,
+                power_t=0.5,
+                max_iteration=200,
+                shuffle=True,
+                tolerance=0.0001,
+                momentum=0.9,
+                nesterovs_momentum=True,
+                beta_1=0.9,
+                beta_2=0.999,
+                epsilon=1e-8,
+                n_iter_no_change=10,
+                verbose=False,
                 classparam=True, 
                 confusion=True, 
                 classreport=True):
@@ -162,12 +178,28 @@ def generateANN(datafile, label,
 
     Usage:
         
-        python bactclass.py genANN --datafile=classifier_train.csv --label=Class --oclass=classifier_ANN.pickle --otype=pickle --classparam=True --confusion=True --classreport=True
+        python bactclass.py genANN --datafile=classifier_train.csv --label=Class --oclass=classifier_ANN.pickle --otype=pickle --hidden_layer_sizes=100 --activation=relu --solver=adam --learning_rate=constant --learning_rate_init=0.001 --power_t=0.5 --max_iteration=200 --shuffle=True --tolerance=0.0001 --momentum=0.9 --nesterovs_momentum=True --beta_1=0.9 --beta_2=0.999 --epsilon=1e-8 --n_iter_no_change=10 --verbose=False --classparam=True --confusion=True --classreport=True
 
     @param datafile String: Path to CSV data file used to generate SVM.
     @param label String: Column (field) name in the data file to indicate the class label.
     @param oclass String: Path to write out the generated classifier. Default = classifier_ANN.pickle
     @param otype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib". Default = pickle
+    @param hidden_layer_sizes String: Defines the number of hidden layers and the number of nodes per hidden layer in semicolon-delimited format. For example, "100" represents 1 hidden layer of 100 nodes; whereas, "100;30" represents 2 hidden layers where the first hidden layer contains 100 nodes while the second hidden layer contains 30 nodes. Default = 100
+    @param activation String: Activation function of the hidden layer. Allowable types are "identity", f(x) = x; "logistic" (logistic sigmoid function), f(x) = 1 / (1 + exp(-x)); "tanh" (hyperbolic tangeant function), f(x) = tanh(x); and "relu" (rectified linear unit function),f(x) = max(0, x). Default = relu
+    @param solver String: Solver for weight optimization. Allowable types are "lbfgs" (is an )optimizer in the family of quasi-Newton methods), "sgd" (stochastic gradient descent), and "adam" (stochastic gradient-based optimizer proposed by Kingma and Ba, 2015. 3rd International Conference on Learning Representations). Default = adam
+    @param learning_rate String: Learning rate schedule for weight updates, which is used only when solver is "sgd". Allowable types are "constant" (constant learning rate given by "learning_rate_init"), "invscaling" (gradually decreases the learning rate at each time step "t" using an inverse scaling exponent of "power_t" where ffective_learning_rate = learning_rate_init / pow(t, power_t)), and "adaptive" (keeps the learning rate constant to "learning_rate_init" as long as training loss keeps decreasing). Default = constant
+    @param learning_rate_init Float: Initial learning rate used to control the step-size in updating the weights. This is only used when solver is "sgd or "adam". Default = 0.001
+    @param power_t Float: Exponent for inverse scaling learning rate, which is used when solver is "sgd" for updating effective learning rate when the learning_rate is set to "invscaling". Default = 0.5
+    @param max_iteration Integer: Maximum number of iterations where the solver iterates until convergence (determined by "tolerance") or reaching maximum iterations. For stochastic solvers ("sgd" or "adam"), note that this determines the number of epochs (how many times each data point will be used) rather than the number of gradient steps.
+    @param shuffle Boolean: Determines whether to shuffle samples in each iteration. Only used when solver is "sgd" or "adam". Default = True
+    @param tolerance Float: Tolerance for the optimization. When the loss or score is not improving by at least tolerance for n_iter_no_change consecutive iterations, unless learning_rate is set to "adaptive", convergence is considered to be reached and training stops. Default = 0.0001
+    @param momentum Float: Momentum, between 0 and 1, for gradient descent update (solver is "sgd"). Default = 0.9
+    @param nesterovs_momentum Boolean: Flag to whether to use Nesterov's momentum when solver is "sgd" and momentum > 0. Default = True
+    @param beta_1 float: Exponential decay rate for estimates of first moment vector, between 0 (inclusive) and 1 (exclusive), in "adam" solver. Default = 0.9
+    @param beta_2 float: Exponential decay rate for estimates of second moment vector, between 0 (inclusive) and 1 (exclusive), in "adam" solver. Default = 0.999
+    @param epsilon float: Value for numerical stability in "adam". Default = 1e-8
+    @param n_iter_no_change Integer: Maximum number of epochs to not meet tolerance improvement when solver is "sgd" or "adam". Default = 10
+    @param verbose Boolean: Flag to indicate whether to print progress messages. Default = False
     @param classparam Boolean: Flag to indicate whether to print out SVM parameters. Default = True
     @param confusion Boolean: Flag to indicate whether to print out confusion matrix. Default = True
     @param classreport Boolean: Flag to indicate whether to print out classification report. Default = True
@@ -178,12 +210,47 @@ def generateANN(datafile, label,
     print("Parameters:")
     print("    Data File = " + str(datafile))
     print("    Classification Label = " + str(label))
+    print("    Hidden Layer Sizes = " + str(hidden_layer_sizes))
+    print("    Activation Function = " + str(activation))
+    print("    Solver Function = " + str(solver))
+    print("    Type of Learning Rate = " + str(learning_rate))
+    print("    Initial Learning Rate (learning_rate_init) = " + str(learning_rate_init))
+    print("    Inverse Scaling Learning Rate Exponent (power_t) = " + str(power_t))
+    print("    Momentum = " + str(momentum))
+    print("    Nesterov's Momentum = " + str(nesterovs_momentum))
+    print("    Exponential decay rate of first moment vector (beta_1) = " + str(beta_1))
+    print("    Exponential decay rate of second moment vector (beta_2) = " + str(beta_2))
+    print("    Numerical Stability (epsilon) = " + str(beta_2))
+    print("    Maximum Iteration = " + str(int(max_iteration)))
+    print("    Maximum Iteration with No Change (n_iter_no_change) = " + str(n_iter_no_change))
+    print("    Tolerance = " + str(tolerance))
+    print("    Shuffle = " + str(shuffle))
+    print("    Verbose = " + str(verbose))
     print("    Classifier File = " + str(oclass))
     print("    Classifier File Type = " + str(otype))
     print("")
     X, Y = readData(datafile, True, label)
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.20)
-    classifier = MLPClassifier(random_state=1, max_iter=300)
+    hidden_layer_sizes = str(hidden_layer_sizes)
+    hidden_layer_sizes = hidden_layer_sizes.split(";")
+    hidden_layer_sizes = [int(x.strip()) for x in hidden_layer_sizes]
+    classifier = MLPClassifier(hidden_layer_sizes=tuple(hidden_layer_sizes),
+                               activation=str(activation),
+                               solver=str(solver),
+                               learning_rate=str(learning_rate),
+                               learning_rate_init=float(learning_rate_init),
+                               power_t=float(power_t),
+                               random_state=1, 
+                               max_iter=int(max_iteration),
+                               shuffle=shuffle,
+                               tol=float(tolerance),
+                               verbose=verbose,
+                               momentum=float(momentum),
+                               nesterovs_momentum=nesterovs_momentum,
+                               beta_1=float(beta_1),
+                               beta_2=float(beta_2),
+                               epsilon=float(epsilon),
+                               n_iter_no_change=int(n_iter_no_change))
     classifier.fit(X_train, Y_train)
     Y_pred = classifier.predict(X_test)
     saveModel(oclass, otype, classifier)
