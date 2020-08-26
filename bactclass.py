@@ -227,6 +227,12 @@ def generateSVM(datafile, label,
                 otype="pickle",
                 kernel="linear", 
                 degree=3,
+                gamma="scale",
+                coef0=0.0,
+                decision_function_shape="ovr",
+                tolerance=0.001,
+                max_iteration=-1,
+                break_ties=False,
                 classparam=True, 
                 confusion=True, 
                 classreport=True):
@@ -235,7 +241,7 @@ def generateSVM(datafile, label,
 
     Usage:
         
-        python bactclass.py genSVM --datafile=classifier_train.csv --label=Class --oclass=classifier_SVM.pickle --otype=pickle --kernel=linear --degree=3 --classparam=True --confusion=True --classreport=True
+        python bactclass.py genSVM --datafile=classifier_train.csv --label=Class --oclass=classifier_SVM.pickle --otype=pickle --kernel=linear --degree=3 --gamma=scale --coef0=0.0 --decision_function_shape=ovr --tolerance=0.001 --max_iteration=-1 --break_ties=False --classparam=True --confusion=True --classreport=True
 
     @param datafile String: Path to CSV data file used to generate SVM.
     @param label String: Column (field) name in the data file to indicate the class label.
@@ -243,6 +249,12 @@ def generateSVM(datafile, label,
     @param otype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib". Default = pickle
     @param kernel String: Type of SVM kernel. Acceptable values are linear, poly, rbf, sigmoid. Default = linear
     @param degree Integer: Polynomial degree, only used in polynomial (poly) kernel. Default = 3
+    @param gamma String: Coefficient for "rbf", "poly" and "sigmoid" kernels. Allowable types are "scale" and "float". Default = scale
+    @param coef0 float: Independent term used in "poly" and "sigmoid" kernels. Default = 0.0
+    @param decision_function_shape String: Uses one-vs-rest (ovr) decision function of shape or one-vs-one ("ovo") decision function. However, one-vs-one ("ovo") is always used as multi-class strategy. The parameter is ignored for binary classification. Default = ovr
+    @param tolerance float: Tolerance for stopping criterion. Default = 0.001
+    @param max_iteration Integer: Hard limit on iterations within solver, or -1 for no limit. Default = -1
+    @param break_ties Boolean: If True, decision_function_shape is "ovr, and number of classes > 2, prediction function will break ties according to the confidence values of decision_function; otherwise the first class among the tied classes is returned. Default = False
     @param classparam Boolean: Flag to indicate whether to print out SVM parameters. Default = True
     @param confusion Boolean: Flag to indicate whether to print out confusion matrix. Default = True
     @param classreport Boolean: Flag to indicate whether to print out classification report. Default = True
@@ -255,12 +267,25 @@ def generateSVM(datafile, label,
     print("    Classification Label = " + str(label))
     print("    SVM Kernel Type = " + str(kernel))
     print("    Polynomial Degree = " + str(int(degree)))
+    print("    Kernel Coefficient (gamma) = " + str(gamma))
+    print("    Independent Coefficient (coef0) = " + str(coef0))
+    print("    Decision Function Shape = " + str(decision_function_shape))
+    print("    Tolerance = " + str(tolerance))
+    print("    Maximum Iteration = " + str(int(max_iteration)))
+    print("    Breaking Prediction ties (break_ties) = " + str(break_ties))   
     print("    Classifier File = " + str(oclass))
     print("    Classifier File Type = " + str(otype))
     print("")
     X, Y = readData(datafile, True, label)
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.20)
-    classifier = SVC(kernel=str(kernel), degree=int(degree))
+    classifier = SVC(kernel=str(kernel), 
+                     degree=int(degree),
+                     gamma=str(gamma),
+                     coef0=float(coef0),
+                     decision_function_shape=str(decision_function_shape),
+                     tol=float(tolerance),
+                     max_iter=int(max_iteration),
+                     break_ties=break_ties)
     classifier.fit(X_train, Y_train)
     Y_pred = classifier.predict(X_test)
     saveModel(oclass, otype, classifier)
