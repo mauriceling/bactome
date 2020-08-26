@@ -25,7 +25,19 @@ import pickle
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-import fire 
+try: 
+    import fire
+except ImportError:
+    subprocess.check_call([sys.executable, '-m', 'pip', 
+                           'install', 'fire'])
+    import fire
+
+try: 
+    import joblib
+except ImportError:
+    subprocess.check_call([sys.executable, '-m', 'pip', 
+                           'install', 'joblib'])
+    import joblib
 
 def readData(filename, training=True, label="Class"):
     """!
@@ -43,27 +55,36 @@ def readData(filename, training=True, label="Class"):
     else: 
         return data
     
-def saveModel(filename, classifier):
+def saveModel(filename, filetype, classifier):
     """!
     Internal function - Write out the classifier object into a pickle file.
 
     @param filename String: Path to write out the generated classifier.
+    @param filetype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib".
     @param classifier Object: Classifier object
     """
-    f = open(filename, "wb")
-    pickle.dump(classifier, f, pickle.HIGHEST_PROTOCOL)
-    f.close()
+    if filetype.lower() == "pickle":
+        f = open(filename, "wb")
+        pickle.dump(classifier, f, pickle.HIGHEST_PROTOCOL)
+        f.close()
+    elif filetype.lower() == "joblib":
+        joblib.dump(classifier, filename)
 
-def loadModel(filename):
+def loadModel(filename, filetype):
     """!
     Internal function - Load the classifier from file.
 
     @param filename String: Path to the generated classifier to be loaded.
+    @param filetype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib". 
     """
-    f = open(filename, "rb")
-    classifier = pickle.load(f)
-    f.close()
-    return classifier
+    if filetype.lower() == "pickle":
+        f = open(filename, "rb")
+        classifier = pickle.load(f)
+        f.close()
+        return classifier
+    elif filetype.lower() == "joblib":
+        classifier = joblib.load(filename)
+        return classifier
 
 def showClassifierParameters(classifier):
     """!
@@ -107,7 +128,8 @@ def showClassificationReport(Y_test, Y_pred):
     print("")
 
 def generateANN(datafile, label, 
-                oclass="classifier_ANN", 
+                oclass="classifier_ANN.pickle", 
+                otype="pickle",
                 classparam=True, 
                 confusion=True, 
                 classreport=True):
@@ -116,11 +138,12 @@ def generateANN(datafile, label,
 
     Usage:
         
-        python bactclass.py genANN --datafile=classifier_train.csv --label=Class --oclass=classifier_ANN --classparam=True --confusion=True --classreport=True
+        python bactclass.py genANN --datafile=classifier_train.csv --label=Class --oclass=classifier_ANN.pickle --otype=pickle --classparam=True --confusion=True --classreport=True
 
     @param datafile String: Path to CSV data file used to generate SVM.
     @param label String: Column (field) name in the data file to indicate the class label.
-    @param oclass String: Path to write out the generated classifier. Default = classifier_ANN
+    @param oclass String: Path to write out the generated classifier. Default = classifier_ANN.pickle
+    @param otype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib". Default = pickle
     @param classparam Boolean: Flag to indicate whether to print out SVM parameters. Default = True
     @param confusion Boolean: Flag to indicate whether to print out confusion matrix. Default = True
     @param classreport Boolean: Flag to indicate whether to print out classification report. Default = True
@@ -132,13 +155,14 @@ def generateANN(datafile, label,
     print("    Data File = " + str(datafile))
     print("    Classification Label = " + str(label))
     print("    Classifier File = " + str(oclass))
+    print("    Classifier File Type = " + str(otype))
     print("")
     X, Y = readData(datafile, True, label)
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.20)
     classifier = MLPClassifier(random_state=1, max_iter=300)
     classifier.fit(X_train, Y_train)
     Y_pred = classifier.predict(X_test)
-    saveModel(oclass, classifier)
+    saveModel(oclass, otype, classifier)
     if classparam:
         showClassifierParameters(classifier)
     if confusion:
@@ -147,17 +171,18 @@ def generateANN(datafile, label,
         showClassificationReport(Y_test, Y_pred)
     print("===================== ANN Generated =====================")
 
-def useANN(datafile, classfile, resultfile):
+def useANN(datafile, classfile, classtype, resultfile):
     """!
     Function to use a previously generated artificial neural network (ANN) 
     to classify data.
 
     Usage:
 
-        python bactclass.py useANN --datafile=classifier_use.csv --classfile=classifier_ANN --resultfile=classifier_result.csv
+        python bactclass.py useANN --datafile=classifier_use.csv --classfile=classifier_ANN.pickle --classtype=pickle --resultfile=classifier_result.csv
     
     @param datafile String: Path to CSV file containing data to be classified.
     @param classfile String: Path to the generated classifier.
+    @param classtype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib".
     @param resultfile String: Path to write out the classified results.
     """
     print("")
@@ -165,15 +190,17 @@ def useANN(datafile, classfile, resultfile):
     print("Parameters:")
     print("    Data File = " + str(datafile))
     print("    Classifier File = " + str(classfile))
+    print("    Classifier File Type = " + str(classtype))
     print("    Result File = " + str(resultfile))
     print("")
-    classifier = loadModel(classfile)
+    classifier = loadModel(classfile, classtype)
     data = readData(datafile, False)
     data["Prediction"] = classifier.predict(data)
     data.to_csv(resultfile, index=False)
 
 def generateSVM(datafile, label, 
-                oclass="classifier_SVM", 
+                oclass="classifier_SVM.pickle", 
+                otype="pickle",
                 kernel="linear", 
                 degree=3,
                 classparam=True, 
@@ -184,11 +211,12 @@ def generateSVM(datafile, label,
 
     Usage:
         
-        python bactclass.py genSVM --datafile=classifier_train.csv --label=Class --oclass=classifier_SVM --kernel=linear --degree=3 --classparam=True --confusion=True --classreport=True
+        python bactclass.py genSVM --datafile=classifier_train.csv --label=Class --oclass=classifier_SVM.pickle --otype=pickle --kernel=linear --degree=3 --classparam=True --confusion=True --classreport=True
 
     @param datafile String: Path to CSV data file used to generate SVM.
     @param label String: Column (field) name in the data file to indicate the class label.
-    @param oclass String: Path to write out the generated classifier. Default = classifier_SVM
+    @param oclass String: Path to write out the generated classifier. Default = classifier_SVM.pickle
+    @param otype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib". Default = pickle
     @param kernel String: Type of SVM kernel. Acceptable values are linear, poly, rbf, sigmoid. Default = linear
     @param degree Integer: Polynomial degree, only used in polynomial (poly) kernel. Default = 3
     @param classparam Boolean: Flag to indicate whether to print out SVM parameters. Default = True
@@ -204,13 +232,14 @@ def generateSVM(datafile, label,
     print("    SVM Kernel Type = " + str(kernel))
     print("    Polynomial Degree = " + str(int(degree)))
     print("    Classifier File = " + str(oclass))
+    print("    Classifier File Type = " + str(otype))
     print("")
     X, Y = readData(datafile, True, label)
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.20)
     classifier = SVC(kernel=str(kernel), degree=int(degree))
     classifier.fit(X_train, Y_train)
     Y_pred = classifier.predict(X_test)
-    saveModel(oclass, classifier)
+    saveModel(oclass, otype, classifier)
     if classparam:
         showClassifierParameters(classifier)
     if confusion:
@@ -219,17 +248,18 @@ def generateSVM(datafile, label,
         showClassificationReport(Y_test, Y_pred)
     print("===================== SVM Generated =====================")
 
-def useSVM(datafile, classfile, resultfile):
+def useSVM(datafile, classfile, classtype, resultfile):
     """!
     Function to use a previously generated support vector machine (SVM) 
     to classify data.
 
     Usage:
 
-        python bactclass.py useSVM --datafile=classifier_use.csv --classfile=classifier_SVM --resultfile=classifier_result.csv
+        python bactclass.py useSVM --datafile=classifier_use.csv --classfile=classifier_SVM.pickle --classtype=pickle --resultfile=classifier_result.csv
     
     @param datafile String: Path to CSV file containing data to be classified.
     @param classfile String: Path to the generated classifier.
+    @param classtype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib".
     @param resultfile String: Path to write out the classified results.
     """
     print("")
@@ -239,7 +269,7 @@ def useSVM(datafile, classfile, resultfile):
     print("    Classifier File = " + str(classfile))
     print("    Result File = " + str(resultfile))
     print("")
-    classifier = loadModel(classfile)
+    classifier = loadModel(classfile, classtype)
     data = readData(datafile, False)
     data["Prediction"] = classifier.predict(data)
     data.to_csv(resultfile, index=False)
