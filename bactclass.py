@@ -127,6 +127,30 @@ def showClassificationReport(Y_test, Y_pred):
     print("------------- End of Classification Report ----------")
     print("")
 
+def recycle(infile, intype, outfile, outtype):
+    """!
+    Function to read in and write out a classifier. This can be used to update the serialization protocol or to change the change the type of serialization; such as, from pickle to joblib.
+
+    Usage:
+        
+        python bactclass.py recycle --infile=classifier_ANN.pickle --intype=pickle --outfile=classifier_ANN.joblib --outtype=joblib
+
+    @param infile String: Path to the input classifier.
+    @param intype String: Type of file of the input classifier. Allowable types are "pickle" and "joblib".
+    @param outfile String: Path to the output classifier.
+    @param outtype String: Type of file of the output classifier. Allowable types are "pickle" and "joblib".
+    """
+    print("")
+    print("Task: Read and Write (Recycle) a Classifier")
+    print("Parameters:")
+    print("    Input Classifier File = " + str(infile))
+    print("    Input Classifier File Type = " + str(intype))
+    print("    Output Classifier File = " + str(outfile))
+    print("    Output Classifier File Type = " + str(outtype))
+    print("")
+    classifier = loadModel(infile, intype)
+    saveModel(outfile, outtype, classifier)
+
 def generateANN(datafile, label, 
                 oclass="classifier_ANN.pickle", 
                 otype="pickle",
@@ -278,6 +302,7 @@ def useSVM(datafile, classfile, classtype, resultfile):
 if __name__ == "__main__":
     exposed_functions = {"genANN": generateANN,
                          "genSVM": generateSVM,
+                         "recycle": recycle,
                          "useANN": useANN,
                          "useSVM": useSVM}
     fire.Fire(exposed_functions)
