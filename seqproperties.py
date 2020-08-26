@@ -743,7 +743,7 @@ def aromaticity(fastafile, molecule, genetic_code=1, to_stop=True):
     Lobry JR, Gautier C. 1994. Hydrophobicity, expressivity and 
     aromaticity are the major trends of amino-acid usage in 999 
     Escherichia coli chromosome-encoded genes, Nucleic Acids Research 
-    22(15):3174–3180. https://doi.org/10.1093/nar/22.15.3174
+    22(15):3174-3180. https://doi.org/10.1093/nar/22.15.3174
 
     Usage:
 
@@ -796,7 +796,7 @@ def instability(fastafile, molecule, genetic_code=1, to_stop=True):
     Guruprasad et al. 1990. Correlation between stability of a protein 
     and its dipeptide composition: a novel approach for predicting in 
     vivo stability of a protein from its primary sequence, Protein 
-    Engineering, Design and Selection 4(2):155–161.
+    Engineering, Design and Selection 4(2):155-161.
 
     Usage:
 
