@@ -194,7 +194,7 @@ def generateANN(datafile, label,
                 power_t=0.5,
                 max_iteration=200,
                 shuffle=True,
-                tolerance=0.0001,
+                tolerance=0.001,
                 momentum=0.9,
                 nesterovs_momentum=True,
                 beta_1=0.9,
@@ -211,7 +211,7 @@ def generateANN(datafile, label,
 
     Usage:
         
-        python bactclass.py genANN --datafile=classifier_train.csv --label=Class --oclass=classifier_ANN.pickle --otype=pickle --hidden_layer_sizes=100 --activation=relu --solver=adam --learning_rate=constant --learning_rate_init=0.001 --power_t=0.5 --max_iteration=200 --shuffle=True --tolerance=0.0001 --momentum=0.9 --nesterovs_momentum=True --beta_1=0.9 --beta_2=0.999 --epsilon=1e-8 --n_iter_no_change=10 --verbose=False --classparam=True --confusion=True --classreport=True --cross_validation=5
+        python bactclass.py genANN --datafile=classifier_train.csv --label=Class --oclass=classifier_ANN.pickle --otype=pickle --hidden_layer_sizes=100 --activation=relu --solver=adam --learning_rate=constant --learning_rate_init=0.001 --power_t=0.5 --max_iteration=200 --shuffle=True --tolerance=0.001 --momentum=0.9 --nesterovs_momentum=True --beta_1=0.9 --beta_2=0.999 --epsilon=1e-8 --n_iter_no_change=10 --verbose=False --classparam=True --confusion=True --classreport=True --cross_validation=5
 
     @param datafile String: Path to CSV data file used to generate SVM.
     @param label String: Column (field) name in the data file to indicate the class label.
@@ -225,7 +225,7 @@ def generateANN(datafile, label,
     @param power_t Float: Exponent for inverse scaling learning rate, which is used when solver is "sgd" for updating effective learning rate when the learning_rate is set to "invscaling". Default = 0.5
     @param max_iteration Integer: Maximum number of iterations where the solver iterates until convergence (determined by "tolerance") or reaching maximum iterations. For stochastic solvers ("sgd" or "adam"), note that this determines the number of epochs (how many times each data point will be used) rather than the number of gradient steps.
     @param shuffle Boolean: Determines whether to shuffle samples in each iteration. Only used when solver is "sgd" or "adam". Default = True
-    @param tolerance Float: Tolerance for the optimization. When the loss or score is not improving by at least tolerance for n_iter_no_change consecutive iterations, unless learning_rate is set to "adaptive", convergence is considered to be reached and training stops. Default = 0.0001
+    @param tolerance Float: Tolerance for the optimization. When the loss or score is not improving by at least tolerance for n_iter_no_change consecutive iterations, unless learning_rate is set to "adaptive", convergence is considered to be reached and training stops. Default = 0.001
     @param momentum Float: Momentum, between 0 and 1, for gradient descent update (solver is "sgd"). Default = 0.9
     @param nesterovs_momentum Boolean: Flag to whether to use Nesterov's momentum when solver is "sgd" and momentum > 0. Default = True
     @param beta_1 float: Exponential decay rate for estimates of first moment vector, between 0 (inclusive) and 1 (exclusive), in "adam" solver. Default = 0.9
