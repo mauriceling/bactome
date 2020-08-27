@@ -159,6 +159,61 @@ def cross_validate(classifier, X, Y, fold):
     print("Note: Values are shown as percentage.")
     print("--------- End of Cross Validation Report ------------")
 
+def process_classifier(datafile, label, classifier, oclass, otype, 
+                        classparam, confusion, classreport, cross_validation):
+    """!
+    Internal function - Process (train, test, and save) classifier.
+
+    @param datafile String: Path to CSV data file used to generate SVM.
+    @param label String: Column (field) name in the data file to indicate the class label.
+    @param oclass String: Path to write out the generated classifier. 
+    @param otype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib".
+    @param classifier Object: Generated classifier object.
+    @param classparam Boolean: Flag to indicate whether to print out SVM parameters.
+    @param confusion Boolean: Flag to indicate whether to print out confusion matrix. 
+    @param classreport Boolean: Flag to indicate whether to print out classification report.
+    @param cross_validation Integer: Number of cross validation (if any) to perform. If less than 2, cross validation will not be carried out.
+    """
+    X, Y = readData(datafile, True, label)
+    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.20)
+    classifier.fit(X_train, Y_train)
+    Y_pred = classifier.predict(X_test)
+    saveModel(oclass, otype, classifier)
+    if classparam:
+        showClassifierParameters(classifier)
+    if confusion:
+        showConfusionMatrix(Y_test, Y_pred)
+    if classreport:
+        showClassificationReport(Y_test, Y_pred)
+    if cross_validation > 1:
+        cross_validate(classifier, X, Y, int(cross_validation))
+
+def useScikitClassifier(classifier_type, datafile, classfile, classtype, resultfile):
+    """!
+    Internal function - Use a previously generated SciKit-Learn classifier  
+    to classify data.
+
+    @param classifier_type String: Type of classifier.
+    @param datafile String: Path to CSV file containing data to be classified.
+    @param classfile String: Path to the generated classifier.
+    @param classtype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib".
+    @param resultfile String: Path to write out the classified results.
+    """
+    taskText = {"ANN": "Classifying using Artificial Neural Network (ANN)",
+                "SVM": "Classifying using Support Vector Machine (SVM)"}
+    print("")
+    print("Task: %s" % taskText[classifier_type])
+    print("Parameters:")
+    print("    Data File = " + str(datafile))
+    print("    Classifier File = " + str(classfile))
+    print("    Classifier File Type = " + str(classtype))
+    print("    Result File = " + str(resultfile))
+    print("")
+    classifier = loadModel(classfile, classtype)
+    data = readData(datafile, False)
+    data["Prediction"] = classifier.predict(data)
+    data.to_csv(resultfile, index=False)
+
 def recycle(infile, intype, outfile, outtype):
     """!
     Function to read in and write out a classifier. This can be used to update the serialization protocol or to change the change the type of serialization; such as, from pickle to joblib.
@@ -263,8 +318,6 @@ def generateANN(datafile, label,
     print("    Classifier File = " + str(oclass))
     print("    Classifier File Type = " + str(otype))
     print("")
-    X, Y = readData(datafile, True, label)
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.20)
     hidden_layer_sizes = str(hidden_layer_sizes)
     hidden_layer_sizes = hidden_layer_sizes.split(";")
     hidden_layer_sizes = [int(x.strip()) for x in hidden_layer_sizes]
@@ -285,17 +338,8 @@ def generateANN(datafile, label,
                                beta_2=float(beta_2),
                                epsilon=float(epsilon),
                                n_iter_no_change=int(n_iter_no_change))
-    classifier.fit(X_train, Y_train)
-    Y_pred = classifier.predict(X_test)
-    saveModel(oclass, otype, classifier)
-    if classparam:
-        showClassifierParameters(classifier)
-    if confusion:
-        showConfusionMatrix(Y_test, Y_pred)
-    if classreport:
-        showClassificationReport(Y_test, Y_pred)
-    if cross_validation > 1:
-        cross_validate(classifier, X, Y, int(cross_validation))
+    process_classifier(datafile, label, classifier, oclass, otype, 
+                       classparam, confusion, classreport, cross_validation)
     print("===================== ANN Generated =====================")
 
 def useANN(datafile, classfile, classtype, resultfile):
@@ -312,18 +356,7 @@ def useANN(datafile, classfile, classtype, resultfile):
     @param classtype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib".
     @param resultfile String: Path to write out the classified results.
     """
-    print("")
-    print("Task: Classifying using Artificial Neural Network (ANN)")
-    print("Parameters:")
-    print("    Data File = " + str(datafile))
-    print("    Classifier File = " + str(classfile))
-    print("    Classifier File Type = " + str(classtype))
-    print("    Result File = " + str(resultfile))
-    print("")
-    classifier = loadModel(classfile, classtype)
-    data = readData(datafile, False)
-    data["Prediction"] = classifier.predict(data)
-    data.to_csv(resultfile, index=False)
+    useScikitClassifier("ANN", datafile, classfile, classtype, resultfile)
 
 def generateSVM(datafile, label, 
                 oclass="classifier_SVM.pickle", 
@@ -381,8 +414,6 @@ def generateSVM(datafile, label,
     print("    Classifier File = " + str(oclass))
     print("    Classifier File Type = " + str(otype))
     print("")
-    X, Y = readData(datafile, True, label)
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.20)
     classifier = SVC(kernel=str(kernel), 
                      degree=int(degree),
                      gamma=str(gamma),
@@ -391,17 +422,8 @@ def generateSVM(datafile, label,
                      tol=float(tolerance),
                      max_iter=int(max_iteration),
                      break_ties=break_ties)
-    classifier.fit(X_train, Y_train)
-    Y_pred = classifier.predict(X_test)
-    saveModel(oclass, otype, classifier)
-    if classparam:
-        showClassifierParameters(classifier)
-    if confusion:
-        showConfusionMatrix(Y_test, Y_pred)
-    if classreport:
-        showClassificationReport(Y_test, Y_pred)
-    if cross_validation > 1:
-        cross_validate(classifier, X, Y, int(cross_validation))
+    process_classifier(datafile, label, classifier, oclass, otype, 
+                       classparam, confusion, classreport, cross_validation)
     print("===================== SVM Generated =====================")
 
 def useSVM(datafile, classfile, classtype, resultfile):
@@ -418,17 +440,7 @@ def useSVM(datafile, classfile, classtype, resultfile):
     @param classtype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib".
     @param resultfile String: Path to write out the classified results.
     """
-    print("")
-    print("Task: Classifying using Support Vector Machine (SVM)")
-    print("Parameters:")
-    print("    Data File = " + str(datafile))
-    print("    Classifier File = " + str(classfile))
-    print("    Result File = " + str(resultfile))
-    print("")
-    classifier = loadModel(classfile, classtype)
-    data = readData(datafile, False)
-    data["Prediction"] = classifier.predict(data)
-    data.to_csv(resultfile, index=False)
+    useScikitClassifier("SVM", datafile, classfile, classtype, resultfile)
 
 
 if __name__ == "__main__":
