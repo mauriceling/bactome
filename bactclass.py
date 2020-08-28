@@ -205,6 +205,7 @@ def useScikitClassifier(classifier_type, datafile, classfile, classtype, resultf
     @param resultfile String: Path to write out the classified results.
     """
     taskText = {"ANN": "Classifying using Artificial Neural Network (ANN)",
+                "DT": "Classifying using Decision Tree (DT)",
                 "SVM": "Classifying using Support Vector Machine (SVM)"}
     print("")
     print("Task: %s" % taskText[classifier_type])
@@ -452,11 +453,22 @@ def generateDT(datafile, label,
                otype="pickle",
                criterion="gini",
                splitter="best",
+               max_depth=0,
+               min_samples_split=2,
+               min_samples_leaf=1,
+               min_weight_fraction_leaf=0.0,
+               max_leaf_nodes=0,
+               ccp_alpha=0.0,
                classparam=True, 
                confusion=True, 
                classreport=True,
                cross_validation=5):
     """!
+    Function to generate a decision tree from given data. 
+
+    Usage:
+        
+        python bactclass.py genDT --datafile=classifier_train.csv --label=Class --oclass=classifier_DT.pickle --otype=pickle --criterion=gini --splitter=best --max_depth=0 --min_samples_split=2 --min_samples_leaf=1 --min_weight_fraction_leaf=0.0 --max_leaf_nodes=0 --ccp_alpha=0.0 --classparam=True --confusion=True --classreport=True --cross_validation=5
 
     @param datafile String: Path to CSV data file used to generate SVM.
     @param label String: Column (field) name in the data file to indicate the class label.
@@ -464,89 +476,12 @@ def generateDT(datafile, label,
     @param otype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib". Default = pickle
     @param criterion String: The function to measure the quality of a split. Allowable types are "gini" (Gini impurity) and "entropy" (information gain). Default = gini
     @param splitter String: The strategy used to choose the split at each node. Allowable types are "best" (best split) and "random" (best random split). Default = best
-
-max_depth int, default=None
-
-    The maximum depth of the tree. If None, then nodes are expanded until all leaves are pure or until all leaves contain less than min_samples_split samples.
-min_samples_split int or float, default=2
-
-    The minimum number of samples required to split an internal node:
-
-        If int, then consider min_samples_split as the minimum number.
-
-        If float, then min_samples_split is a fraction and ceil(min_samples_split * n_samples) are the minimum number of samples for each split.
-
-    Changed in version 0.18: Added float values for fractions.
-min_samples_leaf int or float, default=1
-
-    The minimum number of samples required to be at a leaf node. A split point at any depth will only be considered if it leaves at least min_samples_leaf training samples in each of the left and right branches. This may have the effect of smoothing the model, especially in regression.
-
-        If int, then consider min_samples_leaf as the minimum number.
-
-        If float, then min_samples_leaf is a fraction and ceil(min_samples_leaf * n_samples) are the minimum number of samples for each node.
-
-    Changed in version 0.18: Added float values for fractions.
-min_weight_fraction_leaf float, default=0.0
-
-    The minimum weighted fraction of the sum total of weights (of all the input samples) required to be at a leaf node. Samples have equal weight when sample_weight is not provided.
-max_features int, float or {"auto", "sqrt", "log2"}, default=None
-
-    The number of features to consider when looking for the best split:
-
-            If int, then consider max_features features at each split.
-
-            If float, then max_features is a fraction and int(max_features * n_features) features are considered at each split.
-
-            If "auto", then max_features=sqrt(n_features).
-
-            If "sqrt", then max_features=sqrt(n_features).
-
-            If "log2", then max_features=log2(n_features).
-
-            If None, then max_features=n_features.
-
-    Note: the search for a split does not stop until at least one valid partition of the node samples is found, even if it requires to effectively inspect more than max_features features.
-random_state int, RandomState instance, default=None
-
-    Controls the randomness of the estimator. The features are always randomly permuted at each split, even if splitter is set to "best". When max_features < n_features, the algorithm will select max_features at random at each split before finding the best split among them. But the best found split may vary across different runs, even if max_features=n_features. That is the case, if the improvement of the criterion is identical for several splits and one split has to be selected at random. To obtain a deterministic behaviour during fitting, random_state has to be fixed to an integer. See Glossary for details.
-max_leaf_nodes int, default=None
-
-    Grow a tree with max_leaf_nodes in best-first fashion. Best nodes are defined as relative reduction in impurity. If None then unlimited number of leaf nodes.
-min_impurity_decrease float, default=0.0
-
-    A node will be split if this split induces a decrease of the impurity greater than or equal to this value.
-
-    The weighted impurity decrease equation is the following:
-
-    N_t / N * (impurity - N_t_R / N_t * right_impurity
-                        - N_t_L / N_t * left_impurity)
-
-    where N is the total number of samples, N_t is the number of samples at the current node, N_t_L is the number of samples in the left child, and N_t_R is the number of samples in the right child.
-
-    N, N_t, N_t_R and N_t_L all refer to the weighted sum, if sample_weight is passed.
-
-    New in version 0.19.
-min_impurity_split float, default=0
-
-    Threshold for early stopping in tree growth. A node will split if its impurity is above the threshold, otherwise it is a leaf.
-
-    Deprecated since version 0.19: min_impurity_split has been deprecated in favor of min_impurity_decrease in 0.19. The default value of min_impurity_split has changed from 1e-7 to 0 in 0.23 and it will be removed in 0.25. Use min_impurity_decrease instead.
-class_weight dict, list of dict or "balanced", default=None
-
-    Weights associated with classes in the form {class_label: weight}. If None, all classes are supposed to have weight one. For multi-output problems, a list of dicts can be provided in the same order as the columns of y.
-
-    Note that for multioutput (including multilabel) weights should be defined for each class of every column in its own dict. For example, for four-class multilabel classification weights should be [{0: 1, 1: 1}, {0: 1, 1: 5}, {0: 1, 1: 1}, {0: 1, 1: 1}] instead of [{1:1}, {2:5}, {3:1}, {4:1}].
-
-    The "balanced" mode uses the values of y to automatically adjust weights inversely proportional to class frequencies in the input data as n_samples / (n_classes * np.bincount(y))
-
-    For multi-output, the weights of each column of y will be multiplied.
-
-    Note that these weights will be multiplied with sample_weight (passed through the fit method) if sample_weight is specified.
-
-ccp_alpha float, default=0.0
-
-    Complexity parameter used for Minimal Cost-Complexity Pruning. The subtree with the largest cost complexity that is smaller than ccp_alpha will be chosen. By default, no pruning is performed.
-
+    @param max_depth Integer: The maximum depth of the tree. If less than 1, then nodes are expanded until all leaves are pure or until all leaves contain less than min_samples_split samples. Default = 0
+    @param min_samples_split Integer: The minimum number of samples required to split an internal node. Default = 2
+    @param min_samples_leaf Integer: The minimum number of samples required to be at a leaf node. A split point at any depth will only be considered if it leaves at least min_samples_leaf training samples in each of the left and right branches. This may have the effect of smoothing the model, especially in regression. Default = 1
+    @param min_weight_fraction_leaf Float: The minimum weighted fraction of the sum total of weights (of all the input samples) required to be at a leaf node. Default = 0.0
+    @param max_leaf_nodes Integer: Grow a tree with max_leaf_nodes in best-first fashion. Best nodes are defined as relative reduction in impurity. If less than 1, then unlimited number of leaf nodes. Default = 0
+    @param ccp_alpha Float: Complexity parameter used for Minimal Cost-Complexity Pruning. The subtree with the largest cost complexity that is smaller than ccp_alpha will be chosen. If zero, no pruning is performed. Default = 0.0
     @param classparam Boolean: Flag to indicate whether to print out SVM parameters. Default = True
     @param confusion Boolean: Flag to indicate whether to print out confusion matrix. Default = True
     @param classreport Boolean: Flag to indicate whether to print out classification report. Default = True
@@ -560,21 +495,53 @@ ccp_alpha float, default=0.0
     print("    Classification Label = " + str(label))
     print("    Citerion = " + str(criterion))
     print("    Splitting Strategy = " + str(splitter))
-
+    print("    Maximum Tree Depth = " + str(max_depth))
+    print("    Minimum Samples to Split = " + str(min_samples_split))
+    print("    Minimum Samples per Leaf = " + str(min_samples_leaf))
+    print("    Minimum Weight Fraction per Leaf = " + str(min_weight_fraction_leaf))
+    print("    Maximum number of Leaf Nodes = " + str(max_leaf_nodes))
+    print("    Minimal Cost-Complexity Pruning Parameter = " + str(ccp_alpha))
     print("    Classifier File = " + str(oclass))
     print("    Classifier File Type = " + str(otype))
     print("")
+    max_depth = int(max_depth)
+    if max_depth == 0: max_depth = None
+    max_leaf_nodes = int(max_leaf_nodes)
+    if max_leaf_nodes == 0: max_leaf_nodes = None
     classifier = DecisionTreeClassifier(criterion=str(criterion),
-                                        splitter=str(splitter))
+                                        splitter=str(splitter),
+                                        max_depth=max_depth,
+                                        min_samples_split=int(min_samples_split),
+                                        min_samples_leaf=int(min_samples_leaf),
+                                        min_weight_fraction_leaf=float(min_weight_fraction_leaf),
+                                        max_leaf_nodes=max_leaf_nodes,
+                                        ccp_alpha=float(ccp_alpha))
     process_classifier(datafile, label, classifier, oclass, otype, 
                        classparam, confusion, classreport, cross_validation)
     print("===================== DT Generated =====================")
 
+def useDT(datafile, classfile, classtype, resultfile):
+    """!
+    Function to use a previously generated decision tree (DT) to classify data.
+
+    Usage:
+
+        python bactclass.py useDT --datafile=classifier_use.csv --classfile=classifier_DT.pickle --classtype=pickle --resultfile=classifier_result.csv
+    
+    @param datafile String: Path to CSV file containing data to be classified.
+    @param classfile String: Path to the generated classifier.
+    @param classtype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib".
+    @param resultfile String: Path to write out the classified results.
+    """
+    useScikitClassifier("DT", datafile, classfile, classtype, resultfile)
+
 
 if __name__ == "__main__":
     exposed_functions = {"genANN": generateANN,
+                         "genDT": generateDT,
                          "genSVM": generateSVM,
                          "recycle": recycle,
                          "useANN": useANN,
+                         "useDT": useDT,
                          "useSVM": useSVM}
     fire.Fire(exposed_functions)
