@@ -206,7 +206,10 @@ def useScikitClassifier(classifier_type, datafile, classfile, classtype, resultf
     """
     taskText = {"ANN": "Classifying using Artificial Neural Network (ANN)",
                 "DT": "Classifying using Decision Tree (DT)",
-                "SVM": "Classifying using Support Vector Machine (SVM)"}
+                "SVM": "Classifying using Support Vector Machine (SVM)",
+                "GaussianNB":"Classifying using Gaussian naive bayes (GaussianNB)",
+                "BernoulliNB":"Classifying using Bernoulli naive bayes (BernoulliNB)",
+                "MultinomialNB":"Classifying using Multinomial naive bayes (MultinomialNB)"}
     print("")
     print("Task: %s" % taskText[classifier_type])
     print("Parameters:")
@@ -519,6 +522,7 @@ def generateDT(datafile, label,
     process_classifier(datafile, label, classifier, oclass, otype, 
                        classparam, confusion, classreport, cross_validation)
     print("===================== DT Generated =====================")
+    
 
 def useDT(datafile, classfile, classtype, resultfile):
     """!
@@ -534,6 +538,127 @@ def useDT(datafile, classfile, classtype, resultfile):
     @param resultfile String: Path to write out the classified results.
     """
     useScikitClassifier("DT", datafile, classfile, classtype, resultfile)
+    
+    
+def generateBernoulliNB(datafile, label, 
+                        oclass="classifier_naivebayes.pickle", 
+                        otype="pickle",
+                        alpha=1.0,
+                        binarize=0.0,
+                        fit_priorbool=True,
+                        class_priorarray=None,
+                        classparam=True, 
+                        confusion=True, 
+                        classreport=True,
+                        cross_validation=5):
+    from sklearn.naive_bayes import BernoulliNB
+    print("")
+    print("Task: Generate Bernoulli naive bayes Classifier")
+    print("Parameters:")
+    print("    Data File = " + str(datafile))
+    print("    Classification Label = " + str(label))
+    print("    Classifier File = " + str(oclass))
+    print("    Classifier File Type = " + str(otype))
+    print("")
+    classifier = BernoulliNB(alpha=1.0,
+                             binarize=0.0,
+                             fit_priorbool=True,
+                             class_priorarray=None)
+    process_classifier(datafile, label, classifier, oclass, otype, 
+                       classparam, confusion, classreport, cross_validation)
+    print("===================== BernoulliNB Generated =====================")
+    
+ def useBernoulliNB(datafile, classfile, classtype, resultfile):
+    """!
+    Function to use a previously generated BernoulliNB
+    to classify data.
+    Usage:
+        python bactclass.py useBernoulliNB --datafile=classifier_use.csv --classfile=classifier_BernoulliNB.pickle --classtype=pickle --resultfile=classifier_result.csv
+    
+    @param datafile String: Path to CSV file containing data to be classified.
+    @param classfile String: Path to the generated classifier.
+    @param classtype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib".
+    @param resultfile String: Path to write out the classified results.
+    """
+    useScikitClassifier("BernoulliNB", datafile, classfile, classtype, resultfile)
+    
+    
+def generateMultinomialNB(datafile, label, 
+                          oclass="classifier_naivebayes.pickle", 
+                          otype="pickle",
+                          alpha=1.0,
+                          fit_prior=True,
+                          class_prior=True
+                          classparam=True, 
+                          confusion=True, 
+                          classreport=True,
+                          cross_validation=5):
+    from sklearn.naive_bayes import MultinomialNB
+    print("")
+    print("Task: Generate MultinomialNB Classifier")
+    print("Parameters:")
+    print("    Data File = " + str(datafile))
+    print("    Classification Label = " + str(label))   
+    print("    Classifier File = " + str(oclass))
+    print("    Classifier File Type = " + str(otype))
+    print("")
+    classifier = MultinomialNB(alpha=1.0,
+                               fit_prior=True,
+                               class_prior=True)
+    process_classifier(datafile, label, classifier, oclass, otype, 
+                       classparam, confusion, classreport, cross_validation)
+    print("===================== MultinomialNB Generated =====================")
+    
+def useMultinomialNB(datafile, classfile, classtype, resultfile):
+    """!
+    Function to use a previously generated Multinomial naive bayes 
+    to classify data.
+    Usage:
+        python bactclass.py useMultinomialNB --datafile=classifier_use.csv --classfile=classifier_MultinomialNB.pickle --classtype=pickle --resultfile=classifier_result.csv
+    
+    @param datafile String: Path to CSV file containing data to be classified.
+    @param classfile String: Path to the generated classifier.
+    @param classtype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib".
+    @param resultfile String: Path to write out the classified results.
+    """
+    useScikitClassifier("MultinomialNB", datafile, classfile, classtype, resultfile)
+
+    
+def generateGaussianNB(datafile, label, 
+                       oclass="classifier_naivebayes.pickle", 
+                       otype="pickle",
+                       priors=None,
+                       classparam=True, 
+                       confusion=True, 
+                       classreport=True,
+                       cross_validation=5):
+    from sklearn.naive_bayes import GaussianNB
+    print("")
+    print("Task: Generate GaussianNB Classifier")
+    print("Parameters:")
+    print("    Data File = " + str(datafile))
+    print("    Classification Label = " + str(label))   
+    print("    Classifier File = " + str(oclass))
+    print("    Classifier File Type = " + str(otype))
+    print("")
+    classifier = GaussianNB(priors=None)
+    process_classifier(datafile, label, classifier, oclass, otype, 
+                       classparam, confusion, classreport, cross_validation)
+    print("===================== GaussianNB Generated =====================")
+    
+def useGaussianNB(datafile, classfile, classtype, resultfile):
+    """!
+    Function to use a previously generated support vector machine (SVM) 
+    to classify data.
+    Usage:
+        python bactclass.py useSVM --datafile=classifier_use.csv --classfile=classifier_GaussianNB.pickle --classtype=pickle --resultfile=classifier_result.csv
+    
+    @param datafile String: Path to CSV file containing data to be classified.
+    @param classfile String: Path to the generated classifier.
+    @param classtype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib".
+    @param resultfile String: Path to write out the classified results.
+    """
+    useScikitClassifier("GaussianNB", datafile, classfile, classtype, resultfile)
 
 
 if __name__ == "__main__":
