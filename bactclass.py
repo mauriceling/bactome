@@ -187,12 +187,12 @@ def cross_validate(classifier, X, Y, fold):
         pass
     try:
         scores = cross_val_score(classifier, X, Y, cv=fold, scoring="neg_mean_squared_error")
-        print("Mean Square Error (MSE):       %0.3f (sigma = %0.4f)" % (-1*scores.mean(), scores.std()))
+        print("Mean Square Error (MSE):       %0.3f (sigma = %0.4f)" % (abs(scores.mean()), scores.std()))
     except ValueError:
         pass
     try:
         scores = cross_val_score(classifier, X, Y, cv=fold, scoring="r2")
-        print("R-square:                      %0.3f (sigma = %0.4f)" % (scores.mean(), scores.std()))
+        print("R-square:                      %0.3f (sigma = %0.4f)" % (abs(scores.mean()), scores.std()))
     except ValueError:
         pass
     print("--------- End of Cross Validation Report ------------")
@@ -239,7 +239,7 @@ def useScikitClassifier(classifier_type, datafile, classfile, classtype, resultf
     """
     taskText = {"ANN": "Classifying using Artificial Neural Network (ANN)",
                 "BNB":"Classifying using Naive Bayes for Bernoulli Models (BNB)",
-                "CNB":"Classifying using Complement Naive Bayes (CNB)"
+                "CNB":"Classifying using Complement Naive Bayes (CNB)",
                 "DT": "Classifying using Decision Tree (DT)",
                 "GNB":"Classifying using Gaussian Naive Bayes (GNB)",
                 "MNB":"Classifying using Naive Bayes for Multinomial Models (MNB)",
