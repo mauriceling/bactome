@@ -562,7 +562,9 @@ def generateBNB(datafile, label,
     @param label String: Column (field) name in the data file to indicate the class label.
     @param oclass String: Path to write out the generated classifier. Default = classifier_SVM.pickle
     @param otype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib". Default = pickle
-    
+    @param alpha Float: Additive (Laplace/Lidstone) smoothing parameter (0 for no smoothing). Default = 1.0
+    @param binarize Float: Threshold for binarizing (mapping to booleans) of sample features. Default=0.0
+    @param fit_prior Boolean: Flag to indicate whether to learn class prior probabilities or not. If False, a uniform prior will be used. Default = True
     @param classparam Boolean: Flag to indicate whether to print out SVM parameters. Default = True
     @param confusion Boolean: Flag to indicate whether to print out confusion matrix. Default = True
     @param classreport Boolean: Flag to indicate whether to print out classification report. Default = True
