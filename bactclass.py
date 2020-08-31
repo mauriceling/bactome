@@ -662,54 +662,73 @@ def useMNB(datafile, classfile, classtype, resultfile):
     """
     useScikitClassifier("MNB", datafile, classfile, classtype, resultfile)
 
-    
-def generateGaussianNB(datafile, label, 
-                       oclass="classifier_naivebayes.pickle", 
-                       otype="pickle",
-                       priors=None,
-                       classparam=True, 
-                       confusion=True, 
-                       classreport=True,
-                       cross_validation=5):
+def generateGNB(datafile, label, 
+                oclass="classifier_GNB.pickle", 
+                otype="pickle",
+                var_smoothing=1e-9,
+                classparam=True, 
+                confusion=True, 
+                classreport=True,
+                cross_validation=5):
+    """!
+    Function to generate a Gaussian Naive Bayes classifier (GNB) from given data. 
+
+    Usage:
+        
+        python bactclass.py genGNB --datafile=classifier_train.csv --label=Class --oclass=classifier_GNB.pickle --otype=pickle --var_smoothing=1e-9 --classparam=True --confusion=True --classreport=True --cross_validation=5
+
+    @param datafile String: Path to CSV data file used to generate SVM.
+    @param label String: Column (field) name in the data file to indicate the class label.
+    @param oclass String: Path to write out the generated classifier. Default = classifier_SVM.pickle
+    @param otype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib". Default = pickle
+    @param var_smoothing Float: Portion of the largest variance of all features that is added to variances for calculation stability. Default = 1e-9
+    @param classparam Boolean: Flag to indicate whether to print out SVM parameters. Default = True
+    @param confusion Boolean: Flag to indicate whether to print out confusion matrix. Default = True
+    @param classreport Boolean: Flag to indicate whether to print out classification report. Default = True
+    @param cross_validation Integer: Number of cross validation (if any) to perform. If less than 2, cross validation will not be carried out. Default = 5
+    """
     from sklearn.naive_bayes import GaussianNB
     print("")
-    print("Task: Generate GaussianNB Classifier")
+    print("Task: Generate Gaussian Naive Bayes Classifier")
     print("Parameters:")
     print("    Data File = " + str(datafile))
     print("    Classification Label = " + str(label))   
+    print("    Variance Smoothing = " + str(var_smoothing))
     print("    Classifier File = " + str(oclass))
     print("    Classifier File Type = " + str(otype))
     print("")
-    classifier = GaussianNB(priors=None)
+    classifier = GaussianNB(var_smoothing=float(var_smoothing))
     process_classifier(datafile, label, classifier, oclass, otype, 
                        classparam, confusion, classreport, cross_validation)
     print("===================== GaussianNB Generated =====================")
     
-def useGaussianNB(datafile, classfile, classtype, resultfile):
+def useGNB(datafile, classfile, classtype, resultfile):
     """!
-    Function to use a previously generated support vector machine (SVM) 
-    to classify data.
+    Function to use a previously generated Gaussian Naive Bayes classifier (GNB) classifier to classify data.
+
     Usage:
-        python bactclass.py useSVM --datafile=classifier_use.csv --classfile=classifier_GaussianNB.pickle --classtype=pickle --resultfile=classifier_result.csv
+        python bactclass.py useGNB --datafile=classifier_use.csv --classfile=classifier_GNB.pickle --classtype=pickle --resultfile=classifier_result.csv
     
     @param datafile String: Path to CSV file containing data to be classified.
     @param classfile String: Path to the generated classifier.
     @param classtype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib".
     @param resultfile String: Path to write out the classified results.
     """
-    useScikitClassifier("GaussianNB", datafile, classfile, classtype, resultfile)
+    useScikitClassifier("GNB", datafile, classfile, classtype, resultfile)
 
 
 if __name__ == "__main__":
     exposed_functions = {"genANN": generateANN,
                          "genBNB": generateBNB,
                          "genDT": generateDT,
+                         "genGNB": generateGNB,
                          "genMNB": generateMNB,
                          "genSVM": generateSVM,
                          "recycle": recycle,
                          "useANN": useANN,
                          "useBNB": useBNB,
                          "useDT": useDT,
+                         "useGNB": useGNB,
                          "useMNB": useMNB,
                          "useSVM": useSVM}
     fire.Fire(exposed_functions)
