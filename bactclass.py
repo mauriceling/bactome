@@ -207,9 +207,10 @@ def useScikitClassifier(classifier_type, datafile, classfile, classtype, resultf
     taskText = {"ANN": "Classifying using Artificial Neural Network (ANN)",
                 "DT": "Classifying using Decision Tree (DT)",
                 "SVM": "Classifying using Support Vector Machine (SVM)",
-                "GaussianNB":"Classifying using Gaussian naive bayes (GaussianNB)",
-                "BernoulliNB":"Classifying using Bernoulli naive bayes (BernoulliNB)",
-                "MultinomialNB":"Classifying using Multinomial naive bayes (MultinomialNB)"}
+                "GNB":"Classifying using Gaussian Naive Bayes (GNB)",
+                "BNB":"Classifying using Bernoulli Naive Bayes (BNB)",
+                "MNB":"Classifying using Multinomial Naive Bayes (MNB)",
+                "CNB":"Classifying using Complementary Naive Bayes (CNB)"}
     print("")
     print("Task: %s" % taskText[classifier_type])
     print("Parameters:")
@@ -540,47 +541,65 @@ def useDT(datafile, classfile, classtype, resultfile):
     useScikitClassifier("DT", datafile, classfile, classtype, resultfile)
     
     
-def generateBernoulliNB(datafile, label, 
-                        oclass="classifier_naivebayes.pickle", 
-                        otype="pickle",
-                        alpha=1.0,
-                        binarize=0.0,
-                        fit_priorbool=True,
-                        class_priorarray=None,
-                        classparam=True, 
-                        confusion=True, 
-                        classreport=True,
-                        cross_validation=5):
+def generateBNB(datafile, label, 
+                oclass="classifier_BNB.pickle", 
+                otype="pickle",
+                alpha=1.0,
+                binarize=0.0,
+                fit_prior=True,
+                classparam=True, 
+                confusion=True, 
+                classreport=True,
+                cross_validation=5):
+    """!
+    Function to generate a Bernoulli Naive Bayes classifier (BNB) from given data. 
+
+    Usage:
+        
+        python bactclass.py genBNB --datafile=classifier_train.csv --label=Class --oclass=classifier_BNB.pickle --otype=pickle --alpha=1.0 --binarize=0.0 --fit_prior=True --classparam=True --confusion=True --classreport=True --cross_validation=5
+
+    @param datafile String: Path to CSV data file used to generate SVM.
+    @param label String: Column (field) name in the data file to indicate the class label.
+    @param oclass String: Path to write out the generated classifier. Default = classifier_SVM.pickle
+    @param otype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib". Default = pickle
+    
+    @param classparam Boolean: Flag to indicate whether to print out SVM parameters. Default = True
+    @param confusion Boolean: Flag to indicate whether to print out confusion matrix. Default = True
+    @param classreport Boolean: Flag to indicate whether to print out classification report. Default = True
+    @param cross_validation Integer: Number of cross validation (if any) to perform. If less than 2, cross validation will not be carried out. Default = 5
+    """
     from sklearn.naive_bayes import BernoulliNB
     print("")
-    print("Task: Generate Bernoulli naive bayes Classifier")
+    print("Task: Generate Bernoulli Naive Bayes Classifier")
     print("Parameters:")
     print("    Data File = " + str(datafile))
     print("    Classification Label = " + str(label))
+    print("    Additive Smoothing Parameter = " + str(alpha))
+    print("    Binarizing Threshold = " + str(binarize))
+    print("    Learn Prior Probabilities = " + str(fit_prior))
     print("    Classifier File = " + str(oclass))
     print("    Classifier File Type = " + str(otype))
     print("")
-    classifier = BernoulliNB(alpha=1.0,
-                             binarize=0.0,
-                             fit_priorbool=True,
-                             class_priorarray=None)
+    classifier = BernoulliNB(alpha=float(alpha),
+                             binarize=float(binarize),
+                             fit_prior=fit_prior)
     process_classifier(datafile, label, classifier, oclass, otype, 
                        classparam, confusion, classreport, cross_validation)
     print("===================== BernoulliNB Generated =====================")
     
- def useBernoulliNB(datafile, classfile, classtype, resultfile):
+def useBNB(datafile, classfile, classtype, resultfile):
     """!
-    Function to use a previously generated BernoulliNB
-    to classify data.
+    Function to use a previously generated Bernoulli Naive Bayes (BNB) classifier to classify data.
+
     Usage:
-        python bactclass.py useBernoulliNB --datafile=classifier_use.csv --classfile=classifier_BernoulliNB.pickle --classtype=pickle --resultfile=classifier_result.csv
+        python bactclass.py useBNB --datafile=classifier_use.csv --classfile=classifier_BNB.pickle --classtype=pickle --resultfile=classifier_result.csv
     
     @param datafile String: Path to CSV file containing data to be classified.
     @param classfile String: Path to the generated classifier.
     @param classtype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib".
     @param resultfile String: Path to write out the classified results.
     """
-    useScikitClassifier("BernoulliNB", datafile, classfile, classtype, resultfile)
+    useScikitClassifier("BNB", datafile, classfile, classtype, resultfile)
     
     
 def generateMultinomialNB(datafile, label, 
@@ -588,7 +607,7 @@ def generateMultinomialNB(datafile, label,
                           otype="pickle",
                           alpha=1.0,
                           fit_prior=True,
-                          class_prior=True
+                          class_prior=True,
                           classparam=True, 
                           confusion=True, 
                           classreport=True,
@@ -663,10 +682,12 @@ def useGaussianNB(datafile, classfile, classtype, resultfile):
 
 if __name__ == "__main__":
     exposed_functions = {"genANN": generateANN,
+                         "genBNB": generateBNB,
                          "genDT": generateDT,
                          "genSVM": generateSVM,
                          "recycle": recycle,
                          "useANN": useANN,
+                         "useBNB": useBNB,
                          "useDT": useDT,
                          "useSVM": useSVM}
     fire.Fire(exposed_functions)
