@@ -48,6 +48,8 @@ def readData(filename, training=True, label="Class"):
     @param label String: Column (field) name in the data file to indicate the class label. Default = Class
     """
     data = pd.read_csv(filename)
+    print("Number of rows in data = " + str(data.shape[0]))
+    print("Number of columns in data = " + str(data.shape[1]))
     if training:
         X = data.drop(label, axis=1)
         Y = data[label]
@@ -142,26 +144,57 @@ def cross_validate(classifier, X, Y, fold):
     print("------------ Cross Validation Report ----------------")
     print("%s fold cross validation" % str(fold))
     print("")
-    scores = cross_val_score(classifier, X, Y, cv=fold, scoring="precision")
-    print("Precision:                     %0.3f (sigma = %0.4f)" % (scores.mean(), scores.std()))
-    scores = cross_val_score(classifier, X, Y, cv=fold, scoring="recall")
-    print("Recall:                        %0.3f (sigma = %0.4f)" % (scores.mean(), scores.std()))
-    scores = cross_val_score(classifier, X, Y, cv=fold, scoring="f1")
-    print("F1 Score:                      %0.3f (sigma = %0.4f)" % (scores.mean(), scores.std()))
-    scores = cross_val_score(classifier, X, Y, cv=fold, scoring="accuracy")
-    print("Accuracy:                      %0.3f (sigma = %0.4f)" % (scores.mean(), scores.std()))
-    scores = cross_val_score(classifier, X, Y, cv=fold, scoring="roc_auc")
-    print("Area Under ROC Curve (AUC):    %0.3f (sigma = %0.4f)" % (scores.mean(), scores.std()))
-    scores = cross_val_score(classifier, X, Y, cv=fold, scoring="jaccard")
-    print("Jaccard Similarity:            %0.3f (sigma = %0.4f)" % (scores.mean(), scores.std()))
-    scores = cross_val_score(classifier, X, Y, cv=fold, scoring="normalized_mutual_info_score")
-    print("Normalized Mutual Information: %0.3f (sigma = %0.4f)" % (scores.mean(), scores.std()))
-    scores = cross_val_score(classifier, X, Y, cv=fold, scoring="v_measure_score")
-    print("V-measure:                     %0.3f (sigma = %0.4f)" % (scores.mean(), scores.std()))
-    scores = cross_val_score(classifier, X, Y, cv=fold, scoring="neg_mean_squared_error")
-    print("Mean Square Error (MSE):       %0.3f (sigma = %0.4f)" % (-1*scores.mean(), scores.std()))
-    scores = cross_val_score(classifier, X, Y, cv=fold, scoring="r2")
-    print("R-square:                      %0.3f (sigma = %0.4f)" % (scores.mean(), scores.std()))
+    try:
+        scores = cross_val_score(classifier, X, Y, cv=fold, scoring="precision")
+        print("Precision:                     %0.3f (sigma = %0.4f)" % (scores.mean(), scores.std()))
+    except ValueError:
+        pass
+    try:
+        scores = cross_val_score(classifier, X, Y, cv=fold, scoring="recall")
+        print("Recall:                        %0.3f (sigma = %0.4f)" % (scores.mean(), scores.std()))
+    except ValueError:
+        pass
+    try:
+        scores = cross_val_score(classifier, X, Y, cv=fold, scoring="f1")
+        print("F1 Score:                      %0.3f (sigma = %0.4f)" % (scores.mean(), scores.std()))
+    except ValueError:
+        scores = cross_val_score(classifier, X, Y, cv=fold, scoring="f1_weighted")
+        print("Weighted F1 Score:             %0.3f (sigma = %0.4f)" % (scores.mean(), scores.std()))
+    try:
+        scores = cross_val_score(classifier, X, Y, cv=fold, scoring="accuracy")
+        print("Accuracy:                      %0.3f (sigma = %0.4f)" % (scores.mean(), scores.std()))
+    except ValueError:
+        pass
+    try:
+        scores = cross_val_score(classifier, X, Y, cv=fold, scoring="roc_auc")
+        print("Area Under ROC Curve (AUC):    %0.3f (sigma = %0.4f)" % (scores.mean(), scores.std()))
+    except ValueError:
+        pass
+    try: 
+        scores = cross_val_score(classifier, X, Y, cv=fold, scoring="jaccard")
+        print("Jaccard Similarity:            %0.3f (sigma = %0.4f)" % (scores.mean(), scores.std()))
+    except ValueError:
+        pass
+    try:
+        scores = cross_val_score(classifier, X, Y, cv=fold, scoring="normalized_mutual_info_score")
+        print("Normalized Mutual Information: %0.3f (sigma = %0.4f)" % (scores.mean(), scores.std()))
+    except ValueError:
+        pass
+    try: 
+        scores = cross_val_score(classifier, X, Y, cv=fold, scoring="v_measure_score")
+        print("V-measure:                     %0.3f (sigma = %0.4f)" % (scores.mean(), scores.std()))
+    except ValueError:
+        pass
+    try:
+        scores = cross_val_score(classifier, X, Y, cv=fold, scoring="neg_mean_squared_error")
+        print("Mean Square Error (MSE):       %0.3f (sigma = %0.4f)" % (-1*scores.mean(), scores.std()))
+    except ValueError:
+        pass
+    try:
+        scores = cross_val_score(classifier, X, Y, cv=fold, scoring="r2")
+        print("R-square:                      %0.3f (sigma = %0.4f)" % (scores.mean(), scores.std()))
+    except ValueError:
+        pass
     print("--------- End of Cross Validation Report ------------")
 
 def process_classifier(datafile, label, classifier, oclass, otype, 
