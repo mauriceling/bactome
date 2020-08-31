@@ -238,12 +238,13 @@ def useScikitClassifier(classifier_type, datafile, classfile, classtype, resultf
     @param resultfile String: Path to write out the classified results.
     """
     taskText = {"ANN": "Classifying using Artificial Neural Network (ANN)",
+                "BNB":"Classifying using Naive Bayes for Bernoulli Models (BNB)",
+                "CNB":"Classifying using Complement Naive Bayes (CNB)"
                 "DT": "Classifying using Decision Tree (DT)",
-                "SVM": "Classifying using Support Vector Machine (SVM)",
                 "GNB":"Classifying using Gaussian Naive Bayes (GNB)",
-                "BNB":"Classifying using Bernoulli Naive Bayes (BNB)",
-                "MNB":"Classifying using Multinomial Naive Bayes (MNB)",
-                "CNB":"Classifying using Complementary Naive Bayes (CNB)"}
+                "MNB":"Classifying using Naive Bayes for Multinomial Models (MNB)",
+                "SVM": "Classifying using Support Vector Machine (SVM)",
+                }
     print("")
     print("Task: %s" % taskText[classifier_type])
     print("Parameters:")
@@ -311,7 +312,7 @@ def generateANN(datafile, label,
         
         python bactclass.py genANN --datafile=classifier_train.csv --label=Class --oclass=classifier_ANN.pickle --otype=pickle --hidden_layer_sizes=100 --activation=relu --solver=adam --learning_rate=constant --learning_rate_init=0.001 --power_t=0.5 --max_iteration=200 --shuffle=True --tolerance=0.001 --momentum=0.9 --nesterovs_momentum=True --beta_1=0.9 --beta_2=0.999 --epsilon=1e-8 --n_iter_no_change=10 --verbose=False --classparam=True --confusion=True --classreport=True --cross_validation=5
 
-    @param datafile String: Path to CSV data file used to generate SVM.
+    @param datafile String: Path to CSV data file used to generate ANN.
     @param label String: Column (field) name in the data file to indicate the class label.
     @param oclass String: Path to write out the generated classifier. Default = classifier_ANN.pickle
     @param otype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib". Default = pickle
@@ -331,7 +332,7 @@ def generateANN(datafile, label,
     @param epsilon float: Value for numerical stability in "adam". Default = 1e-8
     @param n_iter_no_change Integer: Maximum number of epochs to not meet tolerance improvement when solver is "sgd" or "adam". Default = 10
     @param verbose Boolean: Flag to indicate whether to print progress messages. Default = False
-    @param classparam Boolean: Flag to indicate whether to print out SVM parameters. Default = True
+    @param classparam Boolean: Flag to indicate whether to print out ANN parameters. Default = True
     @param confusion Boolean: Flag to indicate whether to print out confusion matrix. Default = True
     @param classreport Boolean: Flag to indicate whether to print out classification report. Default = True
     @param cross_validation Integer: Number of cross validation (if any) to perform. If less than 2, cross validation will not be carried out. Default = 5
@@ -507,9 +508,9 @@ def generateDT(datafile, label,
         
         python bactclass.py genDT --datafile=classifier_train.csv --label=Class --oclass=classifier_DT.pickle --otype=pickle --criterion=gini --splitter=best --max_depth=0 --min_samples_split=2 --min_samples_leaf=1 --min_weight_fraction_leaf=0.0 --max_leaf_nodes=0 --ccp_alpha=0.0 --classparam=True --confusion=True --classreport=True --cross_validation=5
 
-    @param datafile String: Path to CSV data file used to generate SVM.
+    @param datafile String: Path to CSV data file used to generate DT.
     @param label String: Column (field) name in the data file to indicate the class label.
-    @param oclass String: Path to write out the generated classifier. Default = classifier_SVM.pickle
+    @param oclass String: Path to write out the generated classifier. Default = classifier_DT.pickle
     @param otype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib". Default = pickle
     @param criterion String: The function to measure the quality of a split. Allowable types are "gini" (Gini impurity) and "entropy" (information gain). Default = gini
     @param splitter String: The strategy used to choose the split at each node. Allowable types are "best" (best split) and "random" (best random split). Default = best
@@ -585,27 +586,27 @@ def generateBNB(datafile, label,
                 classreport=True,
                 cross_validation=5):
     """!
-    Function to generate a Bernoulli Naive Bayes classifier (BNB) from given data. 
+    Function to generate a Naive Bayes classifier for Bernoulli Models (BNB) from given data. 
 
     Usage:
         
         python bactclass.py genBNB --datafile=classifier_train.csv --label=Class --oclass=classifier_BNB.pickle --otype=pickle --alpha=1.0 --binarize=0.0 --fit_prior=True --classparam=True --confusion=True --classreport=True --cross_validation=5
 
-    @param datafile String: Path to CSV data file used to generate SVM.
+    @param datafile String: Path to CSV data file used to generate BNB.
     @param label String: Column (field) name in the data file to indicate the class label.
-    @param oclass String: Path to write out the generated classifier. Default = classifier_SVM.pickle
+    @param oclass String: Path to write out the generated classifier. Default = classifier_BNB.pickle
     @param otype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib". Default = pickle
     @param alpha Float: Additive (Laplace/Lidstone) smoothing parameter (0 for no smoothing). Default = 1.0
     @param binarize Float: Threshold for binarizing (mapping to booleans) of sample features. Default=0.0
     @param fit_prior Boolean: Flag to indicate whether to learn class prior probabilities or not. If False, a uniform prior will be used. Default = True
-    @param classparam Boolean: Flag to indicate whether to print out SVM parameters. Default = True
+    @param classparam Boolean: Flag to indicate whether to print out BNB parameters. Default = True
     @param confusion Boolean: Flag to indicate whether to print out confusion matrix. Default = True
     @param classreport Boolean: Flag to indicate whether to print out classification report. Default = True
     @param cross_validation Integer: Number of cross validation (if any) to perform. If less than 2, cross validation will not be carried out. Default = 5
     """
     from sklearn.naive_bayes import BernoulliNB
     print("")
-    print("Task: Generate Bernoulli Naive Bayes Classifier")
+    print("Task: Generate Naive Bayes Classifier for Bernoulli Models (BNB)")
     print("Parameters:")
     print("    Data File = " + str(datafile))
     print("    Classification Label = " + str(label))
@@ -620,7 +621,7 @@ def generateBNB(datafile, label,
                              fit_prior=fit_prior)
     process_classifier(datafile, label, classifier, oclass, otype, 
                        classparam, confusion, classreport, cross_validation)
-    print("===================== BernoulliNB Generated =====================")
+    print("================ Bernoulli NB Generated ================")
     
 def useBNB(datafile, classfile, classtype, resultfile):
     """!
@@ -652,20 +653,20 @@ def generateCNB(datafile, label,
         
         python bactclass.py genCNB --datafile=classifier_train.csv --label=Class --oclass=classifier_CNB.pickle --otype=pickle --alpha=1.0 --fit_prior=True --classparam=True --confusion=True --classreport=True --cross_validation=5
 
-    @param datafile String: Path to CSV data file used to generate SVM.
+    @param datafile String: Path to CSV data file used to generate CNB.
     @param label String: Column (field) name in the data file to indicate the class label.
     @param oclass String: Path to write out the generated classifier. Default = classifier_CNB.pickle
     @param otype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib". Default = pickle
     @param alpha Float: Additive (Laplace/Lidstone) smoothing parameter (0 for no smoothing). Default = 1.0
     @param fit_prior Boolean: Flag to indicate whether to learn class prior probabilities or not. If False, a uniform prior will be used. Default = True
-    @param classparam Boolean: Flag to indicate whether to print out SVM parameters. Default = True
+    @param classparam Boolean: Flag to indicate whether to print out CNB parameters. Default = True
     @param confusion Boolean: Flag to indicate whether to print out confusion matrix. Default = True
     @param classreport Boolean: Flag to indicate whether to print out classification report. Default = True
     @param cross_validation Integer: Number of cross validation (if any) to perform. If less than 2, cross validation will not be carried out. Default = 5
     """
     from sklearn.naive_bayes import ComplementNB
     print("")
-    print("Task: Generate Complement Naive Bayes Classifier")
+    print("Task: Generate Complement Naive Bayes (CNB) Classifier")
     print("Parameters:")
     print("    Data File = " + str(datafile))
     print("    Classification Label = " + str(label))
@@ -678,7 +679,7 @@ def generateCNB(datafile, label,
                               fit_prior=fit_prior)
     process_classifier(datafile, label, classifier, oclass, otype, 
                        classparam, confusion, classreport, cross_validation)
-    print("===================== MultinomialNB Generated =====================")
+    print("================ Complement NB Generated ================")
     
 def useCNB(datafile, classfile, classtype, resultfile):
     """!
@@ -704,26 +705,26 @@ def generateMNB(datafile, label,
                 classreport=True,
                 cross_validation=5):
     """!
-    Function to generate a Multinomial Naive Bayes classifier (MNB) from given data. 
+    Function to generate a Naive Bayes classifier for Multinomial Models (MNB) from given data. 
 
     Usage:
         
         python bactclass.py genMNB --datafile=classifier_train.csv --label=Class --oclass=classifier_BNB.pickle --otype=pickle --alpha=1.0 --fit_prior=True --classparam=True --confusion=True --classreport=True --cross_validation=5
 
-    @param datafile String: Path to CSV data file used to generate SVM.
+    @param datafile String: Path to CSV data file used to generate BNB.
     @param label String: Column (field) name in the data file to indicate the class label.
-    @param oclass String: Path to write out the generated classifier. Default = classifier_SVM.pickle
+    @param oclass String: Path to write out the generated classifier. Default = classifier_BNB.pickle
     @param otype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib". Default = pickle
     @param alpha Float: Additive (Laplace/Lidstone) smoothing parameter (0 for no smoothing). Default = 1.0
     @param fit_prior Boolean: Flag to indicate whether to learn class prior probabilities or not. If False, a uniform prior will be used. Default = True
-    @param classparam Boolean: Flag to indicate whether to print out SVM parameters. Default = True
+    @param classparam Boolean: Flag to indicate whether to print out MNB parameters. Default = True
     @param confusion Boolean: Flag to indicate whether to print out confusion matrix. Default = True
     @param classreport Boolean: Flag to indicate whether to print out classification report. Default = True
     @param cross_validation Integer: Number of cross validation (if any) to perform. If less than 2, cross validation will not be carried out. Default = 5
     """
     from sklearn.naive_bayes import MultinomialNB
     print("")
-    print("Task: Generate Multinomial Naive Bayes Classifier")
+    print("Task: Generate Naive Bayes Classifier for Multinomial Models (MNB)")
     print("Parameters:")
     print("    Data File = " + str(datafile))
     print("    Classification Label = " + str(label))
@@ -736,11 +737,11 @@ def generateMNB(datafile, label,
                                fit_prior=fit_prior)
     process_classifier(datafile, label, classifier, oclass, otype, 
                        classparam, confusion, classreport, cross_validation)
-    print("===================== MultinomialNB Generated =====================")
+    print("=============== Multinomial NB Generated ===============")
     
 def useMNB(datafile, classfile, classtype, resultfile):
     """!
-    Function to use a previously generated Multinomial Naive Bayes classifier to classify data.
+    Function to use a previously generated Multinomial Naive Bayes (MNB) classifier to classify data.
     
     Usage:
         python bactclass.py useMNB --datafile=classifier_use.csv --classfile=classifier_MNB.pickle --classtype=pickle --resultfile=classifier_result.csv
@@ -767,12 +768,12 @@ def generateGNB(datafile, label,
         
         python bactclass.py genGNB --datafile=classifier_train.csv --label=Class --oclass=classifier_GNB.pickle --otype=pickle --var_smoothing=1e-9 --classparam=True --confusion=True --classreport=True --cross_validation=5
 
-    @param datafile String: Path to CSV data file used to generate SVM.
+    @param datafile String: Path to CSV data file used to generate GNB.
     @param label String: Column (field) name in the data file to indicate the class label.
-    @param oclass String: Path to write out the generated classifier. Default = classifier_SVM.pickle
+    @param oclass String: Path to write out the generated classifier. Default = classifier_GNB.pickle
     @param otype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib". Default = pickle
     @param var_smoothing Float: Portion of the largest variance of all features that is added to variances for calculation stability. Default = 1e-9
-    @param classparam Boolean: Flag to indicate whether to print out SVM parameters. Default = True
+    @param classparam Boolean: Flag to indicate whether to print out GNB parameters. Default = True
     @param confusion Boolean: Flag to indicate whether to print out confusion matrix. Default = True
     @param classreport Boolean: Flag to indicate whether to print out classification report. Default = True
     @param cross_validation Integer: Number of cross validation (if any) to perform. If less than 2, cross validation will not be carried out. Default = 5
@@ -790,7 +791,7 @@ def generateGNB(datafile, label,
     classifier = GaussianNB(var_smoothing=float(var_smoothing))
     process_classifier(datafile, label, classifier, oclass, otype, 
                        classparam, confusion, classreport, cross_validation)
-    print("===================== GaussianNB Generated =====================")
+    print("================= Gaussian NB Generated =================")
     
 def useGNB(datafile, classfile, classtype, resultfile):
     """!
