@@ -603,7 +603,64 @@ def useBNB(datafile, classfile, classtype, resultfile):
     """
     useScikitClassifier("BNB", datafile, classfile, classtype, resultfile)
     
+def generateCNB(datafile, label, 
+                oclass="classifier_CNB.pickle", 
+                otype="pickle",
+                alpha=1.0,
+                fit_prior=True,
+                classparam=True, 
+                confusion=True, 
+                classreport=True,
+                cross_validation=5):
+    """!
+    Function to generate a Complement Naive Bayes classifier (CNB) from given data. 
+
+    Usage:
+        
+        python bactclass.py genCNB --datafile=classifier_train.csv --label=Class --oclass=classifier_CNB.pickle --otype=pickle --alpha=1.0 --fit_prior=True --classparam=True --confusion=True --classreport=True --cross_validation=5
+
+    @param datafile String: Path to CSV data file used to generate SVM.
+    @param label String: Column (field) name in the data file to indicate the class label.
+    @param oclass String: Path to write out the generated classifier. Default = classifier_CNB.pickle
+    @param otype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib". Default = pickle
+    @param alpha Float: Additive (Laplace/Lidstone) smoothing parameter (0 for no smoothing). Default = 1.0
+    @param fit_prior Boolean: Flag to indicate whether to learn class prior probabilities or not. If False, a uniform prior will be used. Default = True
+    @param classparam Boolean: Flag to indicate whether to print out SVM parameters. Default = True
+    @param confusion Boolean: Flag to indicate whether to print out confusion matrix. Default = True
+    @param classreport Boolean: Flag to indicate whether to print out classification report. Default = True
+    @param cross_validation Integer: Number of cross validation (if any) to perform. If less than 2, cross validation will not be carried out. Default = 5
+    """
+    from sklearn.naive_bayes import ComplementNB
+    print("")
+    print("Task: Generate Complement Naive Bayes Classifier")
+    print("Parameters:")
+    print("    Data File = " + str(datafile))
+    print("    Classification Label = " + str(label))
+    print("    Additive Smoothing Parameter = " + str(alpha))
+    print("    Learn Prior Probabilities = " + str(fit_prior))
+    print("    Classifier File = " + str(oclass))
+    print("    Classifier File Type = " + str(otype))
+    print("")
+    classifier = ComplementNB(alpha=float(alpha),
+                              fit_prior=fit_prior)
+    process_classifier(datafile, label, classifier, oclass, otype, 
+                       classparam, confusion, classreport, cross_validation)
+    print("===================== MultinomialNB Generated =====================")
     
+def useCNB(datafile, classfile, classtype, resultfile):
+    """!
+    Function to use a previously generated Complement Naive Bayes (CNB) classifier to classify data.
+    
+    Usage:
+        python bactclass.py useCNB --datafile=classifier_use.csv --classfile=classifier_CNB.pickle --classtype=pickle --resultfile=classifier_result.csv
+    
+    @param datafile String: Path to CSV file containing data to be classified.
+    @param classfile String: Path to the generated classifier.
+    @param classtype String: Type of file to write out the generated classifier. Allowable types are "pickle" and "joblib".
+    @param resultfile String: Path to write out the classified results.
+    """
+    useScikitClassifier("CNB", datafile, classfile, classtype, resultfile)
+
 def generateMNB(datafile, label, 
                 oclass="classifier_MNB.pickle", 
                 otype="pickle",
@@ -720,6 +777,7 @@ def useGNB(datafile, classfile, classtype, resultfile):
 if __name__ == "__main__":
     exposed_functions = {"genANN": generateANN,
                          "genBNB": generateBNB,
+                         "genCNB": generateCNB,
                          "genDT": generateDT,
                          "genGNB": generateGNB,
                          "genMNB": generateMNB,
@@ -727,6 +785,7 @@ if __name__ == "__main__":
                          "recycle": recycle,
                          "useANN": useANN,
                          "useBNB": useBNB,
+                         "useCNB": useCNB,
                          "useDT": useDT,
                          "useGNB": useGNB,
                          "useMNB": useMNB,
