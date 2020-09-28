@@ -27,8 +27,6 @@ import sys
 try: 
     from Bio import Align
     from Bio import SeqIO
-    from Bio.Alphabet import generic_dna
-    from Bio.Alphabet import generic_rna
     from Bio.Seq import Seq
     from Bio.SeqUtils.ProtParam import ProteinAnalysis
 except ImportError:
@@ -36,11 +34,14 @@ except ImportError:
                            'install', 'biopython'])
     from Bio import Align
     from Bio import SeqIO
-    from Bio.Alphabet import generic_dna
-    from Bio.Alphabet import generic_rna
     from Bio.Seq import Seq
     from Bio.SeqUtils.ProtParam import ProteinAnalysis
 
+import Bio
+biopython_version = float(Bio.__version__)
+if biopython_version < 1.78:
+    from Bio.Alphabet import generic_dna
+    from Bio.Alphabet import generic_rna
 
 try: 
     import fire
