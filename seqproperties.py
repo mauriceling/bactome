@@ -999,7 +999,7 @@ def flexibility(fastafile, molecule, genetic_code=1, to_stop=True):
     is not peptide, as these options are needed for translation. The 
     output will be in the format of
 
-        <sequence ID> : <flexibility value>
+        <sequence ID> : {<flexibility value>}
 
     @param fastafile String: Path to the FASTA file to be processed.
     @param molecule String: Defines the type of molecule. Three 
@@ -1018,8 +1018,7 @@ def flexibility(fastafile, molecule, genetic_code=1, to_stop=True):
         sequence = _toPeptide(str(o.seqNN[k][0]), molecule, 
                               genetic_code, to_stop)
         try:
-            result = '%0.6f' % sequence.flexibility()
-            data = [k, result]
+            data = [k] + sequence.flexibility()
             data = ' : '.join([str(x) for x in data])
             print(data)
         except ZeroDivisionError:
@@ -1588,6 +1587,73 @@ def random_selection(fastafile, n=250, with_replacement=True,
             print(s[1][0])
         count = count + 1
 
+def pointMutationOverGenerations(organisms=100, length=1000, bases="DNA", 
+                                 mutations=10, algorithm="local", 
+                                 generations=100, tests=100):
+    """!
+    Function to perform naive simulation of a population of sequences 
+    over a number of generations and sample the sequence diversity at 
+    each generation. 
+
+    The simulation is based on the following: (a) an initial population 
+    of identical sequences, (b) population size and sequence length do 
+    not change, (c) number of bases/residues to mutate does not change, 
+    (d) equal chance of mutation per base/residue, (e) no selection or 
+    mating process, and (f) random sampling of organisms to test for 
+    sequence diversity with selfing and resampling possible.
+
+    Usage:
+
+        python seqproperties.py pmog --organisms=100 --length=1000 --bases=DNA --mutations=10 --algorithm=local --generations=100 --tests=100
+
+    The CSV output will be in the format of:
+
+        <Generation>, {<Pairwise alignment score>}
+
+    @param organisms Integer: Number of organisms. Default = 100
+    @param length Integer: Sequence length per organism. Default = 1000
+    @param bases String: Defines the type of bases, which can be 'peptide' 
+    for amino acid sequences, 'DNA' for DNA sequences, and 'RNA' for RNA 
+    sequence, or self-defined bases. Default = local
+    @param mutations Integer: Number of bases/residues to mutate per 
+    @param algorithm String: Type of pairwise alignment algorithm to 
+    use. Allowable values are 'local' (Smith-Waterman algorithm) 
+    and 'global' (Needleman-Wunsch algorithm). Default = local.
+    @param generations Integer: Number of generations to simulate. 
+    Default = 1000
+    @param tests Integer: Number of pairwise alignments per generation. 
+    Default = 100
+    """
+    if bases == "DNA":
+        bases = [x for x in "ATGC"]
+    elif bases == "RNA":
+        bases = [x for x in "AUGC"]
+    elif bases == "peptide":
+        bases = [x for x in "ACDEFGHIKLMNPQRSTVWY"]
+    else:
+        bases = [x for x in bases]
+    if algorithm == "local":
+        aligner = Align.PairwiseAligner()
+        aligner.mode = "local"
+    elif algorithm == "global":
+        aligner = Align.PairwiseAligner()
+        aligner.mode = "global"
+    seq = [''.join([random.choice(bases) for i in range(int(length))])] * int(organisms)
+    score_header = ','.join(["Score_" + str(i+1) for i in range(tests)])
+    print("Generation,%s" % score_header)
+    for gen in range(int(generations)+1):
+        score = [str(aligner.score(random.choice(seq), random.choice(seq))) 
+                 for test in range(int(tests))]
+        print("%s,%s" % (str(gen), ",".join(score)))
+        new_seq = []
+        for s in seq:
+            s = [base for base in s]
+            for m in range(int(mutations)):
+                s[random.randint(0, len(s)-1)] = random.choice(bases)
+            new_seq.append(''.join(s))
+        seq = new_seq
+
+
 if __name__ == '__main__':
     exposed_functions = {'a': percentA,
                          'aacount': aminoacidCount,
@@ -1613,6 +1679,7 @@ if __name__ == '__main__':
                          'palign': pairwise_alignment,
                          'palign2': pairwise_alignment2,
                          'plength': peptideLength,
+                         'pmog': pointMutationOverGenerations,
                          'propensity': propensity,
                          'reverse': hasReverse,
                          'rselect': random_selection,
