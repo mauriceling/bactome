@@ -1588,7 +1588,8 @@ def random_selection(fastafile, n=250, with_replacement=True,
         count = count + 1
 
 def pointMutationOverGenerations(organisms=100, length=1000, bases="DNA", 
-                                 mutations=10, algorithm="local", 
+                                 mutations=10, mutation_rate=-1,
+                                 algorithm="local", 
                                  generations=100, tests=100):
     """!
     Function to perform naive simulation of a population of sequences 
@@ -1597,14 +1598,16 @@ def pointMutationOverGenerations(organisms=100, length=1000, bases="DNA",
 
     The simulation is based on the following: (a) an initial population 
     of identical sequences, (b) population size and sequence length do 
-    not change, (c) number of bases/residues to mutate does not change, 
-    (d) equal chance of mutation per base/residue, (e) no selection or 
-    mating process, and (f) random sampling of organisms to test for 
-    sequence diversity with selfing and resampling possible.
+    not change, (c) number of bases/residues or probability of bases/
+    residues to mutate does not change (probability, if more than zero, 
+    will take precedence over number), (d) equal chance of mutation 
+    per base/residue, (e) no selection or mating process, and (f) 
+    random sampling of organisms to test for sequence diversity with 
+    selfing and resampling possible.
 
     Usage:
 
-        python seqproperties.py pmog --organisms=100 --length=1000 --bases=DNA --mutations=10 --algorithm=local --generations=100 --tests=100
+        python seqproperties.py pmog --organisms=100 --length=1000 --bases=DNA --mutations=10 --mutation_rate=-1 --algorithm=local --generations=100 --tests=100
 
     The CSV output will be in the format of:
 
@@ -1616,6 +1619,12 @@ def pointMutationOverGenerations(organisms=100, length=1000, bases="DNA",
     for amino acid sequences, 'DNA' for DNA sequences, and 'RNA' for RNA 
     sequence, or self-defined bases. Default = local
     @param mutations Integer: Number of bases/residues to mutate per 
+    organism per generation. This will only be used if mutation_rate < 
+    0. Default = 10
+    @param mutation_rate float: Mutation rate where 0.01 or 1e-2 means 
+    mutation rate is 1 in 100 or 1% chances of mutation per base/residue 
+    per generation. If mutation_rate > 0, this will take precedence 
+    over mutation parameter. Default = -1
     @param algorithm String: Type of pairwise alignment algorithm to 
     use. Allowable values are 'local' (Smith-Waterman algorithm) 
     and 'global' (Needleman-Wunsch algorithm). Default = local.
@@ -1641,17 +1650,22 @@ def pointMutationOverGenerations(organisms=100, length=1000, bases="DNA",
     seq = [''.join([random.choice(bases) for i in range(int(length))])] * int(organisms)
     score_header = ','.join(["Score_" + str(i+1) for i in range(tests)])
     print("Generation,%s" % score_header)
+    mutation_rate = float(mutation_rate)
+    def mutate(s, mutation_rate, mutations):
+        s = [base for base in s]
+        if mutation_rate < 0:
+            for m in range(int(mutations)):
+                s[random.randint(0, len(s)-1)] = random.choice(bases)
+        else:
+            for position in range(len(s)):
+                if random.random() <= mutation_rate:
+                    s[position] = random.choice(bases)
+        return ''.join(s)
     for gen in range(int(generations)+1):
         score = [str(aligner.score(random.choice(seq), random.choice(seq))) 
                  for test in range(int(tests))]
         print("%s,%s" % (str(gen), ",".join(score)))
-        new_seq = []
-        for s in seq:
-            s = [base for base in s]
-            for m in range(int(mutations)):
-                s[random.randint(0, len(s)-1)] = random.choice(bases)
-            new_seq.append(''.join(s))
-        seq = new_seq
+        seq = [mutate(s, mutation_rate, mutations) for s in seq]
 
 
 if __name__ == '__main__':
