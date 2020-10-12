@@ -1697,7 +1697,7 @@ def extractFasta(fastafile, keyfile, outfile, match="start"):
                 if fastakey.startswith(key):
                     print("Found: %s --> %s" % (str(key.strip()), 
                                                 str(fastakey.strip())))
-                    ofile.write("> " + str(fastakey.strip()) + '\n')
+                    ofile.write(">" + str(fastakey.strip()) + '\n')
                     sequence = str(infasta.seqNN[fastakey][0])
                     ofile.write(str(sequence) + '\n')
                     count = count + 1
