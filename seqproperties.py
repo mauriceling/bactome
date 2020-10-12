@@ -1718,6 +1718,53 @@ def extractFasta(fastafile, keyfile, outfile, match="start"):
     print("Number of records matched: %s" % str(count))
     ofile.close()
 
+def differenceFasta(fastafileA, outfile, fastafileB=None, keyfile=None):
+    '''!
+    Function to pull out / extract records that are found in one FASTA 
+    file (fastafileA) but not in the other FASTA file (fastafileB) or 
+    descriptor listing (keyfile). The output FASTA file will consist of 
+    (fastafileA - fastafileB) or (fastafileA - keyfile). The keyfile (if 
+    given) will take precedence over fastafileB (which means fastafileB)
+
+    Usage:
+
+        python seqproperties.py difffasta --fastafileA=<original FASTA file> --fastafileB=<FASTA file to be subtracted> --keyfile=<record list file to be subtract> --outfile=<new output FASTA file>
+
+    @param fastafileA String: Path to the FASTA file to be processed - 
+    the original FASTA file to subtract data from. 
+    @param fastafileB String: Path to the FASTA file containing record 
+    to be subtracted.
+    @param keyfile String: Path to a file containing the list of 
+    records to be subtracted from fastafileA - one description per line.
+    @param outfile String: Path to the new FASTA file to be written.
+    '''
+    fastaA = CodonUsageBias()
+    fastaA.addSequencesFromFasta(fastafileA)
+    fastaA_keys = list(fastaA.seqNN.keys())
+    ofile = open(outfile, "w")
+    if keyfile:
+        kfile = [x[:-1].strip() 
+                 for x in open(keyfile, "r").readlines()]
+        subtracted_keys = [str(x) for x in fastaA_keys 
+                            if x not in kfile]     
+    else:
+        fastaB = CodonUsageBias()
+        fastaB.addSequencesFromFasta(fastafileB)
+        fastaB_keys = list(fastaB.seqNN.keys())
+        subtracted_keys = [str(x) for x in fastaA_keys 
+                            if x not in fastaB_keys]
+    for key in subtracted_keys:
+        ofile.write(">" + key + '\n')
+        sequence = str(fastaA.seqNN[key][0])
+        ofile.write(str(sequence) + '\n')
+    print("Number of records in FASTA file A: %s" % str(len(fastaA_keys)))
+    if keyfile:
+        print("Number of items in keyfile: %s" % str(len(kfile)))
+    else:
+        print("Number of records in FASTA file B: %s" % str(len(fastaB_keys)))
+    print("Number of records in FASTA file A but not in FASTA file B: %s" % str(len(subtracted_keys)))
+    ofile.close()
+
 if __name__ == '__main__':
     exposed_functions = {'a': percentA,
                          'aacount': aminoacidCount,
@@ -1726,6 +1773,7 @@ if __name__ == '__main__':
                          'asymfreq': asymmetricFrequency,
                          'codoncount': codonCount,
                          'complement': complement,
+                         'difffasta': differenceFasta,
                          'extinction': extinction_coefficient,
                          'extractfasta': extractFasta,
                          'count': genericCount,
