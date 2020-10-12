@@ -1667,6 +1667,56 @@ def pointMutationOverGenerations(organisms=100, length=1000, bases="DNA",
         print("%s,%s" % (str(gen), ",".join(score)))
         seq = [mutate(s, mutation_rate, mutations) for s in seq]
 
+def extractFasta(fastafile, keyfile, outfile, match="start"):
+    '''!
+    Function to pull out / extract records from one FASTA file into 
+    another.
+
+    Usage:
+
+        python seqproperties.py extractfasta --fastafile=<original FASTA file> --keyfile=<record list file> --outfile=<new output FASTA file> --match=<type of match>
+
+    @param fastafile String: Path to the FASTA file to be processed - 
+    the original FASTA file to extract data from. 
+    @param keyfile String: Path to a file containing the list of 
+    records - one description per line.
+    @param outfile String: Path to the new FASTA file to be written.
+    @param match String: Type of match. Allowable types are "start" 
+    (matched as long as the start of the descriptor line is the same) 
+    or "full" (full match between descriptor lines).
+    '''
+    infasta = CodonUsageBias()
+    infasta.addSequencesFromFasta(fastafile)
+    kfile = [x[:-1].strip() for x in open(keyfile, "r").readlines()]
+    ofile = open(outfile, "w")
+    ori_FASTA_count = str(len(infasta.seqNN))
+    count = 0
+    for key in kfile:
+        for fastakey in infasta.seqNN:
+            if match == "start":
+                if fastakey.startswith(key):
+                    print("Found: %s --> %s" % (str(key.strip()), 
+                                                str(fastakey.strip())))
+                    ofile.write("> " + str(fastakey.strip()) + '\n')
+                    sequence = str(infasta.seqNN[fastakey][0])
+                    ofile.write(str(sequence) + '\n')
+                    count = count + 1
+                    del infasta.seqNN[fastakey]
+                    break
+            elif match == "full":
+                if fastakey.strip() == key.strip():
+                    print("Found: %s --> %s" % (str(key.strip()), 
+                                                str(fastakey.strip())))
+                    ofile.write("> " + str(fastakey.strip()) + '\n')
+                    sequence = str(infasta.seqNN[fastakey][0])
+                    ofile.write(str(sequence) + '\n')
+                    count = count + 1
+                    del infasta.seqNN[fastakey]
+                    break
+    print("Number of records in original FASTA file: %s" % ori_FASTA_count)
+    print("Number of items in Key File: %s" % str(len(kfile)))
+    print("Number of records matched: %s" % str(count))
+    ofile.close()
 
 if __name__ == '__main__':
     exposed_functions = {'a': percentA,
@@ -1677,6 +1727,7 @@ if __name__ == '__main__':
                          'codoncount': codonCount,
                          'complement': complement,
                          'extinction': extinction_coefficient,
+                         'extractfasta': extractFasta,
                          'count': genericCount,
                          'flexibility': flexibility,
                          'g': percentG,
