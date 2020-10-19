@@ -6,6 +6,8 @@ Date created: 3rd May 2018
 License: GNU General Public License version 3 for academic or 
 not-for-profit use only
 
+Reference: Ling, MHT. 2020. SeqProperties: A Python Command-Line Tool 
+for Basic Sequence Analysis. Acta Scientific Microbiology 3(6): 103-106.
 
 Bactome package is free software: you can redistribute it and/or 
 modify it under the terms of the GNU General Public License as 

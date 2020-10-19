@@ -6,6 +6,9 @@ Date created: 25th July 2020
 License: GNU General Public License version 3 for academic or 
 not-for-profit use only
 
+Reference: Liu, TT, Ling, MHT. 2020. BactClass: Simplifying the Use of 
+Machine Learning in Biology and Medicine. Acta Scientific Medical 
+Sciences 4(11): 43-47.
 
 Bactome package is free software: you can redistribute it and/or 
 modify it under the terms of the GNU General Public License as 

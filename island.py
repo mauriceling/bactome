@@ -6,6 +6,9 @@ Date created: 8th November 2019
 License: GNU General Public License version 3 for academic or 
 not-for-profit use only
 
+Reference: Ling, MHT. 2019. Island: A Simple Forward Simulation Tool 
+for Population Genetics. Acta Scientific Computer Sciences 1(2): 20-22.
+
 
 Bactome package is free software: you can redistribute it and/or 
 modify it under the terms of the GNU General Public License as 
