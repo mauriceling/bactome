@@ -1792,6 +1792,24 @@ def cleanFasta(fastafile, outfile):
             fastaR = False
     ofile.close()
 
+def fastaNGram(fastafile, n):
+    '''!
+    Function to generate starting N-grams of Fasta records.
+
+    Usage:
+
+        python seqproperties.py fastanname --fastafile=<FASTA file> --n=2
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    @param n Integer: Size of n-gram. If n=2, bigram will be generated.
+    '''
+    infasta = CodonUsageBias()
+    infasta.addSequencesFromFasta(fastafile)
+    ngram = set([fastakey[:int(n)] for fastakey in infasta.seqNN])
+    ngram = list(ngram)
+    ngram.sort()
+    return ngram
+
 if __name__ == '__main__':
     exposed_functions = {'a': percentA,
                          'aacount': aminoacidCount,
@@ -1804,6 +1822,7 @@ if __name__ == '__main__':
                          'difffasta': differenceFasta,
                          'extinction': extinction_coefficient,
                          'extractfasta': extractFasta,
+                         'fastanname': fastaNGram,
                          'count': genericCount,
                          'flexibility': flexibility,
                          'g': percentG,
