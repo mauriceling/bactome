@@ -1808,7 +1808,7 @@ def fastaNGram(fastafile, n):
     ngram = set([fastakey[:int(n)] for fastakey in infasta.seqNN])
     ngram = list(ngram)
     ngram.sort()
-    return ngram
+    print(", ".join(ngram))
 
 if __name__ == '__main__':
     exposed_functions = {'a': percentA,
