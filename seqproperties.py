@@ -1767,12 +1767,38 @@ def differenceFasta(fastafileA, outfile, fastafileB=None, keyfile=None):
     print("Number of records in FASTA file A but not in FASTA file B: %s" % str(len(subtracted_keys)))
     ofile.close()
 
+def cleanFasta(fastafile, outfile):
+    '''!
+    Function to clean out irrelevant data from a Fasta file - the resulting output Fasta file will only have Fasta records.
+
+    Usage:
+
+        python seqproperties.py cleanfasta --fastafile=<original FASTA file> --outfile=<new output FASTA file>
+
+    @param fastafile String: Path to the FASTA file to be processed.
+    @param outfile String: Path to the new FASTA file to be written.
+    '''
+    data = open(fastafile, "r").readlines()
+    data = [x[:-1] for x in data]
+    data = [x for x in data if x != ""]
+    ofile = open(outfile, "w")
+    fastaR = False
+    for row in data:
+        if row.startswith(">"):
+            fastaR = True
+            ofile.write(row + "\n")
+        elif fastaR == True:
+            ofile.write(row + "\n")
+            fastaR = False
+    ofile.close()
+
 if __name__ == '__main__':
     exposed_functions = {'a': percentA,
                          'aacount': aminoacidCount,
                          'ai': percentAi,
                          'aromaticity': aromaticity,
                          'asymfreq': asymmetricFrequency,
+                         'cleanfasta': cleanFasta,
                          'codoncount': codonCount,
                          'complement': complement,
                          'difffasta': differenceFasta,
