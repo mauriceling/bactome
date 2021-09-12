@@ -1354,7 +1354,7 @@ def pairwise_alignment2(queryfile, dbfile,
 
     Usage:
 
-        python seqproperties.py palign2 --queryfile=<FASTA file path> -dbfile=<FASTA file path> --algorithm=local --output=summarize
+        python seqproperties.py palign2 --queryfile=<FASTA file path> -dbfile=<FASTA file path> --algorithm=local --outfmt=summarize
 
     The output will be in the format of
 
@@ -1810,6 +1810,129 @@ def fastaNGram(fastafile, n):
     ngram.sort()
     print(", ".join(ngram))
 
+def _coexp_minkowski(d1, d2, power):
+    '''!
+    Private function - calculate Minkowski distances (Euclidean and 
+    Manhattan distances) of d1 and d2.
+    '''
+    score = [abs(d1[i]-d2[i])**power for i in range(len(d1))]
+    score = sum(score) ** (1.0/power)
+    return score
+
+def _coexp_canberra(d1, d2):
+    '''!
+    Private function - calculate Minkowski distance of d1 and d2.
+    '''
+    score = [abs(d1[i]-d2[i])/abs(d1[i]+d2[i]) for i in range(len(d1))]
+    return sum(score)
+
+def _coexp_cosine(d1, d2):
+    '''!
+    Private function - calculate Cosine coefficient of d1 and d2.
+    '''
+    numerator = sum([d1[x] * d2[x] for x in range(len(d1))])
+    denominator = sum([x * x for x in d1]) ** 0.5
+    denominator = denominator * (sum([x * x for x in d2]) ** 0.5)
+    return numerator / denominator
+
+def _coexp_tanimoto(d1, d2):
+    '''!
+    Private function - calculate Tanimoto coefficient of d1 and d2.
+    '''
+    numerator = sum([d1[x] * d2[x] for x in range(len(d1))])
+    denominator = sum([x * x for x in d1])
+    denominator = denominator + (sum([x * x for x in d2])) - numerator
+    return numerator / denominator
+
+def coexpression(expfile, method):
+    '''!
+    Function to generate gene co-expressions from expression data.
+
+    Usage:
+
+        python seqproperties.py coexp --expfile=<CSV file> --method=<coexpression method>
+
+    @param expfile String: Path to the comma-separated value (CSV) file 
+    containing gene co-expression data.
+    @param method String: Co-expression measure. Allowable values are 
+    cosine (Cosine coefficient) canberra (Canberra distance), 
+    euclidean (Euclidean distance), kendall (Kendall's tau), 
+    manhattan (Manhattan distance), pearson (Pearson's correlation), 
+    pointserial (Point biserial correlation), somer (Somer's D), 
+    spearman (Spearman's correlation), and tanimoto (Tanimoto coefficient).
+    '''
+    from scipy import stats
+    expData = {}
+    for line in open(expfile, "r").readlines()[1:]:
+        line = [x.strip() for x in line.split(',')]
+        expData[line[0]] = [float(exp) for exp in line[1:]]
+    idList1 = list(expData.keys())
+    idList2 = list(expData.keys())
+    count = 1
+    for id1 in idList1:
+        idList2 = [i for i in idList2 if i != id1]
+        for id2 in idList2:
+            if method == 'canberra': score = _coexp_canberra(expData[id1], expData[id2])
+            if method == 'cosine': score = _coexp_cosine(expData[id1], expData[id2])
+            if method == 'euclidean': score = _coexp_minkowski(expData[id1], expData[id2], 2)
+            if method == 'kendall': score = stats.kendalltau(expData[id1], expData[id2]).correlation
+            if method == 'manhattan': score = _coexp_minkowski(expData[id1], expData[id2], 1)
+            if method == 'pearson': score = stats.pearsonr(expData[id1], expData[id2])[0]
+            if method == 'pointbiserial': score = stats.pointbiserialr(expData[id1], expData[id2]).correlation
+            if method == 'somer': score = stats.somersd(expData[id1], expData[id2]).statistic
+            if method == 'spearman': score = stats.spearmanr(expData[id1], expData[id2]).correlation
+            if method == 'tanimoto': score = _coexp_tanimoto(expData[id1], expData[id2])
+            print('%s : %s : %s : %s' % (str(count), str(id1), 
+                                         str(id2), str(score)))
+            count = count + 1
+
+def coexpression_randomization(expfile, method, n, replicate):
+    '''!
+    Function to generate randomized gene co-expressions from expression 
+    data (for statistical testing).
+
+    Usage:
+
+        python seqproperties.py coexp_rand --expfile=<CSV file> --method=<coexpression method> --n=1000 --replicate=30
+
+    @param expfile String: Path to the comma-separated value (CSV) file 
+    containing gene co-expression data.
+    @param method String: Co-expression measure. Allowable values are 
+    cosine (Cosine coefficient) canberra (Canberra distance), 
+    euclidean (Euclidean distance), kendall (Kendall's tau), 
+    manhattan (Manhattan distance), pearson (Pearson's correlation), 
+    pointserial (Point biserial correlation), somer (Somer's D), 
+    spearman (Spearman's correlation), and tanimoto (Tanimoto coefficient).
+    @param n Integer: Number of samples in each replicate.
+    @param replicate Integer: Number of replicates.
+    '''
+    from scipy import stats
+    expData = {}
+    for line in open(expfile, "r").readlines()[1:]:
+        line = [x.strip() for x in line.split(',')]
+        expData[line[0]] = [float(exp) for exp in line[1:]]
+    idList = list(expData.keys())
+    count = 1
+    for rep in range(replicate):
+        scores = []
+        for i in range(n):
+            d1 = expData[random.choice(idList)]
+            d2 = expData[random.choice(idList)]
+            if method == 'canberra': scores.append(_coexp_canberra(d1, d2))
+            if method == 'cosine': scores.append(_coexp_cosine(d1, d2))
+            if method == 'euclidean': scores.append(_coexp_minkowski(d1, d2, 2))
+            if method == 'kendall': scores.append(stats.kendalltau(d1, d2).correlation)
+            if method == 'manhattan': scores.append(_coexp_minkowski(d1, d2, 1))
+            if method == 'pearson': scores.append(stats.pearsonr(d1, d2)[0])
+            if method == 'pointbiserial': scores.append(stats.pointbiserialr(d1, d2).correlation)
+            if method == 'somer': scores.append(stats.somersd(d1, d2).statistic)
+            if method == 'spearman': scores.append(stats.spearmanr(d1, d2).correlation)
+            if method == 'tanimoto': scores.append(_coexp_tanimoto(d1, d2))
+        mean_score = stats.describe(scores).mean
+        print('%s : %s : %s' % (str(count), str(len(scores)), str(mean_score)))
+        count = count + 1
+
+
 if __name__ == '__main__':
     exposed_functions = {'a': percentA,
                          'aacount': aminoacidCount,
@@ -1818,6 +1941,8 @@ if __name__ == '__main__':
                          'asymfreq': asymmetricFrequency,
                          'cleanfasta': cleanFasta,
                          'codoncount': codonCount,
+                         'coexp': coexpression,
+                         'coexp_rand': coexpression_randomization,
                          'complement': complement,
                          'difffasta': differenceFasta,
                          'extinction': extinction_coefficient,
