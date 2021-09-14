@@ -1820,12 +1820,7 @@ def coexpression(expfile, method):
 
     @param expfile String: Path to the comma-separated value (CSV) file 
     containing gene co-expression data.
-    @param method String: Co-expression measure. Allowable values are 
-    cosine (Cosine coefficient) canberra (Canberra distance), 
-    euclidean (Euclidean distance), kendall (Kendall's tau), 
-    manhattan (Manhattan distance), pearson (Pearson's correlation), 
-    pointserial (Point biserial correlation), somer (Somer's D), 
-    spearman (Spearman's correlation), and tanimoto (Tanimoto coefficient).
+    @param method String: Co-expression measure. Allowable values are braycurtis (Bray and Curtis coefficient), cosine (Cosine coefficient) canberra (Canberra distance), euclidean (Euclidean distance), kendall (Kendall's tau), manhattan (Manhattan distance), pearson (Pearson's correlation), pointserial (Point biserial correlation), somer (Somer's D), spearman (Spearman's correlation), and tanimoto (Tanimoto coefficient).
     '''
     from scipy import stats
     from copads import objectdistance as d
@@ -1839,6 +1834,7 @@ def coexpression(expfile, method):
     for id1 in idList1:
         idList2 = [i for i in idList2 if i != id1]
         for id2 in idList2:
+            if method == 'braycurtis': score = d.Bray_Curtis(expData[id1], expData[id2])
             if method == 'canberra': score = d.Canberra(expData[id1], expData[id2])
             if method == 'cosine': score = d.Cosine(expData[id1], expData[id2])
             if method == 'euclidean': score = d.Euclidean(expData[id1], expData[id2], 2)
@@ -1864,12 +1860,7 @@ def coexpression_randomization(expfile, method, n, replicate):
 
     @param expfile String: Path to the comma-separated value (CSV) file 
     containing gene co-expression data.
-    @param method String: Co-expression measure. Allowable values are 
-    cosine (Cosine coefficient) canberra (Canberra distance), 
-    euclidean (Euclidean distance), kendall (Kendall's tau), 
-    manhattan (Manhattan distance), pearson (Pearson's correlation), 
-    pointserial (Point biserial correlation), somer (Somer's D), 
-    spearman (Spearman's correlation), and tanimoto (Tanimoto coefficient).
+    @param method String: Co-expression measure. Allowable values are braycurtis (Bray and Curtis coefficient), cosine (Cosine coefficient) canberra (Canberra distance), euclidean (Euclidean distance), kendall (Kendall's tau), manhattan (Manhattan distance), pearson (Pearson's correlation), pointserial (Point biserial correlation), somer (Somer's D), spearman (Spearman's correlation), and tanimoto (Tanimoto coefficient).
     @param n Integer: Number of samples in each replicate.
     @param replicate Integer: Number of replicates.
     '''
@@ -1886,6 +1877,7 @@ def coexpression_randomization(expfile, method, n, replicate):
         for i in range(n):
             d1 = expData[random.choice(idList)]
             d2 = expData[random.choice(idList)]
+            if method == 'braycurtis': scores.append(d.Bray_Curtis(d1, d2))
             if method == 'canberra': scores.append(d.Canberra(d1, d2))
             if method == 'cosine': scores.append(d.Cosine(d1, d2))
             if method == 'euclidean': scores.append(d.Euclidean(d1, d2))
