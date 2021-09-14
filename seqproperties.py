@@ -1810,40 +1810,6 @@ def fastaNGram(fastafile, n):
     ngram.sort()
     print(", ".join(ngram))
 
-def _coexp_minkowski(d1, d2, power):
-    '''!
-    Private function - calculate Minkowski distances (Euclidean and 
-    Manhattan distances) of d1 and d2.
-    '''
-    score = [abs(d1[i]-d2[i])**power for i in range(len(d1))]
-    score = sum(score) ** (1.0/power)
-    return score
-
-def _coexp_canberra(d1, d2):
-    '''!
-    Private function - calculate Minkowski distance of d1 and d2.
-    '''
-    score = [abs(d1[i]-d2[i])/abs(d1[i]+d2[i]) for i in range(len(d1))]
-    return sum(score)
-
-def _coexp_cosine(d1, d2):
-    '''!
-    Private function - calculate Cosine coefficient of d1 and d2.
-    '''
-    numerator = sum([d1[x] * d2[x] for x in range(len(d1))])
-    denominator = sum([x * x for x in d1]) ** 0.5
-    denominator = denominator * (sum([x * x for x in d2]) ** 0.5)
-    return numerator / denominator
-
-def _coexp_tanimoto(d1, d2):
-    '''!
-    Private function - calculate Tanimoto coefficient of d1 and d2.
-    '''
-    numerator = sum([d1[x] * d2[x] for x in range(len(d1))])
-    denominator = sum([x * x for x in d1])
-    denominator = denominator + (sum([x * x for x in d2])) - numerator
-    return numerator / denominator
-
 def coexpression(expfile, method):
     '''!
     Function to generate gene co-expressions from expression data.
@@ -1862,6 +1828,7 @@ def coexpression(expfile, method):
     spearman (Spearman's correlation), and tanimoto (Tanimoto coefficient).
     '''
     from scipy import stats
+    from copads import objectdistance as d
     expData = {}
     for line in open(expfile, "r").readlines()[1:]:
         line = [x.strip() for x in line.split(',')]
@@ -1872,16 +1839,16 @@ def coexpression(expfile, method):
     for id1 in idList1:
         idList2 = [i for i in idList2 if i != id1]
         for id2 in idList2:
-            if method == 'canberra': score = _coexp_canberra(expData[id1], expData[id2])
-            if method == 'cosine': score = _coexp_cosine(expData[id1], expData[id2])
-            if method == 'euclidean': score = _coexp_minkowski(expData[id1], expData[id2], 2)
+            if method == 'canberra': score = d.Canberra(expData[id1], expData[id2])
+            if method == 'cosine': score = d.Cosine(expData[id1], expData[id2])
+            if method == 'euclidean': score = d.Euclidean(expData[id1], expData[id2], 2)
             if method == 'kendall': score = stats.kendalltau(expData[id1], expData[id2]).correlation
-            if method == 'manhattan': score = _coexp_minkowski(expData[id1], expData[id2], 1)
+            if method == 'manhattan': score = d.Manhattan(expData[id1], expData[id2], 1)
             if method == 'pearson': score = stats.pearsonr(expData[id1], expData[id2])[0]
             if method == 'pointbiserial': score = stats.pointbiserialr(expData[id1], expData[id2]).correlation
             if method == 'somer': score = stats.somersd(expData[id1], expData[id2]).statistic
             if method == 'spearman': score = stats.spearmanr(expData[id1], expData[id2]).correlation
-            if method == 'tanimoto': score = _coexp_tanimoto(expData[id1], expData[id2])
+            if method == 'tanimoto': score = d.Tanimoto(expData[id1], expData[id2])
             print('%s : %s : %s : %s' % (str(count), str(id1), 
                                          str(id2), str(score)))
             count = count + 1
@@ -1907,6 +1874,7 @@ def coexpression_randomization(expfile, method, n, replicate):
     @param replicate Integer: Number of replicates.
     '''
     from scipy import stats
+    from copads import objectdistance as d
     expData = {}
     for line in open(expfile, "r").readlines()[1:]:
         line = [x.strip() for x in line.split(',')]
@@ -1918,16 +1886,16 @@ def coexpression_randomization(expfile, method, n, replicate):
         for i in range(n):
             d1 = expData[random.choice(idList)]
             d2 = expData[random.choice(idList)]
-            if method == 'canberra': scores.append(_coexp_canberra(d1, d2))
-            if method == 'cosine': scores.append(_coexp_cosine(d1, d2))
-            if method == 'euclidean': scores.append(_coexp_minkowski(d1, d2, 2))
+            if method == 'canberra': scores.append(d.Canberra(d1, d2))
+            if method == 'cosine': scores.append(d.Cosine(d1, d2))
+            if method == 'euclidean': scores.append(d.Euclidean(d1, d2))
             if method == 'kendall': scores.append(stats.kendalltau(d1, d2).correlation)
-            if method == 'manhattan': scores.append(_coexp_minkowski(d1, d2, 1))
+            if method == 'manhattan': scores.append(d.Manhattan(d1, d2))
             if method == 'pearson': scores.append(stats.pearsonr(d1, d2)[0])
             if method == 'pointbiserial': scores.append(stats.pointbiserialr(d1, d2).correlation)
             if method == 'somer': scores.append(stats.somersd(d1, d2).statistic)
             if method == 'spearman': scores.append(stats.spearmanr(d1, d2).correlation)
-            if method == 'tanimoto': scores.append(_coexp_tanimoto(d1, d2))
+            if method == 'tanimoto': scores.append(d.Tanimoto(d1, d2))
         mean_score = stats.describe(scores).mean
         print('%s : %s : %s' % (str(count), str(len(scores)), str(mean_score)))
         count = count + 1
