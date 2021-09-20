@@ -1892,23 +1892,24 @@ def coexpression_randomization(expfile, method, n, replicate):
         print('%s : %s : %s' % (str(count), str(len(scores)), str(mean_score)))
         count = count + 1
 
-def coexpression_filter(coexpfile, threshold, compare="above", absolute="yes"):
+def coexpression_filter(coexpfile, threshold, compare="above", absolute="yes", separator=":"):
     '''!
     Function to filter gene co-expressions file against a threshold.
 
     Usage:
 
-        python seqproperties.py coexp_filter --compare=above --absolute=yes --coexpfile=<co-expression file>
+        python seqproperties.py coexp_filter --compare=above --absolute=yes --separator=: --coexpfile=<co-expression file>
 
     @param coexpfile String: Path to file containing gene co-expressions.
     @param threshold Float: Threshold value
-    @param compare String: Type of comparison. Allowable types are "above" (filter co-expressions above the threshold) and "below" (filter co-expressions below the threshold).
-    @param absolute String: Flag to take absolute values of co-expressions. Allowable types are "yes" (convert co-expression to absolute co-expression) and "no" (do not convert co-expression to absolute co-expression).
+    @param compare String: Type of comparison. Allowable types are "above" (filter co-expressions above the threshold) and "below" (filter co-expressions below the threshold). Default = above
+    @param absolute String: Flag to take absolute values of co-expressions. Allowable types are "yes" (convert co-expression to absolute co-expression) and "no" (do not convert co-expression to absolute co-expression). Default = yes
+    @param separator String: Separator in gene co-expression file. Default = :
     '''
     threshold = float(threshold)
     with open(coexpfile, "r") as f:
         for line in f:
-            line = [x.strip() for x in line[:-1].split(":")]
+            line = [x.strip() for x in line[:-1].split(separator)]
             line[-1] = float(line[-1])
             if absolute == "yes": line[-1] = abs(line[-1])
             if compare == "above":
