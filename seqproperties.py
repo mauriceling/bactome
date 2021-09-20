@@ -1819,7 +1819,7 @@ def coexpression(expfile, method):
         python seqproperties.py coexp --expfile=<CSV file> --method=<coexpression method>
 
     @param expfile String: Path to the comma-separated value (CSV) file 
-    containing gene co-expression data.
+    containing gene expression data.
     @param method String: Co-expression measure. Allowable values are braycurtis (Bray and Curtis coefficient), cosine (Cosine coefficient) canberra (Canberra distance), euclidean (Euclidean distance), kendall (Kendall's tau), manhattan (Manhattan distance), pearson (Pearson's correlation), pointserial (Point biserial correlation), somer (Somer's D), spearman (Spearman's correlation), and tanimoto (Tanimoto coefficient).
     '''
     from scipy import stats
@@ -1859,7 +1859,7 @@ def coexpression_randomization(expfile, method, n, replicate):
         python seqproperties.py coexp_rand --expfile=<CSV file> --method=<coexpression method> --n=1000 --replicate=30
 
     @param expfile String: Path to the comma-separated value (CSV) file 
-    containing gene co-expression data.
+    containing gene expression data.
     @param method String: Co-expression measure. Allowable values are braycurtis (Bray and Curtis coefficient), cosine (Cosine coefficient) canberra (Canberra distance), euclidean (Euclidean distance), kendall (Kendall's tau), manhattan (Manhattan distance), pearson (Pearson's correlation), pointserial (Point biserial correlation), somer (Somer's D), spearman (Spearman's correlation), and tanimoto (Tanimoto coefficient).
     @param n Integer: Number of samples in each replicate.
     @param replicate Integer: Number of replicates.
