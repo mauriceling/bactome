@@ -1837,9 +1837,9 @@ def coexpression(expfile, method):
             if method == 'braycurtis': score = d.Bray_Curtis(expData[id1], expData[id2])
             if method == 'canberra': score = d.Canberra(expData[id1], expData[id2])
             if method == 'cosine': score = d.Cosine(expData[id1], expData[id2])
-            if method == 'euclidean': score = d.Euclidean(expData[id1], expData[id2], 2)
+            if method == 'euclidean': score = d.Euclidean(expData[id1], expData[id2])
             if method == 'kendall': score = stats.kendalltau(expData[id1], expData[id2]).correlation
-            if method == 'manhattan': score = d.Manhattan(expData[id1], expData[id2], 1)
+            if method == 'manhattan': score = d.Manhattan(expData[id1], expData[id2])
             if method == 'pearson': score = stats.pearsonr(expData[id1], expData[id2])[0]
             if method == 'pointbiserial': score = stats.pointbiserialr(expData[id1], expData[id2]).correlation
             if method == 'somer': score = stats.somersd(expData[id1], expData[id2]).statistic
