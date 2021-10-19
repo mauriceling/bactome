@@ -1892,21 +1892,31 @@ def coexpression_randomization(expfile, method, n, replicate):
         print('%s : %s : %s' % (str(count), str(len(scores)), str(mean_score)))
         count = count + 1
 
-def coexpression_filter(coexpfile, threshold, compare="above", absolute="yes", separator=":"):
+def coexpression_filter(coexpfile, threshold=0, percentile=0, compare="above", absolute="yes", separator=":"):
     '''!
     Function to filter gene co-expressions file against a threshold.
 
     Usage:
 
         python seqproperties.py coexp_filter --compare=above --absolute=yes --separator=: --threshold=0.7 --coexpfile=<co-expression file>
+        python seqproperties.py coexp_filter --compare=above --absolute=no --separator=: --percentile=0.95 --coexpfile=<co-expression file>
 
     @param coexpfile String: Path to file containing gene co-expressions.
-    @param threshold Float: Threshold value
+    @param threshold Float: Threshold value, and will only be used if percentile is 0 or not given. Default = 0
+    @param percentile Float: Percentile to filter, and takes precedence over threshold. Default = 0
     @param compare String: Type of comparison. Allowable types are "above" (filter co-expressions above the threshold) and "below" (filter co-expressions below the threshold). Default = above
     @param absolute String: Flag to take absolute values of co-expressions. Allowable types are "yes" (convert co-expression to absolute co-expression) and "no" (do not convert co-expression to absolute co-expression). Default = yes
     @param separator String: Separator in gene co-expression file. Default = :
     '''
-    threshold = float(threshold)
+    if percentile > 0:
+        threshold = open(coexpfile, "r").readlines()
+        threshold = [x[:-1].split(separator)[-1].strip() for x in threshold]
+        if absolute == "yes": [abs(float(x)) for x in threshold]
+        threshold.sort()
+        index = int(float(percentile) * len(threshold))
+        threshold = float(threshold[index])
+    else:
+        threshold = float(threshold)
     with open(coexpfile, "r") as f:
         for line in f:
             line = [x.strip() for x in line[:-1].split(separator)]
