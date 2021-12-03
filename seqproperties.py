@@ -1995,6 +1995,24 @@ def coexpression_compare(coexpfile, truthfile, separator=":"):
     print("Critical Success Index = %.5f" % CSI)
     print("Fowlkes–Mallows Index = %.5f" % FM)
 
+def checkCSV(file, separator=","):
+    '''!
+    Function to check for potentially problematic data rows in CSV file.
+
+    Usage:
+
+        python seqproperties.py checkcsv --file=<CSV file> --separator=,
+
+    @param file String: Path to CSV file.
+    @param separator String: Separator in CSV file. Default = ,
+    '''
+    import pandas as pd
+    try:
+        data = pd.read_csv(file, sep=separator, on_bad_lines=False)
+    except:
+        data = pd.read_csv(file, sep=separator, error_bad_lines=False, 
+                           warn_bad_lines=True)
+
 
 if __name__ == '__main__':
     exposed_functions = {'a': percentA,
@@ -2002,6 +2020,7 @@ if __name__ == '__main__':
                          'ai': percentAi,
                          'aromaticity': aromaticity,
                          'asymfreq': asymmetricFrequency,
+                         'checkcsv': checkCSV,
                          'cleanfasta': cleanFasta,
                          'codoncount': codonCount,
                          'coexp': coexpression,
