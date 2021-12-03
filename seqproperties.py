@@ -2024,7 +2024,7 @@ def sample_ClusterScan(file, filetype="excel", sheet_name=None,
 
     Usage:
 
-        python seqproperties.py clusterscan --file=<data file> --filetype=<type of file> --sheet_name=<name of Excel sheet> --usecols=None --samplesbyrow=False --min_clusters=2 --max_clusters=100
+        python seqproperties.py clusterscan --file=<data file> --filetype=<type of file> --sheet_name=<name of Excel sheet> --usecols=<columns to use> --samplesbyrow=<whether sample are by rows> --min_clusters=<minimum number of clusters> --max_clusters=<maximum number of clusters>
 
     For example,
 
