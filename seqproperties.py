@@ -2013,6 +2013,58 @@ def checkCSV(file, separator=","):
         data = pd.read_csv(file, sep=separator, error_bad_lines=False, 
                            warn_bad_lines=True)
 
+def sample_ClusterScan(file, filetype="excel", sheet_name=None, 
+                       usecols=None, samplesbyrow=True, 
+                       min_clusters=2, max_clusters=100):
+    '''!
+    Function to calculate Davies-Bouldin Score, Calinski and Harabasz 
+    Score, and Silhouette Score; for the number of clusters in order 
+    to determine the suitable number of clusters for K-means clustering 
+    of the data.
+
+    Usage:
+
+        python seqproperties.py clusterscan --file=<data file> --filetype=<type of file> --sheet_name=<name of Excel sheet> --usecols=None --samplesbyrow=False --min_clusters=2 --max_clusters=100
+
+    For example,
+
+        python seqproperties.py clusterscan --file=iAF692_fluxes.xlsx --filetype=excel --sheet_name=iAF692 --usecols=B:ZK --samples=column
+
+    @param file String: Path to data file.
+    @param filetype String: Type of file. Allowable types are "csv" 
+    (comma-separated file) and "excel" (Microsoft Excel workbook). 
+    Default = excel
+    @param sheet_name String: Name of sheet to analyse (only if filetype 
+    = excel). Default = None
+    @param usecols String: Columns to use. Default = None (all columns 
+    will be used)
+    @param samplesbyrow Boolean: Flag to determine if samples are by 
+    rows. If False, it means samples are by columns. Default = True
+    @param min_clusters Integer: Minimum number of clusters to scan. 
+    Default = 2
+    @param max_clusters Integer: Maximum number of clusters to scan. 
+    Default = 100
+    '''
+    from sklearn.cluster import KMeans
+    from sklearn.metrics import davies_bouldin_score
+    from sklearn.metrics import calinski_harabasz_score
+    from sklearn.metrics import silhouette_score
+    import pandas as pd
+    if filetype.lower() == "excel":
+        df = pd.read_excel(file, sheet_name, usecols, engine="openpyxl")
+    elif filetype.lower() == "csv":
+        df = pd.read_csv(file, usecols)
+    if samples.lower == "column":
+        df = df.T     # columns are features, rows are samples
+    print("Clusters, Davies-Bouldin Score, Calinski and Harabasz Score, Silhouette Score")
+    for centre in range(int(min_clusters), int(max_clusters)+1):
+        kmeans = KMeans(n_clusters=centre)
+        model = kmeans.fit_predict(df)
+        scores = [str(davies_bouldin_score(df, model)),
+                  str(calinski_harabasz_score(df, model)),
+                  str(silhouette_score(df, model))]
+        print(centre, ",", ",".join(scores))
+
 
 if __name__ == '__main__':
     exposed_functions = {'a': percentA,
@@ -2022,6 +2074,7 @@ if __name__ == '__main__':
                          'asymfreq': asymmetricFrequency,
                          'checkcsv': checkCSV,
                          'cleanfasta': cleanFasta,
+                         'clusterscan': sample_ClusterScan,
                          'codoncount': codonCount,
                          'coexp': coexpression,
                          'coexp_compare': coexpression_compare,
