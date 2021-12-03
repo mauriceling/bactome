@@ -33,7 +33,9 @@ try:
     from Bio.SeqUtils.ProtParam import ProteinAnalysis
 except ImportError:
     subprocess.check_call([sys.executable, '-m', 'pip', 
-                           'install', 'biopython'])
+                           'install', 'biopython',
+                           '--trusted-host', 'pypi.org', 
+                           '--trusted-host', 'files.pythonhosted.org'])
     from Bio import Align
     from Bio import SeqIO
     from Bio.Seq import Seq
@@ -49,7 +51,9 @@ try:
     import fire
 except ImportError:
     subprocess.check_call([sys.executable, '-m', 'pip', 
-                           'install', 'fire'])
+                           'install', 'fire',
+                           '--trusted-host', 'pypi.org', 
+                           '--trusted-host', 'files.pythonhosted.org'])
     import fire
 
 
