@@ -33,7 +33,9 @@ try:
     from Bio.SeqUtils.ProtParam import ProteinAnalysis
 except ImportError:
     subprocess.check_call([sys.executable, '-m', 'pip', 
-                           'install', 'biopython'])
+                           'install', 'biopython',
+                           '--trusted-host', 'pypi.org', 
+                           '--trusted-host', 'files.pythonhosted.org'])
     from Bio import Align
     from Bio import SeqIO
     from Bio.Seq import Seq
@@ -49,7 +51,9 @@ try:
     import fire
 except ImportError:
     subprocess.check_call([sys.executable, '-m', 'pip', 
-                           'install', 'fire'])
+                           'install', 'fire',
+                           '--trusted-host', 'pypi.org', 
+                           '--trusted-host', 'files.pythonhosted.org'])
     import fire
 
 
@@ -1991,6 +1995,119 @@ def coexpression_compare(coexpfile, truthfile, separator=":"):
     print("Critical Success Index = %.5f" % CSI)
     print("Fowlkes–Mallows Index = %.5f" % FM)
 
+def checkCSV(file, separator=","):
+    '''!
+    Function to check for potentially problematic data rows in CSV file.
+
+    Usage:
+
+        python seqproperties.py checkcsv --file=<CSV file> --separator=,
+
+    @param file String: Path to CSV file.
+    @param separator String: Separator in CSV file. Default = ,
+    '''
+    import pandas as pd
+    try:
+        data = pd.read_csv(file, sep=separator, on_bad_lines=False)
+    except:
+        data = pd.read_csv(file, sep=separator, error_bad_lines=False, 
+                           warn_bad_lines=True)
+
+def sample_ClusterScan(file, filetype="excel", sheet_name=None, 
+                       usecols=None, samplesbyrow=True, 
+                       min_clusters=2, max_clusters=100):
+    '''!
+    Function to calculate Davies-Bouldin Score, Calinski and Harabasz 
+    Score, and Silhouette Score; for the number of clusters in order 
+    to determine the suitable number of clusters for K-means clustering 
+    of the data.
+
+    Usage:
+
+        python seqproperties.py clusterscan --file=<data file> --filetype=<type of file> --sheet_name=<name of Excel sheet> --usecols=<columns to use> --samplesbyrow=<whether sample are by rows> --min_clusters=<minimum number of clusters> --max_clusters=<maximum number of clusters>
+
+    For example,
+
+        python seqproperties.py clusterscan --file=iAF692_fluxes.xlsx --filetype=excel --sheet_name=iAF692 --usecols=B:ZK --samplesbyrow=False
+
+    @param file String: Path to data file.
+    @param filetype String: Type of file. Allowable types are "csv" 
+    (comma-separated file) and "excel" (Microsoft Excel workbook). 
+    Default = excel
+    @param sheet_name String: Name of sheet to analyse (only if filetype 
+    = excel). Default = None
+    @param usecols String: Columns to use. Default = None (all columns 
+    will be used)
+    @param samplesbyrow Boolean: Flag to determine if samples are by 
+    rows. If False, it means samples are by columns. Default = True
+    @param min_clusters Integer: Minimum number of clusters to scan. 
+    Default = 2
+    @param max_clusters Integer: Maximum number of clusters to scan. 
+    Default = 100
+    '''
+    from sklearn.cluster import KMeans
+    from sklearn.metrics import davies_bouldin_score
+    from sklearn.metrics import calinski_harabasz_score
+    from sklearn.metrics import silhouette_score
+    import pandas as pd
+    if filetype.lower() == "excel":
+        df = pd.read_excel(file, sheet_name, usecols, engine="openpyxl")
+    elif filetype.lower() == "csv":
+        df = pd.read_csv(file, usecols)
+    if samples.lower == "column":
+        df = df.T     # columns are features, rows are samples
+    print("Clusters, Davies-Bouldin Score, Calinski and Harabasz Score, Silhouette Score")
+    for centre in range(int(min_clusters), int(max_clusters)+1):
+        kmeans = KMeans(n_clusters=centre)
+        model = kmeans.fit_predict(df)
+        scores = [str(davies_bouldin_score(df, model)),
+                  str(calinski_harabasz_score(df, model)),
+                  str(silhouette_score(df, model))]
+        print(centre, ",", ",".join(scores))
+
+def sample_ClusterLabel(file, filetype="excel", sheet_name=None, 
+                        usecols=None, samplesbyrow=True, 
+                        clusters=10, label="cluster",
+                        resultfile="result.csv"):
+    '''!
+    Function to cluster data from file by K-means clustering and append 
+    the cluster label to the result file.
+
+    Usage:
+
+        python seqproperties.py clusterlabel --file=<data file> --filetype=<type of file> --sheet_name=<name of Excel sheet> --usecols=<columns to use> --samplesbyrow=<whether sample are by rows> --clusters=<number of clusters> --label=<cluster label> --resultfile=<result file name>
+
+    For example,
+
+        python seqproperties.py clusterlabel --file=iAF692_fluxes.xlsx --filetype=excel --sheet_name=iAF692 --usecols=B:ZK --samplesbyrow=False --clusters=10 --label=cluster --resultfile=iAF692_clustered.csv
+
+    @param file String: Path to data file.
+    @param filetype String: Type of file. Allowable types are "csv" 
+    (comma-separated file) and "excel" (Microsoft Excel workbook). 
+    Default = excel
+    @param sheet_name String: Name of sheet to analyse (only if filetype 
+    = excel). Default = None
+    @param usecols String: Columns to use. Default = None (all columns 
+    will be used)
+    @param samplesbyrow Boolean: Flag to determine if samples are by 
+    rows. If False, it means samples are by columns. Default = True
+    @param clusters Integer: Number of clusters. Default = 10
+    @param label String: Field name for cluster. Default = cluster
+    @param resultfile String: Name of result file containing clusters. 
+    Default = result.csv
+    '''
+    import pandas as pd
+    from sklearn.cluster import KMeans
+    if filetype.lower() == "excel":
+        df = pd.read_excel(file, sheet_name, usecols, engine="openpyxl")
+    elif filetype.lower() == "csv":
+        df = pd.read_csv(file, usecols)
+    if samples.lower == "column":
+        df = df.T     # columns are features, rows are samples
+    model = KMeans(n_clusters=int(clusters), random_state=0).fit(df)
+    df[str(label)] = model.labels_
+    df.to_csv(str(resultfile))
+
 
 if __name__ == '__main__':
     exposed_functions = {'a': percentA,
@@ -1998,7 +2115,10 @@ if __name__ == '__main__':
                          'ai': percentAi,
                          'aromaticity': aromaticity,
                          'asymfreq': asymmetricFrequency,
+                         'checkcsv': checkCSV,
                          'cleanfasta': cleanFasta,
+                         'clusterscan': sample_ClusterScan,
+                         'clusterlabel': sample_ClusterLabel,
                          'codoncount': codonCount,
                          'coexp': coexpression,
                          'coexp_compare': coexpression_compare,
