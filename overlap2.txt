@@ -1,0 +1,14 @@
+A:B
+A:D
+A:F
+A:H
+A:D
+J:K
+F:U
+B:K
+J:U
+K:G
+N:L
+W:K
+E:L
+R:L

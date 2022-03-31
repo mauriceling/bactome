@@ -2108,6 +2108,44 @@ def sample_ClusterLabel(file, filetype="excel", sheet_name=None,
     df[str(label)] = model.labels_
     df.to_csv(str(resultfile))
 
+def overlap_statistics(file1, file2, separator, n_item, replicate=30):
+    '''!
+    Function to randomize 2 lists (given as files - file1 and file 2) 
+    and generate the number of overlapping elements within the 2 randomized 
+    list for a number of replicates. This can be used to test whether 
+    the number of overlapping elements in 2 files is significantly 
+    higher or lower than chance.
+
+    Each file is in the format of <item 1><separator><item 2><separator>
+    <item 3><separator> ... <separator><item N>
+
+    Usage:
+
+        python seqproperties.py overlap_stat --file1=overlap1.txt --file2=overlap2.txt --separator=: --n_item=2 --replicate=30
+
+    @param file1 String: Path to data file 1.
+    @param file2 String: Path to data file 2.
+    @param separator String: Separator for items in the files. Default = :
+    @param n_items Integer: Number of consecutive items to be considered as 
+    an element.
+    @param replicate Integer: Number of replicates.
+    '''
+    dataA = [x[:-1] for x in open(file1).readlines()]
+    dataA = [[x.strip() for x in row.split(separator)] for row in dataA]
+    dataA = [separator.join(row[:n_item]) for row in dataA]
+    dataB = [x[:-1] for x in open(file2).readlines()]
+    dataB = [[x.strip() for x in row.split(separator)] for row in dataB]
+    dataB = [separator.join(row[:n_item]) for row in dataB]
+    actual_overlap = sum([1 for x in dataA if x in dataB])
+    print("Actual number of overlaps = " + str(actual_overlap))
+    for i in range(replicate):
+        combinelist = dataA + dataB
+        random.shuffle(combinelist)
+        listA = combinelist[:len(dataA)]
+        listB = combinelist[len(dataA):]
+        randomized_overlap = sum([1 for x in listA if x in listB])
+        print("Randomized overlaps %s = %s" % (i+1, randomized_overlap))
+
 
 if __name__ == '__main__':
     exposed_functions = {'a': percentA,
@@ -2142,6 +2180,7 @@ if __name__ == '__main__':
                          'ngram': nGram,
                          'nlength': nucleotideLength,
                          'orf': findORF,
+                         'overlap_stat': overlap_statistics,
                          'palign': pairwise_alignment,
                          'palign2': pairwise_alignment2,
                          'plength': peptideLength,
