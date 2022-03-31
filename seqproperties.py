@@ -2127,7 +2127,9 @@ def overlap_statistics(file1, file2, separator, n_item, replicate=30):
     @param file2 String: Path to data file 2.
     @param separator String: Separator for items in the files. Default = :
     @param n_items Integer: Number of consecutive items to be considered as 
-    an element.
+    an element. For example, if n_item = 1, it will consider <item 1> as 
+    1 element; but if n_item = 2, it will consider <item 1><separator><item 2> 
+    as 1 element.
     @param replicate Integer: Number of replicates.
     '''
     dataA = [x[:-1] for x in open(file1).readlines()]
