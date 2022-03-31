@@ -2108,7 +2108,7 @@ def sample_ClusterLabel(file, filetype="excel", sheet_name=None,
     df[str(label)] = model.labels_
     df.to_csv(str(resultfile))
 
-def overlap_statistics(file1, file2, separator, n_item, replicate=30):
+def overlap_statistics(file1, file2, separator, n_item, option, replicate=30):
     '''!
     Function to randomize 2 lists (given as files - file1 and file 2) 
     and generate the number of overlapping elements within the 2 randomized 
@@ -2121,7 +2121,7 @@ def overlap_statistics(file1, file2, separator, n_item, replicate=30):
 
     Usage:
 
-        python seqproperties.py overlap_stat --file1=overlap1.txt --file2=overlap2.txt --separator=: --n_item=2 --replicate=30
+        python seqproperties.py overlap_stat --file1=overlap1.txt --file2=overlap2.txt --separator=: --n_item=2 --option=<null or confidence> --replicate=30
 
     @param file1 String: Path to data file 1.
     @param file2 String: Path to data file 2.
@@ -2130,6 +2130,8 @@ def overlap_statistics(file1, file2, separator, n_item, replicate=30):
     an element. For example, if n_item = 1, it will consider <item 1> as 
     1 element; but if n_item = 2, it will consider <item 1><separator><item 2> 
     as 1 element.
+    @param option String: Option to select between "null" hypothesis testing or 
+    "confidence" interval testing.
     @param replicate Integer: Number of replicates.
     '''
     dataA = [x[:-1] for x in open(file1).readlines()]
@@ -2143,8 +2145,12 @@ def overlap_statistics(file1, file2, separator, n_item, replicate=30):
     for i in range(replicate):
         combinelist = dataA + dataB
         random.shuffle(combinelist)
-        listA = combinelist[:len(dataA)]
-        listB = combinelist[len(dataA):]
+        if option.lower() == "confidence":
+            listA = random.sample(combinelist, len(dataA))
+            listB = random.sample(combinelist, len(dataB))
+        if option.lower() == "null":
+            listA = combinelist[:len(dataA)]
+            listB = combinelist[len(dataA):]
         randomized_overlap = sum([1 for x in listA if x in listB])
         print("Randomized overlaps %s = %s" % (i+1, randomized_overlap))
 
