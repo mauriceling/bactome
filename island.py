@@ -406,46 +406,58 @@ def _generate_observed_allelic_counts(organisms, geneData):
     # print(allele_counts)
     return allele_counts
 
-def tabulate_allelic_counts(populationfile, ploidy=2):
+def tabulate_allelic_counts(populationfile, ploidy=2, statistic="chisq"):
     """!
     Function to tabulate the expected and actual allelic counts from 
-    the population and reports Chi-Square statistic.
+    the population and reports the required statistic.
 
     Usage:
     
-        python island.py tabulateCount --ploidy=2 --populationfile=test_pop
+        python island.py tabulateCount --ploidy=2 --populationfile=test_pop --statistic=chisq
 
     @param populationfile String: Relative or absolute path of the 
     population file to tabulate.
     @param ploidy Integer: Number of chromosome sets. Default = 2 
     (diploid).
+    @param statistic String: Type of statistic to generate. Allowable 
+    values are "chisq" (generates normalized Chi-Square statistic), and 
+    "count" (generates allelic counts).
     """
     (geneData, alleleData, organismData, organisms) = \
         read_population_file(populationfile, False)
+    statistic = statistic.lower()
     pop_size = len(organisms)
     exp_allele_counts = _generate_expected_allelic_counts(alleleData, 
                                                           pop_size, 
                                                           ploidy)
-    obs_allele_counts = _generate_observed_allelic_counts(organisms, 
-                                                          geneData)
-    chiSq = 0
-    df = -1
-    print("Gene Name : Allele : Expected Count : Observed Count")
-    for gene in exp_allele_counts:
-        for allele in range(len(exp_allele_counts[gene])):
-            print("%s : %s : %s : %s" % \
-                (str(gene), str(allele),
-                 str(exp_allele_counts[gene][allele]),
-                 str(obs_allele_counts[gene][allele])))
-            df = df + 1
-            chiSq = chiSq + \
-                (((obs_allele_counts[gene][allele] - \
-                    exp_allele_counts[gene][allele]) ** 2)  / \
-                exp_allele_counts[gene][allele])
-    print("Chi Square Statistic : %s" % str(chiSq))
-    print("Degrees of Freedom : %i" % df)
-    print("Normalized Chi Square Statistic : %s" % str(chiSq / (df + 1)))
-
+    if statistic == "chisq":
+        obs_allele_counts = _generate_observed_allelic_counts(organisms, 
+                                                              geneData)
+        chiSq = 0
+        df = -1
+        print("Gene Name : Allele : Expected Count : Observed Count")
+        for gene in exp_allele_counts:
+            for allele in range(len(exp_allele_counts[gene])):
+                print("%s : %s : %s : %s" % \
+                    (str(gene), str(allele),
+                     str(exp_allele_counts[gene][allele]),
+                     str(obs_allele_counts[gene][allele])))
+                df = df + 1
+                chiSq = chiSq + \
+                    (((obs_allele_counts[gene][allele] - \
+                        exp_allele_counts[gene][allele]) ** 2)  / \
+                    exp_allele_counts[gene][allele])
+        print("Chi Square Statistic : %s" % str(chiSq))
+        print("Degrees of Freedom : %i" % df)
+        print("Normalized Chi Square Statistic : %s" % str(chiSq / (df + 1)))
+    elif statistic == "count":
+        print("Gene Name : Allele : Observed Count")
+        for gene in exp_allele_counts:
+            for allele in range(len(exp_allele_counts[gene])):
+                print("%s : %s : %s" % \
+                    (str(gene), str(allele),
+                     str(exp_allele_counts[gene][allele])))
+    
 ######################################################################
 # Section 5: Utility operations
 ######################################################################
