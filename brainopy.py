@@ -215,5 +215,35 @@ class brainopy(object):
         """
         pass
 
+    def mtNeuronGrowth(self):
+        """
+        Neuronal Growth Function (NGF)
+        """
+        pass
+
+    def mtSynapseGrowth(self):
+        """
+        Synaptic Growth Function (SGF)
+        """
+        pass
+
+    def mtNeuronPrune(self):
+        """
+        Neuronal Prune Function (NPF)
+        """
+        pass
+
+    def mtSynapsePrune(self):
+        """
+        Synaptic Prune Function (SGF)
+        """
+        pass
+
+    def mtGlobal(self):
+        """
+        Global Maintenance Function (GMF)
+        """
+        pass
+
     def inputSignal(self, synapse_state_ID, signal_state):
         pass
