@@ -215,6 +215,15 @@ class brainopy(object):
         """
         pass
 
+    def neuronFunction(self, neuron_ID):
+        self.tfSynapseDendrite(neuron_ID)
+        self.mfDendrite(neuron_ID)
+        self.tfDendriteNeuron(neuron_ID)
+        self.mfNeuron(neuron_ID)
+        self.tfNeuronAxon(neuron_ID)
+        self.mfAxon(neuron_ID)
+        self.tfAxonSynapse(neuron_ID)
+        
     def mtNeuronGrowth(self):
         """
         Neuronal Growth Function (NGF)
@@ -244,6 +253,12 @@ class brainopy(object):
         Global Maintenance Function (GMF)
         """
         pass
+
+    def maintenanceFunction(self):
+        self.mtNeuronGrowth()
+        self.mtNeuronPrune()
+        self.mtSynapseGrowth()
+        self.mtSynapsePrune()
 
     def inputSignal(self, synapse_state_ID, signal_state):
         pass
