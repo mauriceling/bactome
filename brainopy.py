@@ -162,30 +162,57 @@ class brainopy(object):
         return linkages
 
     def tfSynapseDendrite(self, neuron_ID):
+        """
+        Synapse to Dendrite Transfer Function
+        """
         pass
 
     def mfDendrite(self, neuron_ID):
+        """
+        Dendrite Modulator
+        """
         pass
 
     def tfDendriteNeuron(self, neuron_ID):
+        """
+        Dendrite to Neuron Transfer Function 
+        """
         pass
 
     def mfNeuron(self, neuron_ID):
+        """
+        Neuron Modulator
+        """
         pass
 
     def tfNeuronAxon(self, neuron_ID):
+        """
+        Neuron to Axon Transfer Function 
+        """
         pass
 
     def mfAxon(self, neuron_ID):
+        """
+        Axon Modulator
+        """
         pass
 
     def tfAxonSynapse(self, neuron_ID):
+        """
+        Axon to Synapse Transfer Function 
+        """
         pass
 
     def mfSynapse(self, synapse_state_IDs):
+        """
+        Synapse Modulator
+        """
         pass 
     
     def tfSynapseAxon(self, neuron_ID):
+        """
+        Synapse to Axon Transfer Function 
+        """
         pass
 
     def inputSignal(self, synapse_state_ID, signal_state):
