@@ -32,8 +32,8 @@ class brainopy(object):
             self.connectBrain(brainDB)
 
     def connectBrain(self, brainDB):
-        """ create a database connection to the SQLite database
-            specified by the db_file
+        """!
+        Connects to the brain database specified by the brainDB, which is a SQLite database.
         @param brainDB: Path to Brain database file
         @return: (Connection object or None, Cursor object or None)
         """
@@ -49,16 +49,16 @@ class brainopy(object):
         self.cur.execute("CREATE TABLE IF NOT EXISTS neuron_dendrite (ID text, dendrite_state_ID text)")
         self.cur.execute("CREATE TABLE IF NOT EXISTS axon_synapse_link (axon_state_ID text, synapse_state_ID text)")
         self.cur.execute("CREATE TABLE IF NOT EXISTS synapse_dendrite_link (synapse_state_ID text, dendrite_state_ID text)")
-        self.cur.execute("CREATE INDEX IF NOT EXISTS ID_table_index (ID, table_name)")
-        self.cur.execute("CREATE INDEX IF NOT EXISTS ID_table_table (table_name)")
-        self.cur.execute("CREATE INDEX IF NOT EXISTS neuron_state_ID (ID)")
-        self.cur.execute("CREATE INDEX IF NOT EXISTS dendrite_state_ID (ID)")
-        self.cur.execute("CREATE INDEX IF NOT EXISTS axon_state_ID (ID)")
-        self.cur.execute("CREATE INDEX IF NOT EXISTS synapse_state_ID (ID)")
-        self.cur.execute("CREATE INDEX IF NOT EXISTS neuron_body_ID (ID)")
-        self.cur.execute("CREATE INDEX IF NOT EXISTS neuron_dendrite_ID (ID)")
-        self.cur.execute("CREATE INDEX IF NOT EXISTS axon_synapse_link_index (axon_state_ID, synapse_state_ID)")
-        self.cur.execute("CREATE INDEX IF NOT EXISTS synapse_dendrite_link_index (synapse_state_ID, dendrite_state_ID)")
+        self.cur.execute("CREATE INDEX IF NOT EXISTS ID_table_index ON ID_table (ID, table_name)")
+        self.cur.execute("CREATE INDEX IF NOT EXISTS ID_table_table ON ID_table (table_name)")
+        self.cur.execute("CREATE INDEX IF NOT EXISTS neuron_state_ID ON neuron_state (ID)")
+        self.cur.execute("CREATE INDEX IF NOT EXISTS dendrite_state_ID ON dendrite_state (ID)")
+        self.cur.execute("CREATE INDEX IF NOT EXISTS axon_state_ID ON axon_state (ID)")
+        self.cur.execute("CREATE INDEX IF NOT EXISTS synapse_state_ID ON synapse_state (ID)")
+        self.cur.execute("CREATE INDEX IF NOT EXISTS neuron_body_ID ON neuron_body (ID)")
+        self.cur.execute("CREATE INDEX IF NOT EXISTS neuron_dendrite_ID ON neuron_dendrite (ID)")
+        self.cur.execute("CREATE INDEX IF NOT EXISTS axon_synapse_link_index ON axon_synapse_link (axon_state_ID, synapse_state_ID)")
+        self.cur.execute("CREATE INDEX IF NOT EXISTS synapse_dendrite_link_index ON synapse_dendrite_link (synapse_state_ID, dendrite_state_ID)")
         self.con.commit()
 
     def disconnectBrain(self):
@@ -99,21 +99,28 @@ class brainopy(object):
         self.con.commit()
         return ID
 
-    def addNeuron(self):
-        neurotransmitters = self.getNeurotransmitters()
-        neuron_ID = self._getUniqueID()
-        dendrite_state_ID = self._addState("dendrite_state")
-        neuron_state_ID = self._addState("neuron_state")
-        axon_state_ID = self._addState("axon_state")
-        self.cur.execute("INSERT INTO ID_table VALUES ('%s', '%s')" % (ID, 'neuron_body'))
-        self.cur.execute("INSERT INTO neuron_body VALUES ('%s', '%s', '%s')" % (neuron_ID, neuron_state_ID, axon_state_ID))
-        self.cur.execute("INSERT INTO neuron_dendrite VALUES ('%s', '%s')" % (neuron_ID, dendrite_state_ID))
-        self.con.commit()
-        return (neuron_ID, dendrite_state_ID, neuron_state_ID, axon_state_ID)
+    def addNeuron(self, n=1):
+        IDList = []
+        for i in range(int(n)):
+            neurotransmitters = self.getNeurotransmitters()
+            neuron_ID = self._getUniqueID()
+            dendrite_state_ID = self._addState("dendrite_state")
+            neuron_state_ID = self._addState("neuron_state")
+            axon_state_ID = self._addState("axon_state")
+            self.cur.execute("INSERT INTO ID_table VALUES ('%s', '%s')" % (neuron_ID, 'neuron_body'))
+            self.cur.execute("INSERT INTO neuron_body VALUES ('%s', '%s', '%s')" % (neuron_ID, neuron_state_ID, axon_state_ID))
+            self.cur.execute("INSERT INTO neuron_dendrite VALUES ('%s', '%s')" % (neuron_ID, dendrite_state_ID))
+            self.con.commit()
+            IDs = (neuron_ID, dendrite_state_ID, neuron_state_ID, axon_state_ID)
+            IDList.append(IDs)
+        return IDList
 
-    def addSynapse(self):
-        synapse_state_ID = self._addState("synapse_state")
-        return synapse_state_ID
+    def addSynapse(self, n=1):
+        synapse_state_IDs = []
+        for i in range(int(n)):
+            synapse_state_ID = self._addState("synapse_state")
+            synapse_state_IDs.append(synapse_state_ID)
+        return synapse_state_IDs
 
     def addDendrite(self, neuron_ID):
         neurotransmitters = self.getNeurotransmitters()
@@ -125,7 +132,61 @@ class brainopy(object):
     def linkAxonSynapse(self, axon_state_ID, synapse_state_ID):
         self.cur.execute("INSERT INTO axon_synapse_link VALUES ('%s', '%s')" % (axon_state_ID, synapse_state_ID))
         self.con.commit()
+        return [(axon_state_ID, synapse_state_ID)]
+
+    def linkRandomAxonSynapse(self, n=1):
+        axon_state_IDs = self.getIDs("axon_state")
+        synapse_state_IDs = self.getIDs("synapse_state")
+        linkages = []
+        for i in range(int(n)):
+            axon_state_ID = random.choice(axon_state_IDs)
+            synapse_state_ID = random.choice(synapse_state_IDs)
+            link = self.linkAxonSynapse(axon_state_ID, synapse_state_ID)
+            linkages.append(link[0])
+        return linkages
 
     def linkSynapseDendrite(self, synapse_state_ID, dendrite_state_ID):
         self.cur.execute("INSERT INTO synapse_dendrite_link VALUES ('%s', '%s')" % (synapse_state_ID, dendrite_state_ID))
         self.con.commit()
+        return [(synapse_state_ID, dendrite_state_ID)]
+
+    def linkRandomSynapseDendrite(self, n=1):
+        dendrite_state_IDs = self.getIDs("dendrite_state")
+        synapse_state_IDs = self.getIDs("synapse_state")
+        linkages = []
+        for i in range(int(n)):
+            dendrite_state_ID = random.choice(dendrite_state_IDs)
+            synapse_state_ID = random.choice(synapse_state_IDs)
+            link = self.linkSynapseDendrite(synapse_state_ID, dendrite_state_ID)
+            linkages.append(link[0])
+        return linkages
+
+    def tfSynapseDendrite(self, neuron_ID):
+        pass
+
+    def mfDendrite(self, neuron_ID):
+        pass
+
+    def tfDendriteNeuron(self, neuron_ID):
+        pass
+
+    def mfNeuron(self, neuron_ID):
+        pass
+
+    def tfNeuronAxon(self, neuron_ID):
+        pass
+
+    def mfAxon(self, neuron_ID):
+        pass
+
+    def tfAxonSynapse(self, neuron_ID):
+        pass
+
+    def mfSynapse(self, synapse_state_IDs):
+        pass 
+    
+    def tfSynapseAxon(self, neuron_ID):
+        pass
+
+    def inputSignal(self, synapse_state_ID, signal_state):
+        pass
