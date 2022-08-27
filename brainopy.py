@@ -261,6 +261,22 @@ class brainopy(object):
         Neuron to Axon Transfer Function 
         """
         neurotransmitters = self.getNeurotransmitters()
+        self.cur.execute("SELECT DISTINCT neuron_state_ID, axon_state_ID FROM neuron_body where ID = '%s'" % neuron_ID)
+        neuron_axon = [(x[0], x[1]) for x in self.cur.fetchall()]
+        if self.logging: self.logger("tfNeuronAxon", "1/get_link")
+        if len(neuron_axon) > 1:
+            print("BRAIN CORRUPTED!!! - MORE THAN ONE NEURON-AXON PAIR!")
+            print(neuron_axon)
+        else:
+            neuron_state_ID = neuron_axon[0][0]
+            axon_state_ID = neuron_axon[0][1]
+        self.cur.execute("SELECT neurotransmitter, value FROM neuron_state WHERE ID = '%s'" % neuron_state_ID)
+        stateList = [(x[0], x[1]) for x in self.cur.fetchall()]
+        if self.logging: self.logger("tfNeuronAxon", "2/process_axon/neuron_state_ID=" + str(neuron_state_ID) + "/daxon_state_ID=" + str(axon_state_ID))
+        for state in stateList:
+            self.cur.execute("UPDATE axon_state SET value = '%s' WHERE ID = '%s' AND neurotransmitter = '%s'" % (state[1], axon_state_ID, state[0]))
+            if self.logging: self.logger("tfNeuronAxon", "3/update_axon_state/axon_state_ID=" + str(axon_state_ID) + "/neurotransmitter=" + str(state[0]) + "/value=" + str(state[1]))
+        self.con.commit()
 
     def mfAxon(self, neuron_ID):
         """

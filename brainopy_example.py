@@ -43,5 +43,7 @@ for neuron_ID in neuronList:
     print("Dendrite state updated for neuron " + neuron_ID)
     b.tfDendriteNeuron(neuron_ID)
     print("Neuron state updated for neuron " + neuron_ID)
+    b.tfNeuronAxon(neuron_ID)
+    print("Axon state updated for neuron " + neuron_ID)
 
 b.disconnectBrain()
