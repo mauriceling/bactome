@@ -265,7 +265,7 @@ class brainopy(object):
         neuron_axon = [(x[0], x[1]) for x in self.cur.fetchall()]
         if self.logging: self.logger("tfNeuronAxon", "1/get_link")
         if len(neuron_axon) > 1:
-            print("BRAIN CORRUPTED!!! - MORE THAN ONE NEURON-AXON PAIR!")
+            print("BRAIN CORRUPTED!!! - MORE THAN ONE NEURON-AXON PAIRS!")
             print(neuron_axon)
         else:
             neuron_state_ID = neuron_axon[0][0]
