@@ -203,49 +203,50 @@ class brainopy(object):
         """
         Dendrite Modulator
         """
-        pass
+        neurotransmitters = self.getNeurotransmitters()
 
     def tfDendriteNeuron(self, neuron_ID):
         """
         Dendrite to Neuron Transfer Function 
         """
-        pass
+        neurotransmitters = self.getNeurotransmitters()
+        self.cur.execute("SELECT DISTINCT dendrite_state_ID, neuron_state_ID FROM neuron WHERE neuron_ID = '%s'" % neuron_ID)
 
     def mfNeuron(self, neuron_ID):
         """
         Neuron Modulator
         """
-        pass
+        neurotransmitters = self.getNeurotransmitters()
 
     def tfNeuronAxon(self, neuron_ID):
         """
         Neuron to Axon Transfer Function 
         """
-        pass
+        neurotransmitters = self.getNeurotransmitters()
 
     def mfAxon(self, neuron_ID):
         """
         Axon Modulator
         """
-        pass
+        neurotransmitters = self.getNeurotransmitters()
 
     def tfAxonSynapse(self, neuron_ID):
         """
         Axon to Synapse Transfer Function 
         """
-        pass
+        neurotransmitters = self.getNeurotransmitters()
 
     def mfSynapse(self, synapse_state_IDs):
         """
         Synapse Modulator
         """
-        pass 
+        neurotransmitters = self.getNeurotransmitters()
     
     def tfSynapseAxon(self, neuron_ID):
         """
         Synapse to Axon Transfer Function 
         """
-        pass
+        neurotransmitters = self.getNeurotransmitters()
 
     def neuronFunction(self, neuron_ID):
         self.tfSynapseDendrite(neuron_ID)
