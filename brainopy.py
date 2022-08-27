@@ -273,7 +273,7 @@ class brainopy(object):
             axon_state_ID = neuron_axon[0][1]
         self.cur.execute("SELECT neurotransmitter, value FROM neuron_state WHERE ID = '%s'" % neuron_state_ID)
         stateList = [(x[0], x[1]) for x in self.cur.fetchall()]
-        if self.logging: self.logger("tfNeuronAxon", "2/process_axon/neuron_state_ID=" + str(neuron_state_ID) + "/daxon_state_ID=" + str(axon_state_ID))
+        if self.logging: self.logger("tfNeuronAxon", "2/process_axon/neuron_state_ID=" + str(neuron_state_ID) + "/axon_state_ID=" + str(axon_state_ID))
         for state in stateList:
             self.cur.execute("UPDATE axon_state SET value = '%s' WHERE ID = '%s' AND neurotransmitter = '%s'" % (state[1], axon_state_ID, state[0]))
             if self.logging: self.logger("tfNeuronAxon", "3/update_axon_state/axon_state_ID=" + str(axon_state_ID) + "/neurotransmitter=" + str(state[0]) + "/value=" + str(state[1]))
@@ -290,6 +290,21 @@ class brainopy(object):
         Axon to Synapse Transfer Function 
         """
         neurotransmitters = self.getNeurotransmitters()
+        self.cur.execute("SELECT DISTINCT a.axon_state_ID, a.synapse_state_ID FROM axon_synapse a WHERE a.neuron_ID = '%s'" % neuron_ID)
+        axon_synapse_List = [(x[0], x[1]) for x in self.cur.fetchall()]
+        if self.logging: self.logger("tfAxonSynapse", "1/get_links")
+        if len(axon_synapse_List) > 0:
+            axon_state_ID = axon_synapse_List[0][0]
+            try: self.cur.execute("SELECT neurotransmitter, value FROM axon_state WHERE ID = '%s'" % axon_state_ID)
+            except TypeError: print(axon_state_ID)
+            stateList = [(x[0], x[1]) for x in self.cur.fetchall()]
+            if self.logging: self.logger("tfAxonSynapse", "2/get_axon_state/neuron_state_ID=" + str(neuron_ID) + "/axon_state_ID=" + str(axon_state_ID))
+            synapseList = list(set([x[1] for x in axon_synapse_List]))
+            for synapse_state_ID in synapseList:
+                for state in stateList:
+                    self.cur.execute("UPDATE synapse_state SET value = '%s' WHERE ID = '%s' AND neurotransmitter = '%s'" % (state[1], synapse_state_ID, state[0]))
+                    if self.logging: self.logger("tfAxonSynapse", "3/update_synapse_state/synapse_state_ID=" + str(synapse_state_ID) + "/neurotransmitter=" + str(state[0]) + "/value=" + str(state[1]))
+            self.con.commit()
 
     def mfSynapse(self, synapse_state_IDs):
         """
