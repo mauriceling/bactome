@@ -41,5 +41,7 @@ neuronList = b.getIDs("neuron_body")
 for neuron_ID in neuronList:
     b.tfSynapseDendrite(neuron_ID)
     print("Dendrite state updated for neuron " + neuron_ID)
+    b.tfDendriteNeuron(neuron_ID)
+    print("Neuron state updated for neuron " + neuron_ID)
 
 b.disconnectBrain()

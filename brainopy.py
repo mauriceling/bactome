@@ -1,5 +1,5 @@
 '''!
-Brainopy
+Brainopy: A SQLite-Based Neural Network (Brain) Library
 
 Date created: 18th August 2022
 
@@ -199,7 +199,7 @@ class brainopy(object):
         neurotransmitters = self.getNeurotransmitters()
         self.cur.execute("SELECT DISTINCT s.dendrite_state_ID, s.synapse_state_ID FROM synapse_dendrite s WHERE s.neuron_ID = '%s'" % neuron_ID)
         synapse_dendrite_List = [(x[0], x[1]) for x in self.cur.fetchall()]
-        if self.logging: self.logger("tfSynapseDendrite", "1/get_links|ynapse_dendrite_list=" + str(synapse_dendrite_List))
+        if self.logging: self.logger("tfSynapseDendrite", "1/get_links")
         dendriteList = list(set([x[0] for x in synapse_dendrite_List]))
         for dendrite in dendriteList:
             if self.logging: self.logger("tfSynapseDendrite", "2/process_dendrite/dendrite_state_ID=" + str(dendrite))
@@ -208,7 +208,7 @@ class brainopy(object):
                 dendrite_neuro[n] = []
             synapseList = list(set([x[1] for x in synapse_dendrite_List if x[0] == dendrite]))
             for synapse in synapseList:
-                if self.logging: self.logger("tfSynapseDendrite", "3/process_dendritic_synapse/synapse_state_ID=" + str(synapse))
+                if self.logging: self.logger("tfSynapseDendrite", "3/process_dendritic_synapse/dendrite_state_ID=" + str(dendrite) + "/synapse_state_ID=" + str(synapse))
                 self.cur.execute("SELECT neurotransmitter, value FROM synapse_state WHERE ID = '%s'" % synapse)
                 for state in [(x[0], x[1]) for x in self.cur.fetchall()]:
                     dendrite_neuro[state[0]] = dendrite_neuro[state[0]] + [float(state[1])]
@@ -230,6 +230,25 @@ class brainopy(object):
         """
         neurotransmitters = self.getNeurotransmitters()
         self.cur.execute("SELECT DISTINCT dendrite_state_ID, neuron_state_ID FROM neuron WHERE neuron_ID = '%s'" % neuron_ID)
+        dendrite_neuron_List = [(x[0], x[1]) for x in self.cur.fetchall()]
+        if self.logging: self.logger("tfDendriteNeuron", "1/get_links")
+        neuronList = list(set([x[1] for x in dendrite_neuron_List]))
+        for neuron in neuronList:
+            if self.logging: self.logger("tfDendriteNeuron", "2/process_neuron/neuron_state_ID=" + str(neuron))
+            neuron_neuro = {}
+            for n in neurotransmitters:
+                neuron_neuro[n] = []
+            dendriteList = list(set([x[0] for x in dendrite_neuron_List if x[1] == neuron]))
+            for dendrite in dendriteList:
+                if self.logging: self.logger("tfDendriteNeuron", "3/process_dendrite/neuron_state_ID=" + str(neuron) + "/dendrite_state_ID=" + str(dendrite))
+                self.cur.execute("SELECT neurotransmitter, value FROM dendrite_state WHERE ID = '%s'" % dendrite)
+                for state in [(x[0], x[1]) for x in self.cur.fetchall()]:
+                    neuron_neuro[state[0]] = neuron_neuro[state[0]] + [float(state[1])]
+            for n in neurotransmitters:
+                neuron_neuro[n] = str(sum(neuron_neuro[n]) / len(neuron_neuro[n]))
+                self.cur.execute("UPDATE neuron_state SET value = '%s' WHERE ID = '%s' AND neurotransmitter = '%s'" % (neuron_neuro[n], neuron, n))
+                if self.logging: self.logger("tfDendriteNeuron", "4/update_neuron_state/dendrite_state_ID=" + str(neuron) + "/neurotransmitter=" + str(n) + "/value=" + str(neuron_neuro[n]))
+        self.con.commit()
 
     def mfNeuron(self, neuron_ID):
         """
