@@ -67,19 +67,25 @@ class brainopy(object):
         self.cur.execute("CREATE VIEW IF NOT EXISTS synapse_dendrite (neuron_ID, dendrite_state_ID, synapse_state_ID) AS SELECT nd.ID, sdl.dendrite_state_ID, sdl.synapse_state_ID FROM neuron_dendrite nd INNER JOIN synapse_dendrite_link sdl WHERE nd.dendrite_state_ID = sdl.dendrite_state_ID")
         self.cur.execute("CREATE VIEW IF NOT EXISTS neuron (neuron_ID, dendrite_state_ID, neuron_state_ID, axon_state_ID) AS SELECT neuron_dendrite.ID, neuron_dendrite.dendrite_state_ID, neuron_body.neuron_state_ID, neuron_body.axon_state_ID FROM neuron_dendrite INNER JOIN neuron_body WHERE neuron_dendrite.ID = neuron_body.ID")
         self.con.commit()
+        if self.logging: self.logger("connectBrain", "connectBrain")
 
     def disconnectBrain(self):
         self.con.commit()
+        if self.logging: self.logger("disconnectBrain", "disconnectBrain")
         self.con.close()
 
     def logger(self, function, message):
-        self.cur.execute("INSERT INTO log (function , message) VALUES ('%s', '%s')" % (function , message))
+        try: 
+            self.cur.execute("INSERT INTO log (function , message) VALUES ('%s', '%s')" % (function , message))
+        except sqlite3.OperationalError:
+            print("INSERT INTO log (function , message) VALUES ('%s', '%s')" % (function , message))
         self.con.commit()
 
     def addNeurotransmitters(self, neurotransmitters):
         for key in neurotransmitters:
             try: 
                 self.cur.execute("INSERT INTO neurotransmitter (neurotransmitter, description) VALUES ('%s', '%s')" % (key, neurotransmitters[key]))
+                if self.logging: self.logger("addNeurotransmitters", "neurotransmitter=" + str(key) + "/value=" + str(value))
             except: 
                 pass
         self.con.commit()
@@ -115,13 +121,18 @@ class brainopy(object):
         for i in range(int(n)):
             neurotransmitters = self.getNeurotransmitters()
             neuron_ID = self._getUniqueID()
+            if self.logging: self.logger("addNeuron", "1/neuron_ID=" + str(neuron_ID))
             dendrite_state_ID = self._addState("dendrite_state")
+            if self.logging: self.logger("addNeuron", "2/new_dendrite_state/dendrite_state_ID=" + str(dendrite_state_ID))
             neuron_state_ID = self._addState("neuron_state")
+            if self.logging: self.logger("addNeuron", "3/new_neuron_state/neuron_state_ID=" + str(neuron_state_ID))
             axon_state_ID = self._addState("axon_state")
+            if self.logging: self.logger("addNeuron", "4/new_axon_state/axon_state_ID=" + str(axon_state_ID))
             self.cur.execute("INSERT INTO ID_table (ID, table_name) VALUES ('%s', '%s')" % (neuron_ID, 'neuron_body'))
             self.cur.execute("INSERT INTO neuron_body (ID, neuron_state_ID, axon_state_ID) VALUES ('%s', '%s', '%s')" % (neuron_ID, neuron_state_ID, axon_state_ID))
             self.cur.execute("INSERT INTO neuron_dendrite (ID, dendrite_state_ID) VALUES ('%s', '%s')" % (neuron_ID, dendrite_state_ID))
             self.con.commit()
+            if self.logging: self.logger("addNeuron", "5/insert_tables")
             IDs = (neuron_ID, dendrite_state_ID, neuron_state_ID, axon_state_ID)
             IDList.append(IDs)
         return IDList
@@ -130,20 +141,24 @@ class brainopy(object):
         synapse_state_IDs = []
         for i in range(int(n)):
             synapse_state_ID = self._addState("synapse_state")
+            if self.logging: self.logger("addSynapse", "new_synapse_state/synapse_state_ID=" + str(synapse_state_ID))
             synapse_state_IDs.append(synapse_state_ID)
         return synapse_state_IDs
 
     def addDendrite(self, neuron_ID):
         neurotransmitters = self.getNeurotransmitters()
         dendrite_state_ID = self._addState("dendrite_state")
+        if self.logging: self.logger("addDendrite", "1/new_dendrite_state/dendrite_state_ID=" + str(dendrite_state_ID))
         self.cur.execute("INSERT INTO neuron_dendrite (ID, dendrite_state_ID) VALUES ('%s', '%s')" % (neuron_ID, dendrite_state_ID))
         self.con.commit()
+        if self.logging: self.logger("addDendrite", "2/insert_tables")
         return dendrite_state_ID
 
     def linkAxonSynapse(self, axon_state_ID, synapse_state_ID):
         try:
             self.cur.execute("INSERT INTO axon_synapse_link (axon_state_ID, synapse_state_ID) VALUES ('%s', '%s')" % (axon_state_ID, synapse_state_ID))
             self.con.commit()
+            if self.logging: self.logger("linkAxonSynapse", "new_axon_synapse/axon_state_ID=" + str(axon_state_ID) + "/synapse_state_ID=" + str(synapse_state_ID))
         except sqlite3.IntegrityError: pass
         return [(axon_state_ID, synapse_state_ID)]
 
@@ -162,6 +177,7 @@ class brainopy(object):
         try:
             self.cur.execute("INSERT INTO synapse_dendrite_link (synapse_state_ID, dendrite_state_ID) VALUES ('%s', '%s')" % (synapse_state_ID, dendrite_state_ID))
             self.con.commit()
+            if self.logging: self.logger("linkSynapseDendrite", "new_synapse_dendrite/dendrite_state_ID=" + str(dendrite_state_ID) + "/synapse_state_ID=" + str(synapse_state_ID))
         except sqlite3.IntegrityError: pass
         return [(synapse_state_ID, dendrite_state_ID)]
 
@@ -183,22 +199,23 @@ class brainopy(object):
         neurotransmitters = self.getNeurotransmitters()
         self.cur.execute("SELECT DISTINCT s.dendrite_state_ID, s.synapse_state_ID FROM synapse_dendrite s WHERE s.neuron_ID = '%s'" % neuron_ID)
         synapse_dendrite_List = [(x[0], x[1]) for x in self.cur.fetchall()]
-        print("synapse_dendrite_List: " + str(synapse_dendrite_List))
+        if self.logging: self.logger("tfSynapseDendrite", "1/get_links|ynapse_dendrite_list=" + str(synapse_dendrite_List))
         dendriteList = list(set([x[0] for x in synapse_dendrite_List]))
         for dendrite in dendriteList:
-            print("process dendrite " + dendrite)
+            if self.logging: self.logger("tfSynapseDendrite", "2/process_dendrite/dendrite_state_ID=" + str(dendrite))
             dendrite_neuro = {}
             for n in neurotransmitters:
                 dendrite_neuro[n] = []
             synapseList = list(set([x[1] for x in synapse_dendrite_List if x[0] == dendrite]))
             for synapse in synapseList:
-                print("process dendritic synapse " + synapse)
+                if self.logging: self.logger("tfSynapseDendrite", "3/process_dendritic_synapse/synapse_state_ID=" + str(synapse))
                 self.cur.execute("SELECT neurotransmitter, value FROM synapse_state WHERE ID = '%s'" % synapse)
                 for state in [(x[0], x[1]) for x in self.cur.fetchall()]:
                     dendrite_neuro[state[0]] = dendrite_neuro[state[0]] + [float(state[1])]
             for n in neurotransmitters:
                 dendrite_neuro[n] = str(sum(dendrite_neuro[n]) / len(dendrite_neuro[n]))
                 self.cur.execute("UPDATE dendrite_state SET value = '%s' WHERE ID = '%s' AND neurotransmitter = '%s'" % (dendrite_neuro[n], dendrite, n))
+                if self.logging: self.logger("tfSynapseDendrite", "4/update_dendrite_state/dendrite_state_ID=" + str(dendrite) + "/neurotransmitter=" + str(n) + "/value=" + str(dendrite_neuro[n]))
         self.con.commit()
 
     def mfDendrite(self, neuron_ID):
@@ -296,7 +313,9 @@ class brainopy(object):
         self.mtSynapsePrune()
 
     def inputSignal(self, synapse_state_ID, signal_state):
+        if self.logging: self.logger("inputSignal", "1/input_signal/synapse_state_ID=" + str(synapse_state_ID))
         for neurotransmitter in signal_state:
             value = float(signal_state[neurotransmitter])
             self.cur.execute("UPDATE synapse_state SET value = '%s' WHERE ID = '%s' AND neurotransmitter = '%s'" % (value, synapse_state_ID, neurotransmitter))
+            if self.logging: self.logger("inputSignal", "2/update_synapse_state/synapse_state_ID=" + str(synapse_state_ID) + "/neurotransmitter=" + str(neurotransmitter) + "/value=" + str(value))
         self.con.commit()
