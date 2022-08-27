@@ -59,6 +59,7 @@ class brainopy(object):
         self.cur.execute("CREATE INDEX IF NOT EXISTS neuron_dendrite_ID ON neuron_dendrite (ID)")
         self.cur.execute("CREATE INDEX IF NOT EXISTS axon_synapse_link_index ON axon_synapse_link (axon_state_ID, synapse_state_ID)")
         self.cur.execute("CREATE INDEX IF NOT EXISTS synapse_dendrite_link_index ON synapse_dendrite_link (synapse_state_ID, dendrite_state_ID)")
+        self.cur.execute("CREATE VIEW IF NOT EXISTS neuron (neuron_ID, dendrite_state_ID, neuron_state_ID, axon_state_ID) AS SELECT neuron_dendrite.ID, neuron_dendrite.dendrite_state_ID, neuron_body.neuron_state_ID, neuron_body.axon_state_ID FROM neuron_dendrite INNER JOIN neuron_body WHERE neuron_dendrite.ID = neuron_body.ID")
         self.con.commit()
 
     def disconnectBrain(self):
@@ -165,7 +166,23 @@ class brainopy(object):
         """
         Synapse to Dendrite Transfer Function
         """
-        pass
+        neurotransmitters = self.getNeurotransmitters()
+        self.cur.execute("SELECT DISTINCT sdl.dendrite_state_ID, sdl.synapse_state_ID FROM neuron_dendrite nd INNER JOIN synapse_dendrite_link sdl WHERE nd.dendrite_state_ID = sdl.dendrite_state_ID AND nd.ID = '%s'" % neuron_ID)
+        synapse_dendrite_List = [(x[0], x[1]) for x in self.cur.fetchall()]
+        dendriteList = list(set([x[0] for x in synapse_dendrite_List]))
+        for dendrite in dendriteList:
+            dendrite_neuro = {}
+            for n in neurotransmitters:
+                dendrite_neuro[n] = []
+            synapseList = list(set([x[1] for x in synapse_dendrite_List if x[0] == dendrite]))
+            for synapse in synapseList:
+                self.cur.execute("SELECT neurotransmitter, value FROM synapse_state WHERE ID = '%s'" % synapse)
+                for state in [(x[0], x[1]) for x in self.cur.fetchall()]:
+                    dendrite_neuro[state[0]] = dendrite_neuro[state[0]] + [float(state[1])]
+            for n in neurotransmitters:
+                dendrite_neuro[n] = str(sum(dendrite_neuro[n]) / len(dendrite_neuro[n]))
+                self.cur.execute("UPDATE dendrite_state SET value = '%s' WHERE ID = '%s' AND neurotransmitter = '%s'" % (dendrite_neuro[n], dendrite, n))
+        self.con.commit()
 
     def mfDendrite(self, neuron_ID):
         """
@@ -261,4 +278,7 @@ class brainopy(object):
         self.mtSynapsePrune()
 
     def inputSignal(self, synapse_state_ID, signal_state):
-        pass
+        for neurotransmitter in signal_state:
+            value = float(signal_state[neurotransmitter])
+            self.cur.execute("UPDATE synapse_state SET value = '%s' WHERE ID = '%s' AND neurotransmitter = '%s'" % (value, synapse_state_ID, neurotransmitter))
+        self.con.commit()
