@@ -66,6 +66,7 @@ class brainopy(object):
         # CREATE VIEW statements
         self.cur.execute("CREATE VIEW IF NOT EXISTS synapse_dendrite (neuron_ID, dendrite_state_ID, synapse_state_ID) AS SELECT nd.ID, sdl.dendrite_state_ID, sdl.synapse_state_ID FROM neuron_dendrite nd INNER JOIN synapse_dendrite_link sdl WHERE nd.dendrite_state_ID = sdl.dendrite_state_ID")
         self.cur.execute("CREATE VIEW IF NOT EXISTS neuron (neuron_ID, dendrite_state_ID, neuron_state_ID, axon_state_ID) AS SELECT neuron_dendrite.ID, neuron_dendrite.dendrite_state_ID, neuron_body.neuron_state_ID, neuron_body.axon_state_ID FROM neuron_dendrite INNER JOIN neuron_body WHERE neuron_dendrite.ID = neuron_body.ID")
+        self.cur.execute("CREATE VIEW IF NOT EXISTS axon_synapse (neuron_ID, axon_state_ID, synapse_state_ID) AS SELECT nb.ID, nb.axon_state_ID, asl.synapse_state_ID FROM neuron_body nb INNER JOIN axon_synapse_link asl WHERE nb.axon_state_ID = asl.axon_state_ID")
         self.con.commit()
         if self.logging: self.logger("connectBrain", "connectBrain")
 
