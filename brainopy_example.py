@@ -1,6 +1,7 @@
 from brainopy import brainopy
 
 b = brainopy("brain.db")
+b.logging = True
 
 neurotransmitters = {"Ach": "acetylcholine",
                      "DA": "dopamine", 
