@@ -18,11 +18,11 @@ synapseList = b.addSynapse(10)
 # Synapse List = [synapse_state_IDs]
 print("Synapse List: " + str(synapseList))
 
-linkages = b.linkRandomAxonSynapse(10)
+linkages = b.linkRandomAxonSynapse(30)
 # Axon-Synapse Linkages = [(axon_state_ID, synapse_state_ID)]
 print("Axon-Synapse Linkages: " + str(linkages))
 
-linkages = b.linkRandomSynapseDendrite(10)
+linkages = b.linkRandomSynapseDendrite(30)
 # Synapse-Dendrite Linkages = [(synapse_state_ID, dendrite_state_ID)]
 print("Synapse-Dendrite Linkages: " + str(linkages))
 
@@ -36,9 +36,9 @@ for synapse_state_ID in synapseList:
     b.inputSignal(synapse_state_ID, inputSignal)
     print("Inserted input signal into synapse " + synapse_state_ID)
 
-dendriteList = b.getIDs("dendrite_state")
-for dendrite in dendriteList:
-    b.tfSynapseDendrite(dendrite)
-    print("Dendrite state updated - " + dendrite)
+neuronList = b.getIDs("neuron_body")
+for neuron_ID in neuronList:
+    b.tfSynapseDendrite(neuron_ID)
+    print("Dendrite state updated for neuron " + neuron_ID)
 
 b.disconnectBrain()
