@@ -24,7 +24,16 @@ import sqlite3
 import uuid
 
 class brainopy(object):
+    """!
+    Class to encapsulate the brain (neural network), which is persisted as a SQLite database.
+    """
+
     def __init__(self, brainDB=None):
+        """!
+        Initialization method. If the Brain database file given as brainDB, the brain (neural network) will be connected using connectBrain() method.
+
+        @param brainDB String: Path to Brain database file. Default = None.
+        """
         self.logging = False
         if brainDB == None:
             self.con = None
@@ -34,9 +43,9 @@ class brainopy(object):
 
     def connectBrain(self, brainDB):
         """!
-        Connects to the brain database specified by the brainDB, which is a SQLite database.
-        @param brainDB: Path to Brain database file
-        @return: (Connection object or None, Cursor object or None)
+        Connects to the brain database specified by the brainDB, which is a SQLite database. If the brain database does not exist, the database will be created.
+
+        @param brainDB String: Path to Brain database file
         """
         self.con = sqlite3.connect(brainDB)
         self.cur = self.con.cursor()
@@ -71,11 +80,20 @@ class brainopy(object):
         if self.logging: self.logger("connectBrain", "connectBrain")
 
     def disconnectBrain(self):
+        """!
+        Disconnects and closes the brain database file.
+        """
         self.con.commit()
         if self.logging: self.logger("disconnectBrain", "disconnectBrain")
         self.con.close()
 
     def logger(self, function, message):
+        """!
+        Method to write information into log table - used for internal logging if self.logging == True.
+
+        @param function String: Function / method name initiating the log message
+        @param message String: Message to be logged
+        """
         try: 
             self.cur.execute("INSERT INTO log (function , message) VALUES ('%s', '%s')" % (function , message))
         except sqlite3.OperationalError:
@@ -83,6 +101,11 @@ class brainopy(object):
         self.con.commit()
 
     def addNeurotransmitters(self, neurotransmitters):
+        """!
+        Method to add / register neurotransmitters. Neurotransmitters is given as a dictionary of {<neurotransmitter>: <description>}; for example, {"Ach": "acetylcholine", "DA": "dopamine", "GLU": "glutamate", "NE": "norepinephrine", "5HT": "serotonin", "GABA": "gamma-Aminobutyric acid"}. This method does not backpatch new neurotransmitters to existing neurons and synapses, which may cause errors in processing; hence, all neurotransmitters must be confirmed and registered before initializig neurons and synapses.
+
+        @param neurotransmitters Dictionary: Neurotransmitters to be added
+        """
         for key in neurotransmitters:
             try: 
                 self.cur.execute("INSERT INTO neurotransmitter (neurotransmitter, description) VALUES ('%s', '%s')" % (key, neurotransmitters[key]))
@@ -92,6 +115,9 @@ class brainopy(object):
         self.con.commit()
 
     def _getUniqueID(self):
+        """!
+        Internal method to get a new unique ID for object / state.
+        """
         exist = True
         while exist:
             ID = str(uuid.uuid4())
@@ -101,23 +127,44 @@ class brainopy(object):
         return ID
 
     def getIDs(self, table):
+        """!
+        Method to get IDs registerd in a table, which is one of ["axon_state", "dendrite_state", "neuron_body", "neuron_state", "synapse_state"].
+
+        @param table String: Name of database table
+        @return: List of IDs
+        """
         self.cur.execute("SELECT DISTINCT ID from ID_table WHERE table_name = '%s'" % table)
         return [x[0] for x in self.cur.fetchall()]
 
     def getNeurotransmitters(self):
+        """!
+        Method to get list of registered neurotransmitters.
+
+        @return: List of neurotransmitters
+        """
         self.cur.execute("SELECT neurotransmitter from neurotransmitter")
         return [x[0] for x in self.cur.fetchall()]
 
-    def _addState(self, table):
+    def _addState(self, statetype):
+        """!
+        Internal method to add a new state, which is one of ["axon_state", "dendrite_state", "neuron_body", "neuron_state", "synapse_state"].
+        @param tatetype String: Type of state
+        """
         neurotransmitters = self.getNeurotransmitters()
         ID = self._getUniqueID()
-        self.cur.execute("INSERT INTO ID_table (ID, table_name) VALUES ('%s', '%s')" % (ID, table))
+        self.cur.execute("INSERT INTO ID_table (ID, table_name) VALUES ('%s', '%s')" % (ID, statetype))
         for ntrans in neurotransmitters:
-            self.cur.execute("INSERT INTO %s VALUES ('%s', '%s', %f)" % (table, ID, ntrans, 0.0))
+            self.cur.execute("INSERT INTO %s VALUES ('%s', '%s', %f)" % (statetype, ID, ntrans, 0.0))
         self.con.commit()
         return ID
 
     def addNeuron(self, n=1):
+        """!
+        Method to add neuron(s). Each added neuron consists of one dendrite (which may be increased using addDendrite() method), one neuron body, and one axon. Hence, one neuron minimally consists of one dendrite state, one neuron state, and one axon state. One state is represented by the values of a set of registered neurotransmitters.
+
+        @param n Integer: Number of neuron(s) to add. Default = 1
+        @return: [(neuron_ID, dendrite_state_ID, neuron_state_ID, axon_state_ID)] representing the added neuron(s)
+        """
         IDList = []
         for i in range(int(n)):
             neurotransmitters = self.getNeurotransmitters()
@@ -139,6 +186,12 @@ class brainopy(object):
         return IDList
 
     def addSynapse(self, n=1):
+        """!
+        Method to add synapse(s). Each synapse is represented by one synapse state, which is represented by the values of a set of registered neurotransmitters.
+
+        @param n Integer: Number of synapse(s) to add. Default = 1
+        @return: [synapse_state_ID] representing the added synapse(s)
+        """
         synapse_state_IDs = []
         for i in range(int(n)):
             synapse_state_ID = self._addState("synapse_state")
@@ -147,6 +200,12 @@ class brainopy(object):
         return synapse_state_IDs
 
     def addDendrite(self, neuron_ID):
+        """!
+        Method to add a new dendrite to an existing neuron (represented by neuron_ID). The added dendrite is represented by one synapse state, which is represented by the values of a set of registered neurotransmitters.
+
+        @param neuron_ID String: ID of neuron
+        @return: dendrite_state_ID, representing the added dendrite
+        """
         neurotransmitters = self.getNeurotransmitters()
         dendrite_state_ID = self._addState("dendrite_state")
         if self.logging: self.logger("addDendrite", "1/new_dendrite_state/dendrite_state_ID=" + str(dendrite_state_ID))
@@ -156,14 +215,27 @@ class brainopy(object):
         return dendrite_state_ID
 
     def linkAxonSynapse(self, axon_state_ID, synapse_state_ID):
+        """!
+        Method to register a connection between an existing axon (represented by axon_state_ID) and an existing synapse (represented by synapse_state_ID).
+
+        @param axon_state_ID String: ID of axon
+        @param synapse_state_ID String: ID of synapse
+        @return: (axon_state_ID, synapse_state_ID), which are the parameters and the connection to register
+        """
         try:
             self.cur.execute("INSERT INTO axon_synapse_link (axon_state_ID, synapse_state_ID) VALUES ('%s', '%s')" % (axon_state_ID, synapse_state_ID))
             self.con.commit()
             if self.logging: self.logger("linkAxonSynapse", "new_axon_synapse/axon_state_ID=" + str(axon_state_ID) + "/synapse_state_ID=" + str(synapse_state_ID))
         except sqlite3.IntegrityError: pass
-        return [(axon_state_ID, synapse_state_ID)]
+        return (axon_state_ID, synapse_state_ID)
 
     def linkRandomAxonSynapse(self, n=1):
+        """!
+        Method to register one or more random connection(s) between an existing axon (represented by axon_state_ID) and an existing synapse (represented by synapse_state_ID).
+
+        @param n Integer: Number of connection(s) to add. Default = 1
+        @return: [(axon_state_ID, synapse_state_ID)], representing the registered connections
+        """
         axon_state_IDs = self.getIDs("axon_state")
         synapse_state_IDs = self.getIDs("synapse_state")
         linkages = []
@@ -171,18 +243,31 @@ class brainopy(object):
             axon_state_ID = random.choice(axon_state_IDs)
             synapse_state_ID = random.choice(synapse_state_IDs)
             link = self.linkAxonSynapse(axon_state_ID, synapse_state_ID)
-            linkages.append(link[0])
+            linkages.append(link)
         return linkages
 
     def linkSynapseDendrite(self, synapse_state_ID, dendrite_state_ID):
+        """!
+        Method to register a connection between an existing dendrite (represented by dendrite_state_ID) and an existing synapse (represented by synapse_state_ID).
+
+        @param synapse_state_ID String: ID of synapse
+        @param dendrite_state_ID String: ID of dendrite
+        @return: (synapse_state_ID, dendrite_state_ID), which are the parameters and the connection to register
+        """
         try:
             self.cur.execute("INSERT INTO synapse_dendrite_link (synapse_state_ID, dendrite_state_ID) VALUES ('%s', '%s')" % (synapse_state_ID, dendrite_state_ID))
             self.con.commit()
             if self.logging: self.logger("linkSynapseDendrite", "new_synapse_dendrite/dendrite_state_ID=" + str(dendrite_state_ID) + "/synapse_state_ID=" + str(synapse_state_ID))
         except sqlite3.IntegrityError: pass
-        return [(synapse_state_ID, dendrite_state_ID)]
+        return (synapse_state_ID, dendrite_state_ID)
 
     def linkRandomSynapseDendrite(self, n=1):
+        """!
+        Method to register one or more random connection(s) between an existing dendrite (represented by dendrite_state_ID) and an existing synapse (represented by synapse_state_ID).
+
+        @param n Integer: Number of connection(s) to add. Default = 1
+        @return: [(synapse_state_ID, dendrite_state_ID)], representing the registered connections
+        """
         dendrite_state_IDs = self.getIDs("dendrite_state")
         synapse_state_IDs = self.getIDs("synapse_state")
         linkages = []
@@ -190,12 +275,14 @@ class brainopy(object):
             dendrite_state_ID = random.choice(dendrite_state_IDs)
             synapse_state_ID = random.choice(synapse_state_IDs)
             link = self.linkSynapseDendrite(synapse_state_ID, dendrite_state_ID)
-            linkages.append(link[0])
+            linkages.append(link)
         return linkages
 
     def tfSynapseDendrite(self, neuron_ID):
-        """
-        Synapse to Dendrite Transfer Function
+        """!
+        Default Synapse to Dendrite Transfer Function (SDTF), which should be overridden based on specific usage. SDTF is based on individual neuron, represented by neuron_ID. This default SDTF averages the synapse state(s) into dendrite state.
+
+        @param neuron_ID String: ID of neuron
         """
         neurotransmitters = self.getNeurotransmitters()
         self.cur.execute("SELECT DISTINCT s.dendrite_state_ID, s.synapse_state_ID FROM synapse_dendrite s WHERE s.neuron_ID = '%s'" % neuron_ID)
@@ -220,14 +307,17 @@ class brainopy(object):
         self.con.commit()
 
     def mfDendrite(self, neuron_ID):
-        """
-        Dendrite Modulator
+        """!
+        Default Dendrite Modulator (DMF), which should be overridden based on specific usage. DNTF is based on individual neuron, represented by neuron_ID.
+
+        @param neuron_ID String: ID of neuron
         """
         neurotransmitters = self.getNeurotransmitters()
 
     def tfDendriteNeuron(self, neuron_ID):
-        """
-        Dendrite to Neuron Transfer Function 
+        """!
+        Default Dendrite to Neuron Transfer Function (DNTF), which should be overridden based on specific usage. DNTF is based on individual neuron, represented by neuron_ID. This default DNTF averages the dendrite state(s) into neuron state.
+        @param neuron_ID String: ID of neuron
         """
         neurotransmitters = self.getNeurotransmitters()
         self.cur.execute("SELECT DISTINCT dendrite_state_ID, neuron_state_ID FROM neuron WHERE neuron_ID = '%s'" % neuron_ID)
@@ -252,14 +342,18 @@ class brainopy(object):
         self.con.commit()
 
     def mfNeuron(self, neuron_ID):
-        """
-        Neuron Modulator
+        """!
+        Default Neuron Modulator (NMF), which should be overridden based on specific usage. DNTF is based on individual neuron, represented by neuron_ID.
+
+        @param neuron_ID String: ID of neuron
         """
         neurotransmitters = self.getNeurotransmitters()
 
     def tfNeuronAxon(self, neuron_ID):
-        """
-        Neuron to Axon Transfer Function 
+        """!
+        Default Neuron to Axon Transfer Function (NATF), which should be overridden based on specific usage. NATF is based on individual neuron, represented by neuron_ID. This default NATF equates axon state to neuron state.
+
+        @param neuron_ID String: ID of neuron
         """
         neurotransmitters = self.getNeurotransmitters()
         self.cur.execute("SELECT DISTINCT neuron_state_ID, axon_state_ID FROM neuron_body where ID = '%s'" % neuron_ID)
@@ -280,14 +374,18 @@ class brainopy(object):
         self.con.commit()
 
     def mfAxon(self, neuron_ID):
-        """
-        Axon Modulator
+        """!
+        Default Axon Modulator (AMF), which should be overridden based on specific usage. DNTF is based on individual neuron, represented by neuron_ID.
+
+        @param neuron_ID String: ID of neuron
         """
         neurotransmitters = self.getNeurotransmitters()
 
     def tfAxonSynapse(self, neuron_ID):
-        """
-        Axon to Synapse Transfer Function 
+        """!
+        Default Axon to Synapse Transfer Function (ASTF), which should be overridden based on specific usage. ASTF is based on individual neuron, represented by neuron_ID. This default ASTF equates synapse state(s) to axon state.
+
+        @param neuron_ID String: ID of neuron
         """
         neurotransmitters = self.getNeurotransmitters()
         self.cur.execute("SELECT DISTINCT a.axon_state_ID, a.synapse_state_ID FROM axon_synapse a WHERE a.neuron_ID = '%s'" % neuron_ID)
@@ -306,19 +404,28 @@ class brainopy(object):
                     if self.logging: self.logger("tfAxonSynapse", "3/update_synapse_state/synapse_state_ID=" + str(synapse_state_ID) + "/neurotransmitter=" + str(state[0]) + "/value=" + str(state[1]))
             self.con.commit()
 
-    def mfSynapse(self, synapse_state_IDs):
-        """
-        Synapse Modulator
+    def mfSynapse(self, synapse_state_ID):
+        """!
+        Default Synapse Modulator (SMF), which should be overridden based on specific usage. DNTF is based on individual synapse, represented by synapse_state_IDs.
+
+        @param synapse_state_ID String: ID of synapse state
         """
         neurotransmitters = self.getNeurotransmitters()
     
     def tfSynapseAxon(self, neuron_ID):
-        """
-        Synapse to Axon Transfer Function 
+        """!
+        Default Synapse to Axon Transfer Function (SATF), which should be overridden based on specific usage. SATF is based on individual neuron, represented by neuron_ID. SATF can be used to represent synaptic reuptake of neurotransmitters. This default SATF does nothing.
+
+        @param neuron_ID String: ID of neuron
         """
         neurotransmitters = self.getNeurotransmitters()
 
     def neuronFunction(self, neuron_ID):
+        """!
+        Wrapper method to execute the standard processes / functions of an individual neuron, represented by neuron_ID. The order of operation is (1) synapse to dendrite transfer function (SDTF), (2) dendrite modulator (DMF), (3) dendrite to neuron transfer function (DNTF), (4) neuron modulator (NMF), (5) neuron to axon transfer function (NATF), (6) axon modulator (AMF), and (7) axon to synapse transfer function (ASTF).
+
+        @param neuron_ID String: ID of neuron
+        """
         self.tfSynapseDendrite(neuron_ID)
         self.mfDendrite(neuron_ID)
         self.tfDendriteNeuron(neuron_ID)
@@ -328,42 +435,52 @@ class brainopy(object):
         self.tfAxonSynapse(neuron_ID)
         
     def mtNeuronGrowth(self):
-        """
-        Neuronal Growth Function (NGF)
+        """!
+        Default Neuronal Growth Function (NGF), which should be overridden based on specific usage.
         """
         pass
 
     def mtSynapseGrowth(self):
-        """
-        Synaptic Growth Function (SGF)
+        """!
+        Default Synaptic Growth Function (SGF), which should be overridden based on specific usage.
         """
         pass
 
     def mtNeuronPrune(self):
-        """
-        Neuronal Prune Function (NPF)
+        """!
+        Default Neuronal Prune Function (NPF), which should be overridden based on specific usage.
         """
         pass
 
     def mtSynapsePrune(self):
-        """
-        Synaptic Prune Function (SGF)
+        """!
+        Default Synaptic Prune Function (SGF), which should be overridden based on specific usage.
         """
         pass
 
     def mtGlobal(self):
-        """
-        Global Maintenance Function (GMF)
+        """!
+        Default Global Maintenance Function (GMF), which should be overridden based on specific usage.
         """
         pass
 
     def maintenanceFunction(self):
+        """!
+        Wrapper method to execute the standard processes / functions for brain maintenance. The order of operation is (1) neuronal growth function (NGF), (2) neuronal prune function (NPF), (3) synaptic growth function (SGF), (4) synaptic prune function (SPF), and (5) global maintenance function (GMF).
+        """
         self.mtNeuronGrowth()
         self.mtNeuronPrune()
         self.mtSynapseGrowth()
         self.mtSynapsePrune()
+        self.mtGlobal()
 
     def inputSignal(self, synapse_state_ID, signal_state):
+        """!
+        Method to update a synapse state (represented by synapse_state_ID) from an exogenous state (represented by signal_state). This represents the input of signal into the brain. The signal_state is a dictionary of {<neurotransmitter>: <value>}; for example, {"Ach": 0.11, "DA": 0.15, "GLU": 0.21, "NE": 0.25, "5HT": 0.31, "GABA": 0.35}.
+
+        @param synapse_state_ID String: ID of synapse state
+        @param signal_state Dictionary: Dictionary of neurotransmitter values
+        """
         if self.logging: self.logger("inputSignal", "1/input_signal/synapse_state_ID=" + str(synapse_state_ID))
         for neurotransmitter in signal_state:
             value = float(signal_state[neurotransmitter])
