@@ -148,7 +148,8 @@ class brainopy(object):
     def _addState(self, statetype):
         """!
         Internal method to add a new state, which is one of ["axon_state", "dendrite_state", "neuron_body", "neuron_state", "synapse_state"].
-        @param tatetype String: Type of state
+
+        @param statetype String: Type of state
         """
         neurotransmitters = self.getNeurotransmitters()
         ID = self._getUniqueID()
@@ -278,6 +279,27 @@ class brainopy(object):
             linkages.append(link)
         return linkages
 
+    def randomState(self, statetype, state_ID, variation=0.01):
+        """!
+        Method to perform random variation to the neurotransmitter values of a state; denoted by statetype, which is one of ["axon_state", "dendrite_state", "neuron_body", "neuron_state", "synapse_state"], and the ID of the state. Variation is given in proportion; for example, 0.01 means to vary +/- 1% of its original value.
+
+        @param statetype String: Type of state
+        @param state_ID String: ID of state
+        @param variation Float: Variation limit. Default = 0.01 (1% variation)
+        """
+        variation = float(variation)
+        lower_limit = 1000000 - (1000000 * variation)
+        upper_limit = 1000000 + (1000000 * variation)
+        self.cur.execute("SELECT neurotransmitter, value FROM %s WHERE ID = '%s'" % (statetype, state_ID))
+        stateList = [[x[0], x[1]] for x in self.cur.fetchall()]
+        for state in stateList:
+            multiplier = random.randint(lower_limit, upper_limit) / 1000000
+            neurotransmitter = state[0]
+            value = float(state[1])
+            value = str(value * multiplier)
+            self.cur.execute("UPDATE %s SET value = '%s' WHERE ID = '%s' AND neurotransmitter = '%s'" % (statetype, value, state_ID, neurotransmitter))
+            if self.logging: self.logger("randomState", "update_state/state_type=" + str(statetype) + "/state_ID=" + str(state_ID) + "/neurotransmitter=" + str(neurotransmitter) + "/value=" + str(value))
+
     def tfSynapseDendrite(self, neuron_ID):
         """!
         Default Synapse to Dendrite Transfer Function (SDTF), which should be overridden based on specific usage. SDTF is based on individual neuron, represented by neuron_ID. This default SDTF averages the synapse state(s) into dendrite state.
@@ -343,11 +365,14 @@ class brainopy(object):
 
     def mfNeuron(self, neuron_ID):
         """!
-        Default Neuron Modulator (NMF), which should be overridden based on specific usage. DNTF is based on individual neuron, represented by neuron_ID.
+        Default Neuron Modulator (NMF), which should be overridden based on specific usage. DNTF is based on individual neuron, represented by neuron_ID. This default NMF randomly varies each neurotransmitter in the neuron state by +/- 1% of its original value.
 
         @param neuron_ID String: ID of neuron
         """
-        neurotransmitters = self.getNeurotransmitters()
+        self.cur.execute("SELECT DISTINCT neuron_state_ID FROM neuron WHERE neuron_ID = '%s'" % neuron_ID)
+        neuron_state_ID = [x[0] for x in self.cur.fetchall()][0]
+        if self.logging: self.logger("mfNeuron", "get_link")
+        self.randomState("neuron_state", neuron_state_ID, 0.01)
 
     def tfNeuronAxon(self, neuron_ID):
         """!
