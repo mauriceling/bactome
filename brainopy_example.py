@@ -38,14 +38,6 @@ for synapse_state_ID in synapseList:
     print("Inserted input signal into synapse " + synapse_state_ID)
 
 neuronList = b.getIDs("neuron_body")
-for neuron_ID in neuronList:
-    b.tfSynapseDendrite(neuron_ID)
-    print("Dendrite state updated for neuron " + neuron_ID)
-    b.tfDendriteNeuron(neuron_ID)
-    print("Neuron state updated for neuron " + neuron_ID)
-    b.tfNeuronAxon(neuron_ID)
-    print("Axon state updated for neuron " + neuron_ID)
-    b.tfAxonSynapse(neuron_ID)
-    print("Synapse state updated for neuron " + neuron_ID)
+b.runBrain(neuronList)
 
 b.disconnectBrain()

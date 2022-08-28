@@ -474,6 +474,18 @@ class brainopy(object):
         self.mtSynapsePrune()
         self.mtGlobal()
 
+    def runBrain(self, neuronList=[]):
+        """!
+        Wrapper method to execute / run the entire brain or part of the brain. If a list of neuron_IDs (represented by neuronList) is not given, the entire brain will be executed / ran. To execute / run part of the brain, neurons (represented by neuron_IDs) for the part of the brain must be given as neuronList.
+
+        Neuron processes / functions [(1) synapse to dendrite transfer function (SDTF), (2) dendrite modulator (DMF), (3) dendrite to neuron transfer function (DNTF), (4) neuron modulator (NMF), (5) neuron to axon transfer function (NATF), (6) axon modulator (AMF), and (7) axon to synapse transfer function (ASTF)] are executed for each neuron, followed by brain maintenance processes / functions [(1) neuronal growth function (NGF), (2) neuronal prune function (NPF), (3) synaptic growth function (SGF), (4) synaptic prune function (SPF), and (5) global maintenance function (GMF)].
+
+        @param neuroList List: List of neuron_IDs. Default = []
+        """
+        if len(neuronList) == 0: neuronList = self.getIDs("neuron_body")
+        for neuron_ID in neuronList: self.neuronFunction(neuron_ID)
+        self.maintenanceFunction()
+
     def inputSignal(self, synapse_state_ID, signal_state):
         """!
         Method to update a synapse state (represented by synapse_state_ID) from an exogenous state (represented by signal_state). This represents the input of signal into the brain. The signal_state is a dictionary of {<neurotransmitter>: <value>}; for example, {"Ach": 0.11, "DA": 0.15, "GLU": 0.21, "NE": 0.25, "5HT": 0.31, "GABA": 0.35}.
