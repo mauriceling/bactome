@@ -51,6 +51,7 @@ class brainopy(object):
         self.cur = self.con.cursor()
         # CREATE TABLE statements
         self.cur.execute("CREATE TABLE IF NOT EXISTS ID_table (ID text primary key, table_name text)")
+        self.cur.execute("CREATE TABLE IF NOT EXISTS name_ID (ID text primary key, name text, description text)")
         self.cur.execute("CREATE TABLE IF NOT EXISTS neurotransmitter (neurotransmitter text primary key, description text)")
         self.cur.execute("CREATE TABLE IF NOT EXISTS neuron_state (ID text, neurotransmitter text, value real)")
         self.cur.execute("CREATE TABLE IF NOT EXISTS dendrite_state (ID text, neurotransmitter text, value real)")
@@ -76,6 +77,13 @@ class brainopy(object):
         self.cur.execute("CREATE VIEW IF NOT EXISTS synapse_dendrite (neuron_ID, dendrite_state_ID, synapse_state_ID) AS SELECT nd.ID, sdl.dendrite_state_ID, sdl.synapse_state_ID FROM neuron_dendrite nd INNER JOIN synapse_dendrite_link sdl WHERE nd.dendrite_state_ID = sdl.dendrite_state_ID")
         self.cur.execute("CREATE VIEW IF NOT EXISTS neuron (neuron_ID, dendrite_state_ID, neuron_state_ID, axon_state_ID) AS SELECT neuron_dendrite.ID, neuron_dendrite.dendrite_state_ID, neuron_body.neuron_state_ID, neuron_body.axon_state_ID FROM neuron_dendrite INNER JOIN neuron_body WHERE neuron_dendrite.ID = neuron_body.ID")
         self.cur.execute("CREATE VIEW IF NOT EXISTS axon_synapse (neuron_ID, axon_state_ID, synapse_state_ID) AS SELECT nb.ID, nb.axon_state_ID, asl.synapse_state_ID FROM neuron_body nb INNER JOIN axon_synapse_link asl WHERE nb.axon_state_ID = asl.axon_state_ID")
+        self.cur.execute("CREATE VIEW IF NOT EXISTS name_ID_table (ID, name, description, table_name) AS SELECT name_ID.ID, name_ID.name, name_ID.description, ID_table.table_name FROM name_ID INNER JOIN ID_table WHERE name_ID.ID = ID_table.ID")
+        self.cur.execute("CREATE VIEW IF NOT EXISTS name_neuron_body (ID, name, description, neuron_state_ID, axon_state_ID) AS SELECT name_ID.ID, name_ID.name, name_ID.description, neuron_body.neuron_state_ID, neuron_body.axon_state_ID FROM name_ID INNER JOIN neuron_body WHERE name_ID.ID = neuron_body.ID")
+        self.cur.execute("CREATE VIEW IF NOT EXISTS name_neuron_state (ID, name, description, neurotransmitter, value) AS SELECT name_ID.ID, name_ID.name, name_ID.description, neuron_state.neurotransmitter, neuron_state.value FROM neuron_state INNER JOIN name_ID WHERE neuron_state.ID = name_ID.ID")        
+        self.cur.execute("CREATE VIEW IF NOT EXISTS name_dendrite_state (ID, name, description, neurotransmitter, value) AS SELECT name_ID.ID, name_ID.name, name_ID.description, dendrite_state.neurotransmitter, dendrite_state.value FROM dendrite_state INNER JOIN name_ID WHERE dendrite_state.ID = name_ID.ID")
+        self.cur.execute("CREATE VIEW IF NOT EXISTS name_axon_state (ID, name, description, neurotransmitter, value) AS SELECT name_ID.ID, name_ID.name, name_ID.description, axon_state.neurotransmitter, axon_state.value FROM axon_state INNER JOIN name_ID WHERE axon_state.ID = ID_table.ID")
+        self.cur.execute("CREATE VIEW IF NOT EXISTS name_synapse_state (ID, name, description, neurotransmitter, value) AS SELECT name_ID.ID, name_ID.name, name_ID.description, synapse_state.neurotransmitter, synapse_state.value FROM synapse_state INNER JOIN name_ID WHERE synapse_state.ID = name_ID.ID")
+
         self.con.commit()
         if self.logging: self.logger("connectBrain", "connectBrain")
 
@@ -99,6 +107,17 @@ class brainopy(object):
         except sqlite3.OperationalError:
             print("INSERT INTO log (function , message) VALUES ('%s', '%s')" % (function , message))
         self.con.commit()
+
+    def nameID(self, ID, name, description=""):
+        """!
+        Method to add a name label (with corresponding description) to an ID (which can be neuron ID, neuron state ID, dendrite state ID, axon state ID, and synapse state ID).
+
+        @param ID String: ID to label
+        @param name String: Label
+        @param description String: Descriptive text of the label
+        """
+        self.cur.execute("INSERT INTO name_ID (ID, name, description) VALUES ('%s', '%s', '%s')" % (ID, name, description))
+        if self.logging: self.logger("nameID", "ID=" + str(ID) + "/name=" + str(name) + "/description=" + str(description))
 
     def addNeurotransmitters(self, neurotransmitters):
         """!
