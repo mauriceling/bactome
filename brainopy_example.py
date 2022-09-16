@@ -38,6 +38,10 @@ for synapse_state_ID in synapseList:
     print("Inserted input signal into synapse " + synapse_state_ID)
 
 neuronList = b.getIDs("neuron_body")
+
+b.nameID(neuronList[3], "neuron4", "neuron number 4")
+b.nameID(synapseList[3], "synapse4", "synapse number 4")
+
 b.runBrain(neuronList)
 
 b.disconnectBrain()
