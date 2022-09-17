@@ -119,6 +119,32 @@ class brainopy(object):
         self.cur.execute("INSERT INTO name_ID (ID, name, description) VALUES ('%s', '%s', '%s')" % (ID, name, description))
         if self.logging: self.logger("nameID", "ID=" + str(ID) + "/name=" + str(name) + "/description=" + str(description))
 
+    def readNeurotransmitters(self, identifier, identifier_type="name"):
+        """!
+        Method to read neurotransmitter values using an identifier (ID or name label tagged by nameID method). This can be used to read dendrite state, neuron state, axon state, or synapse state. If the identifier is a neuron body ID or name label of a neuron body, an empty dictionary will be returned. 
+
+        @param identifier String: ID or name label
+        @param identifier_type String: Type of identifier. Allowable values are "ID" (the identifier is an ID) and "name" (the identifier is a name label). Default = "name"
+        @return: Dictionary of neurotransmitter values - {<neurotransmitter>: <value>}
+        """
+        if identifier_type.lower() == "name":
+            self.cur.execute("SELECT table_name FROM name_ID_table WHERE name = '%s'" % identifier)
+            table_name = [x[0] for x in self.cur.fetchall()][0]
+            if table_name == "neuron_body": return {}
+            else: 
+                self.cur.execute("SELECT neurotransmitter, value FROM name_%s WHERE name = '%s'" % (table_name, identifier))
+        elif identifier_type.lower() == "id":
+            self.cur.execute("SELECT table_name FROM name_ID_table WHERE ID = '%s'" % identifier)
+            table_name = [x[0] for x in self.cur.fetchall()][0]
+            if table_name == "neuron_body": return {}
+            else: 
+                self.cur.execute("SELECT neurotransmitter, value FROM %s WHERE ID = '%s'" % (table_name, identifier))
+        else: return {}
+        neurotransmitters = {}
+        for neurotransmitter in [(x[0], x[1]) for x in self.cur.fetchall()]:
+            neurotransmitters[neurotransmitter[0]] = neurotransmitter[1]
+        return neurotransmitters
+
     def addNeurotransmitters(self, neurotransmitters):
         """!
         Method to add / register neurotransmitters. Neurotransmitters is given as a dictionary of {<neurotransmitter>: <description>}; for example, {"Ach": "acetylcholine", "DA": "dopamine", "GLU": "glutamate", "NE": "norepinephrine", "5HT": "serotonin", "GABA": "gamma-Aminobutyric acid"}. This method does not backpatch new neurotransmitters to existing neurons and synapses, which may cause errors in processing; hence, all neurotransmitters must be confirmed and registered before initializig neurons and synapses.
