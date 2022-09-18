@@ -379,7 +379,7 @@ class brainopy(object):
 
     def mfDendrite(self, neuron_ID):
         """!
-        Default Dendrite Modulating Function (DMF), which should be overridden based on specific usage. DNTF is based on individual neuron, represented by neuron_ID. This default DMF randomly varies each neurotransmitter in the neuron state by +/- 0.5% of its original value.
+        Default Dendrite Modulating Function (DMF), which should be overridden based on specific usage. DMF is based on individual neuron, represented by neuron_ID. This default DMF randomly varies each neurotransmitter in the neuron state by +/- proportion (determined by self.neurotransmitter_dendrite_variation) of its original value.
 
         @param neuron_ID String: ID of neuron
         """
@@ -418,7 +418,7 @@ class brainopy(object):
 
     def mfNeuron(self, neuron_ID):
         """!
-        Default Neuron Modulating Function (NMF), which should be overridden based on specific usage. DNTF is based on individual neuron, represented by neuron_ID. This default NMF randomly varies each neurotransmitter in the neuron state by +/- 0.5% of its original value.
+        Default Neuron Modulating Function (NMF), which should be overridden based on specific usage. DMF is based on individual neuron, represented by neuron_ID. This default NMF randomly varies each neurotransmitter in the neuron state by +/- proportion (determined by self.neurotransmitter_neuron_variation) of its original value.
 
         @param neuron_ID String: ID of neuron
         """
@@ -453,7 +453,7 @@ class brainopy(object):
 
     def mfAxon(self, neuron_ID):
         """!
-        Default Axon Modulating Function (AMF), which should be overridden based on specific usage. DNTF is based on individual neuron, represented by neuron_ID. This default AMF randomly varies each neurotransmitter in the neuron state by +/- 0.5% of its original value.
+        Default Axon Modulating Function (AMF), which should be overridden based on specific usage. AMF is based on individual neuron, represented by neuron_ID. This default AMF randomly varies each neurotransmitter in the neuron state by +/- proportion (determined by self.neurotransmitter_axon_variation) of its original value.
 
         @param neuron_ID String: ID of neuron
         """
@@ -487,7 +487,7 @@ class brainopy(object):
 
     def mfSynapse(self, synapse_state_ID):
         """!
-        Default Synapse Modulator (SMF), which should be overridden based on specific usage. SMF is based on individual synapse, represented by synapse_state_IDs. This default SMF randomly varies each neurotransmitter in the synapse state by +/- 0.5% of its original value.
+        Default Synapse Modulating Function (SMF), which should be overridden based on specific usage. SMF is based on individual synapse, represented by synapse_state_IDs. This default SMF randomly varies each neurotransmitter in the synapse state by +/- proportion (determined by self.neurotransmitter_synapse_variation) of its original value.
 
         @param synapse_state_ID String: ID of synapse state
         """
