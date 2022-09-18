@@ -34,6 +34,9 @@ class brainopy(object):
 
         @param brainDB String: Path to Brain database file. Default = None.
         """
+        self.neurotransmitter_axon_variation = 0.005
+        self.neurotransmitter_dendrite_variation = 0.005
+        self.neurotransmitter_neuron_variation = 0.005
         self.logging = False
         if brainDB == None:
             self.con = None
@@ -410,14 +413,14 @@ class brainopy(object):
 
     def mfNeuron(self, neuron_ID):
         """!
-        Default Neuron Modulator (NMF), which should be overridden based on specific usage. DNTF is based on individual neuron, represented by neuron_ID. This default NMF randomly varies each neurotransmitter in the neuron state by +/- 1% of its original value.
+        Default Neuron Modulating Function (NMF), which should be overridden based on specific usage. DNTF is based on individual neuron, represented by neuron_ID. This default NMF randomly varies each neurotransmitter in the neuron state by +/- 0.5% of its original value.
 
         @param neuron_ID String: ID of neuron
         """
         self.cur.execute("SELECT DISTINCT neuron_state_ID FROM neuron WHERE neuron_ID = '%s'" % neuron_ID)
         neuron_state_ID = [x[0] for x in self.cur.fetchall()][0]
         if self.logging: self.logger("mfNeuron", "get_link")
-        self.randomState("neuron_state", neuron_state_ID, 0.01)
+        self.randomState("neuron_state", neuron_state_ID, self.neurotransmitter_neuron_variation)
 
     def tfNeuronAxon(self, neuron_ID):
         """!
