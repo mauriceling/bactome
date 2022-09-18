@@ -556,9 +556,9 @@ class brainopy(object):
         self.mtSynapsePrune()
         self.mtGlobal()
 
-    def runBrain(self, neuronList=[]):
+    def runBrain(self, neuronList=[], synapseList=[]):
         """!
-        Wrapper method to execute / run the entire brain or part of the brain. If a list of neuron_IDs (represented by neuronList) is not given, the entire brain will be executed / ran. To execute / run part of the brain, neurons (represented by neuron_IDs) for the part of the brain must be given as neuronList.
+        Wrapper method to execute / run the entire brain or part of the brain. If a list of neuron_IDs (represented by neuronList) and list of synapse IDs (represented by synapseList) are not given, the entire brain will be executed / ran. To execute / run part of the brain, neurons (represented by neuron_IDs in neuronList) and/or synapses (represented by synapse_state_IDs in synpaseList)for the part of the brain must be given as neuronList.
 
         The steps are as follow:
             1. Neuron processes / functions [(1) synapse to dendrite transfer function (SDTF), (2) dendrite modulator (DMF), (3) dendrite to neuron transfer function (DNTF), (4) neuron modulator (NMF), (5) neuron to axon transfer function (NATF), (6) axon modulator (AMF), and (7) axon to synapse transfer function (ASTF)] executed for each neuron.
@@ -567,9 +567,10 @@ class brainopy(object):
             Brain maintenance processes / functions [(1) neuronal growth function (NGF), (2) neuronal prune function (NPF), (3) synaptic growth function (SGF), (4) synaptic prune function (SPF), and (5) global maintenance function (GMF)] executed.
 
         @param neuroList List: List of neuron_IDs. Default = []
+        @param synapseList List: List of synapse_state_IDs. Default = []
         """
         if len(neuronList) == 0: neuronList = self.getIDs("neuron_body")
-        synapseList = self.getIDs("synapse_state")
+        if len(synapseList) == 0: synapseList = self.getIDs("synapse_state")
         for neuron_ID in neuronList: self.neuronFunction(neuron_ID)
         for synapse_state_ID in synapseList: self.mfSynapse(synapse_state_ID)
         for neuron_ID in neuronList: self.tfSynapseAxon(neuron_ID)
