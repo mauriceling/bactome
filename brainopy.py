@@ -37,6 +37,7 @@ class brainopy(object):
         self.neurotransmitter_axon_variation = 0.005
         self.neurotransmitter_dendrite_variation = 0.005
         self.neurotransmitter_neuron_variation = 0.005
+        self.neurotransmitter_synapse_variation = 0.005
         self.logging = False
         if brainDB == None:
             self.con = None
@@ -486,11 +487,12 @@ class brainopy(object):
 
     def mfSynapse(self, synapse_state_ID):
         """!
-        Default Synapse Modulator (SMF), which should be overridden based on specific usage. DNTF is based on individual synapse, represented by synapse_state_IDs.
+        Default Synapse Modulator (SMF), which should be overridden based on specific usage. SMF is based on individual synapse, represented by synapse_state_IDs. This default SMF randomly varies each neurotransmitter in the synapse state by +/- 0.5% of its original value.
 
         @param synapse_state_ID String: ID of synapse state
         """
-        neurotransmitters = self.getNeurotransmitters()
+        if self.logging: self.logger("mfSynapse", "get_link")
+        self.randomState("synapse_state", synapse_state_ID, self.neurotransmitter_synapse_variation)
     
     def tfSynapseAxon(self, neuron_ID):
         """!
