@@ -75,8 +75,10 @@ class brainopy(object):
         self.cur.execute("CREATE INDEX IF NOT EXISTS synapse_state_ID ON synapse_state (ID)")
         self.cur.execute("CREATE INDEX IF NOT EXISTS neuron_body_ID ON neuron_body (ID)")
         self.cur.execute("CREATE INDEX IF NOT EXISTS neuron_dendrite_ID ON neuron_dendrite (ID)")
-        self.cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS axon_synapse_link_index ON axon_synapse_link (axon_state_ID, synapse_state_ID)")
-        self.cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS synapse_dendrite_link_index ON synapse_dendrite_link (synapse_state_ID, dendrite_state_ID)")
+        self.cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS axon_synapse_link_axon ON axon_synapse_link (axon_state_ID)")
+        self.cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS axon_synapse_link_synapse ON axon_synapse_link (synapse_state_ID)")
+        self.cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS synapse_dendrite_link_synapse ON synapse_dendrite_link (synapse_state_ID)")
+        self.cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS synapse_dendrite_link_dendrite ON synapse_dendrite_link (dendrite_state_ID)")
         # CREATE VIEW statements
         self.cur.execute("CREATE VIEW IF NOT EXISTS synapse_dendrite (neuron_ID, dendrite_state_ID, synapse_state_ID) AS SELECT nd.ID, sdl.dendrite_state_ID, sdl.synapse_state_ID FROM neuron_dendrite nd INNER JOIN synapse_dendrite_link sdl WHERE nd.dendrite_state_ID = sdl.dendrite_state_ID")
         self.cur.execute("CREATE VIEW IF NOT EXISTS neuron (neuron_ID, dendrite_state_ID, neuron_state_ID, axon_state_ID) AS SELECT neuron_dendrite.ID, neuron_dendrite.dendrite_state_ID, neuron_body.neuron_state_ID, neuron_body.axon_state_ID FROM neuron_dendrite INNER JOIN neuron_body WHERE neuron_dendrite.ID = neuron_body.ID")
