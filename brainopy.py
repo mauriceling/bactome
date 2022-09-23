@@ -326,16 +326,21 @@ class brainopy(object):
         if self.logging: self.logger("addDendrite", "2/insert_tables")
         return dendrite_state_ID
 
-    def stapleNeurons_byID(self, from_neuron_ID, to_neuron_ID):
+    def stapleNeurons(self, from_neuron, to_neuron, identifier_type="name"):
         """!
-        Method to link up 2 neurons (staple 2 neurons together) using a pair or neuron body IDs. There is an underlying assumption that each neuron has only one dendrite and one axon. However, multiple axons can link to one dendrite, and one axon can link to multiple dendrites. During linking process, a synapse will be created. This results in (from_neuron_ID)--axon_state_ID--> synapse_state_ID >--dendrite_state_ID--(to_neuron_ID).
+        Method to link up 2 neurons (staple 2 neurons together) using a pair of neuron body IDs or neuron names. There is an underlying assumption that each neuron has only one dendrite and one axon. However, multiple axons can link to one dendrite, and one axon can link to multiple dendrites. During linking process, a synapse will be created. This results in (from_neuron_ID)--axon_state_ID--> synapse_state_ID >--dendrite_state_ID--(to_neuron_ID).
 
         @param from_neuron_ID String: Source neuron body ID (the neuron providing the axon)
         @param to_neuron_ID String: Destination neuron body ID (the neuron providing the dendrite)
+        @param identifier_type String: Type of identifier. Allowable values are "ID" (the identifier is an ID) and "name" (the identifier is a name label). Default = "name"
         @return: (axon_state_ID, synapse_state_ID, dendrite_state_ID)
         """
-        axon_state_ID = self.getStateIDFromNeuronID(from_neuron_ID, "axon_state_ID")
-        dendrite_state_ID = self.getStateIDFromNeuronID(to_neuron_ID, "dendrite_state_ID")[0]
+        if identifier_type.lower() == "name":
+            axon_state_ID = self.getStateIDFromNeuronName(from_neuron, "axon_state_ID")
+            dendrite_state_ID = self.getStateIDFromNeuronName(to_neuron, "dendrite_state_ID")[0]
+        elif identifier_type.lower() == "id":
+            axon_state_ID = self.getStateIDFromNeuronID(from_neuron, "axon_state_ID")
+            dendrite_state_ID = self.getStateIDFromNeuronID(to_neuron, "dendrite_state_ID")[0]
         synapse_state_ID = self.addSynapse(1)[0]
         self.linkAxonSynapse(axon_state_ID, synapse_state_ID)
         self.linkSynapseDendrite(synapse_state_ID, dendrite_state_ID)
