@@ -326,6 +326,21 @@ class brainopy(object):
         if self.logging: self.logger("addDendrite", "2/insert_tables")
         return dendrite_state_ID
 
+    def stapleNeurons_byID(self, from_neuron_ID, to_neuron_ID):
+        """!
+        Method to link up 2 neurons (staple 2 neurons together) using a pair or neuron body IDs. There is an underlying assumption that each neuron has only one dendrite and one axon. However, multiple axons can link to one dendrite, and one axon can link to multiple dendrites. During linking process, a synapse will be created. This results in (from_neuron_ID)--axon_state_ID--> synapse_state_ID >--dendrite_state_ID--(to_neuron_ID).
+
+        @param from_neuron_ID String: Source neuron body ID (the neuron providing the axon)
+        @param to_neuron_ID String: Destination neuron body ID (the neuron providing the dendrite)
+        @return: (axon_state_ID, synapse_state_ID, dendrite_state_ID)
+        """
+        axon_state_ID = self.getStateIDFromNeuronID(from_neuron_ID, "axon_state_ID")
+        dendrite_state_ID = self.getStateIDFromNeuronID(to_neuron_ID, "dendrite_state_ID")[0]
+        synapse_state_ID = self.addSynapse(1)[0]
+        self.linkAxonSynapse(axon_state_ID, synapse_state_ID)
+        self.linkSynapseDendrite(synapse_state_ID, dendrite_state_ID)
+        return (axon_state_ID, synapse_state_ID, dendrite_state_ID)
+
     def linkAxonSynapse(self, axon_state_ID, synapse_state_ID):
         """!
         Method to register a connection between an existing axon (represented by axon_state_ID) and an existing synapse (represented by synapse_state_ID).
