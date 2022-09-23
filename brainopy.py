@@ -135,13 +135,13 @@ class brainopy(object):
         """
         if identifier_type.lower() == "name":
             self.cur.execute("SELECT table_name FROM name_ID_table WHERE name = '%s'" % identifier)
-            table_name = [x[0] for x in self.cur.fetchall()][0]
+            table_name = self.cur.fetchone()[0]
             if table_name == "neuron_body": return {}
             else: 
                 self.cur.execute("SELECT neurotransmitter, value FROM name_%s WHERE name = '%s'" % (table_name, identifier))
         elif identifier_type.lower() == "id":
             self.cur.execute("SELECT table_name FROM name_ID_table WHERE ID = '%s'" % identifier)
-            table_name = [x[0] for x in self.cur.fetchall()][0]
+            table_name = self.cur.fetchone()[0]
             if table_name == "neuron_body": return {}
             else: 
                 self.cur.execute("SELECT neurotransmitter, value FROM %s WHERE ID = '%s'" % (table_name, identifier))
@@ -425,7 +425,7 @@ class brainopy(object):
         @param neuron_ID String: ID of neuron
         """
         self.cur.execute("SELECT DISTINCT neuron_state_ID FROM neuron WHERE neuron_ID = '%s'" % neuron_ID)
-        neuron_state_ID = [x[0] for x in self.cur.fetchall()][0]
+        neuron_state_ID = self.cur.fetchone()[0]
         if self.logging: self.logger("mfNeuron", "get_link")
         self.randomState("neuron_state", neuron_state_ID, self.neurotransmitter_neuron_variation)
 
@@ -460,7 +460,7 @@ class brainopy(object):
         @param neuron_ID String: ID of neuron
         """
         self.cur.execute("SELECT DISTINCT axon_state_ID FROM neuron WHERE neuron_ID = '%s'" % neuron_ID)
-        axon_state_ID = [x[0] for x in self.cur.fetchall()][0]
+        axon_state_ID = self.cur.fetchone()[0]
         if self.logging: self.logger("mfAxon", "get_link")
         self.randomState("axon_state", axon_state_ID, self.neurotransmitter_axon_variation)
 
