@@ -125,9 +125,33 @@ class brainopy(object):
         self.cur.execute("INSERT INTO name_ID (ID, name, description) VALUES ('%s', '%s', '%s')" % (ID, name, description))
         if self.logging: self.logger("nameID", "ID=" + str(ID) + "/name=" + str(name) + "/description=" + str(description))
 
+    def getStateIDFromNeuronID(self, ID, state_type="neuron_state_ID"):
+        """!
+        Method to get neuron state ID or axon state ID from neuron ID / neuron body ID.
+
+        @param ID String: ID of neuron / neuron body
+        @param state_type String: Type of ID to return. Default = "neuron_state_ID"
+        """
+        self.cur.execute("SELECT %s FROM neuron_body WHERE ID = '%s'" % (state_type, ID))
+        state_ID = self.cur.fetchone()[0]
+        return state_ID
+
+    def getStateIDFromNeuronName(self, name, state_type="neuron_state_ID"):
+        """!
+        Method to get neuron state ID or axon state ID from neuron name label
+
+        @param name String: Neuron name label
+        @param state_type String: Type of ID to return. Default = "neuron_state_ID"
+        """
+        self.cur.execute("SELECT ID FROM name_ID_table WHERE name = '%s'" % name)
+        neuron_ID = self.cur.fetchone()[0]
+        self.cur.execute("SELECT %s FROM neuron_body WHERE ID = '%s'" % (state_type, neuron_ID))
+        state_ID = self.cur.fetchone()[0]
+        return state_ID
+
     def readNeurotransmitters(self, identifier, identifier_type="name"):
         """!
-        Method to read neurotransmitter values using an identifier (ID or name label tagged by nameID method). This can be used to read dendrite state, neuron state, axon state, or synapse state. If the identifier is a neuron body ID or name label of a neuron body, an empty dictionary will be returned. 
+        Method to read neurotransmitter values using an identifier (ID or name label tagged by nameID method). This can be used to read dendrite state, neuron state, axon state, or synapse state. If the identifier is a neuron body ID or name label of a neuron body, the neuron state of the neuron body will be returned. 
 
         @param identifier String: ID or name label
         @param identifier_type String: Type of identifier. Allowable values are "ID" (the identifier is an ID) and "name" (the identifier is a name label). Default = "name"
@@ -136,14 +160,18 @@ class brainopy(object):
         if identifier_type.lower() == "name":
             self.cur.execute("SELECT table_name FROM name_ID_table WHERE name = '%s'" % identifier)
             table_name = self.cur.fetchone()[0]
-            if table_name == "neuron_body": return {}
+            if table_name == "neuron_body": 
+                identifier = self.getStateIDFromNeuronName(identifier, "neuron_state_ID")
+                self.cur.execute("SELECT neurotransmitter, value FROM neuron_state WHERE ID = '%s'" % identifier)
             else: 
                 self.cur.execute("SELECT neurotransmitter, value FROM name_%s WHERE name = '%s'" % (table_name, identifier))
         elif identifier_type.lower() == "id":
-            self.cur.execute("SELECT table_name FROM name_ID_table WHERE ID = '%s'" % identifier)
+            self.cur.execute("SELECT table_name FROM ID_table WHERE ID = '%s'" % identifier)
             table_name = self.cur.fetchone()[0]
-            if table_name == "neuron_body": return {}
-            else: 
+            if table_name == "neuron_body":
+                identifier = self.getStateIDFromNeuronID(identifier, "neuron_state_ID")
+                self.cur.execute("SELECT neurotransmitter, value FROM neuron_state WHERE ID = '%s'" % identifier)
+            else:
                 self.cur.execute("SELECT neurotransmitter, value FROM %s WHERE ID = '%s'" % (table_name, identifier))
         else: return {}
         neurotransmitters = {}

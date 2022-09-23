@@ -41,6 +41,12 @@ neuronList = b.getIDs("neuron_body")
 # Neuron List = [neuron_ID]
 print("Neurons to run brain: " + str(neuronList))
 
+b.nameID(neuronList[0], "neuron1", "neuron number 1")
+print("Label " + neuronList[0] + " as neuron1")
+
+print("State ID of " + neuronList[0] + " = " + b.getStateIDFromNeuronID(neuronList[0], "neuron_state_ID"))
+original_neuron1 = b.readNeurotransmitters("neuron1")
+
 b.nameID(synapseList[3], "synapse4", "synapse number 4")
 print("Label " + synapseList[3] + " as synapse4")
 
@@ -53,5 +59,14 @@ for cycle in range(1, 11):
     print("By name: " + str(b.readNeurotransmitters("synapse4")))
     print("By ID: " + str(b.readNeurotransmitters(synapseList[3], "ID")))
     print("")
+
+final_neuron1 = b.readNeurotransmitters("neuron1")
+print("Original state of neuron1 (by name) = " + str(original_neuron1))
+print("Final state of neuron1 (by name) = " + str(final_neuron1))
+print("Final state of neuron1 (by ID) = " + str(b.readNeurotransmitters(neuronList[0], "ID")))
+
+for i in range(len(neuronList)):
+    state = b.readNeurotransmitters(neuronList[i], "ID")
+    print("Final state of %s = %s" % (neuronList[i], str(state)))
 
 b.disconnectBrain()
