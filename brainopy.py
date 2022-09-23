@@ -127,26 +127,34 @@ class brainopy(object):
 
     def getStateIDFromNeuronID(self, ID, state_type="neuron_state_ID"):
         """!
-        Method to get neuron state ID or axon state ID from neuron ID / neuron body ID.
+        Method to get dendrite state ID, neuron state ID or axon state ID from neuron ID / neuron body ID.
 
         @param ID String: ID of neuron / neuron body
-        @param state_type String: Type of ID to return. Default = "neuron_state_ID"
+        @param state_type String: Type of ID to return. Allowable values are "dendrite_state_ID", "neuron_state_ID", or "axon_state_ID". Default = "neuron_state_ID"
+        @return: ID if state_type is "neuron_state_ID", or "axon_state_ID", [IDs] if state_type is "dendrite_state_ID".
         """
-        self.cur.execute("SELECT %s FROM neuron_body WHERE ID = '%s'" % (state_type, ID))
-        state_ID = self.cur.fetchone()[0]
+        self.cur.execute("SELECT %s FROM neuron WHERE neuron_ID = '%s'" % (state_type, ID))
+        if state_type in ["neuron_state_ID", "axon_state_ID"]:
+            state_ID = self.cur.fetchone()[0]
+        elif state_type == "dendrite_state_ID":
+            state_ID = [x[0] for x in self.cur.fetchall()]
         return state_ID
 
     def getStateIDFromNeuronName(self, name, state_type="neuron_state_ID"):
         """!
-        Method to get neuron state ID or axon state ID from neuron name label
+        Method to get dendrite state ID, neuron state ID or axon state ID from neuron name label
 
         @param name String: Neuron name label
-        @param state_type String: Type of ID to return. Default = "neuron_state_ID"
+        @param state_type String: Type of ID to return. Allowable values are "dendrite_state_ID", "neuron_state_ID", or "axon_state_ID".Default = "neuron_state_ID"
+        @return: ID if state_type is "neuron_state_ID", or "axon_state_ID", [IDs] if state_type is "dendrite_state_ID".
         """
         self.cur.execute("SELECT ID FROM name_ID_table WHERE name = '%s'" % name)
         neuron_ID = self.cur.fetchone()[0]
-        self.cur.execute("SELECT %s FROM neuron_body WHERE ID = '%s'" % (state_type, neuron_ID))
-        state_ID = self.cur.fetchone()[0]
+        self.cur.execute("SELECT %s FROM neuron WHERE neuron_ID = '%s'" % (state_type, neuron_ID))
+        if state_type in ["neuron_state_ID", "axon_state_ID"]:
+            state_ID = self.cur.fetchone()[0]
+        elif state_type == "dendrite_state_ID":
+            state_ID = [x[0] for x in self.cur.fetchall()]
         return state_ID
 
     def readNeurotransmitters(self, identifier, identifier_type="name"):

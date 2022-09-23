@@ -69,4 +69,7 @@ for i in range(len(neuronList)):
     state = b.readNeurotransmitters(neuronList[i], "ID")
     print("Final state of %s = %s" % (neuronList[i], str(state)))
 
+print("Dendrite state IDs of neuron1 (by name) = " + str(b.getStateIDFromNeuronName("neuron1", "dendrite_state_ID")))
+print("Dendrite state IDs of neuron1 (by ID) = " + str(b.getStateIDFromNeuronID(neuronList[0], "dendrite_state_ID")))
+
 b.disconnectBrain()
