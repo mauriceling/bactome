@@ -238,6 +238,18 @@ class brainopy(object):
         self.con.commit()
         return ID
 
+    def addNamedNeuron(self, name, description=""):
+        """!
+        Method to add a labelled neuron. The added neuron consists of one dendrite (which may be increased using addDendrite() method), one neuron body, and one axon. Hence, one neuron minimally consists of one dendrite state, one neuron state, and one axon state. One state is represented by the values of a set of registered neurotransmitters.
+
+        @param name String: Label
+        @param description String: Descriptive text of the label
+        """
+        if self.logging: self.logger("addNamedNeuron", "/name=" + str(name) + "/description=" + str(description))
+        neuron_IDs = self.addNeuron(1)[0]
+        self.nameID(neuron_IDs[0], name, description)
+        return neuron_IDs
+
     def addNeuron(self, n=1):
         """!
         Method to add neuron(s). Each added neuron consists of one dendrite (which may be increased using addDendrite() method), one neuron body, and one axon. Hence, one neuron minimally consists of one dendrite state, one neuron state, and one axon state. One state is represented by the values of a set of registered neurotransmitters.
@@ -264,6 +276,18 @@ class brainopy(object):
             IDs = (neuron_ID, dendrite_state_ID, neuron_state_ID, axon_state_ID)
             IDList.append(IDs)
         return IDList
+
+    def addNamedSynapse(self, name, description=""):
+        """!
+        Method to add a labelled synapse. The added synapse is represented by one synapse state, which is represented by the values of a set of registered neurotransmitters.
+
+        @param name String: Label
+        @param description String: Descriptive text of the label
+        """
+        if self.logging: self.logger("addNamedSynapse", "/name=" + str(name) + "/description=" + str(description))
+        synapse_state_ID = self.addSynapse(1)[0]
+        self.nameID(synapse_state_ID, name, description)
+        return synapse_state_ID
 
     def addSynapse(self, n=1):
         """!
