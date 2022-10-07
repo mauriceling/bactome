@@ -341,7 +341,7 @@ def gFixedLength(length, n, allow_start=False, allow_stop=False,
                                       allow_stop, cap_start, cap_stop)
         if fasta:
             title = "_".join([str(prefix), str(i+1)])
-            print("> %s" % title)
+            print(">%s" % title)
         print(sequence)
 
 def gVariableLength(min_length, max_length, n, 
@@ -409,7 +409,7 @@ def gVariableLength(min_length, max_length, n,
                                       cap_start, cap_stop)
         if fasta:
             title = "_".join([str(prefix), str(i+1)])
-            print("> %s" % title)
+            print(">%s" % title)
         print(sequence)
     
 def shuffle(sequence):
@@ -562,7 +562,7 @@ def gMixedSequences(n, selection="A,250;T,250;G,250;C,250",
         sequence = _generate_MDseq(o, md)
         if fasta:
             title = "_".join([str(prefix), str(i+1)])
-            print("> %s" % title)
+            print(">%s" % title)
         print(sequence)
 
 
