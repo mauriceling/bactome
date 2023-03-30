@@ -148,6 +148,7 @@ class brainopy(object):
         @param state_type String: Type of ID to return. Allowable values are "dendrite_state_ID", "neuron_state_ID", or "axon_state_ID".Default = "neuron_state_ID"
         @return: ID if state_type is "neuron_state_ID", or "axon_state_ID", [IDs] if state_type is "dendrite_state_ID".
         """
+        #print("SELECT ID FROM name_ID_table WHERE name = '%s'" % name)
         self.cur.execute("SELECT ID FROM name_ID_table WHERE name = '%s'" % name)
         neuron_ID = self.cur.fetchone()[0]
         self.cur.execute("SELECT %s FROM neuron WHERE neuron_ID = '%s'" % (state_type, neuron_ID))
@@ -658,16 +659,24 @@ class brainopy(object):
         for neuron_ID in neuronList: self.tfSynapseAxon(neuron_ID)
         self.maintenanceFunction()
 
-    def inputSignal(self, synapse_state_ID, signal_state):
+    def inputSignal(self, state_ID, signal_state, state_type="synapse_state_ID"):
         """!
-        Method to update a synapse state (represented by synapse_state_ID) from an exogenous state (represented by signal_state). This represents the input of signal into the brain. The signal_state is a dictionary of {<neurotransmitter>: <value>}; for example, {"Ach": 0.11, "DA": 0.15, "GLU": 0.21, "NE": 0.25, "5HT": 0.31, "GABA": 0.35}.
+        Method to update a synapse state or neuron state (both represented by state_ID) from an exogenous state (represented by signal_state). This represents the input of signal into the brain. The signal_state is a dictionary of {<neurotransmitter>: <value>}; for example, {"Ach": 0.11, "DA": 0.15, "GLU": 0.21, "NE": 0.25, "5HT": 0.31, "GABA": 0.35}.
 
-        @param synapse_state_ID String: ID of synapse state
+        @param state_ID String: ID of state to insert
         @param signal_state Dictionary: Dictionary of neurotransmitter values
+        @param state_type: Type of ID for state_ID. Allowable values are synapse_state_ID and neuron_state_ID
         """
-        if self.logging: self.logger("inputSignal", "1/input_signal/synapse_state_ID=" + str(synapse_state_ID))
-        for neurotransmitter in signal_state:
-            value = float(signal_state[neurotransmitter])
-            self.cur.execute("UPDATE synapse_state SET value = '%s' WHERE ID = '%s' AND neurotransmitter = '%s'" % (value, synapse_state_ID, neurotransmitter))
-            if self.logging: self.logger("inputSignal", "2/update_synapse_state/synapse_state_ID=" + str(synapse_state_ID) + "/neurotransmitter=" + str(neurotransmitter) + "/value=" + str(value))
+        if state_type == "synapse_state_ID":
+            if self.logging: self.logger("inputSignal", "1/input_signal/synapse_state_ID=" + str(state_ID))
+            for neurotransmitter in signal_state:
+                value = float(signal_state[neurotransmitter])
+                self.cur.execute("UPDATE synapse_state SET value = '%s' WHERE ID = '%s' AND neurotransmitter = '%s'" % (value, state_ID, neurotransmitter))
+                if self.logging: self.logger("inputSignal", "2/update_synapse_state/synapse_state_ID=" + str(state_ID) + "/neurotransmitter=" + str(neurotransmitter) + "/value=" + str(value))
+        elif state_type == "neuron_state_ID":
+            if self.logging: self.logger("inputSignal", "1/input_signal/neuron_state_ID=" + str(state_ID))
+            for neurotransmitter in signal_state:
+                value = float(signal_state[neurotransmitter])
+                self.cur.execute("UPDATE neuron_state SET value = '%s' WHERE ID = '%s' AND neurotransmitter = '%s'" % (value, state_ID, neurotransmitter))
+                if self.logging: self.logger("inputSignal", "2/update_neuron_state/neuron_state_ID=" + str(state_ID) + "/neurotransmitter=" + str(neurotransmitter) + "/value=" + str(value))
         self.con.commit()
