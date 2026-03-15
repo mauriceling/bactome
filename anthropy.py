@@ -1843,12 +1843,12 @@ def report(results):
                                       "ST_HeathCarter (Ectomorphy)"]
     }
     units = {
-        "Anthropometric Indices": {"AT_BMI": "", "AT_PI": "", "AT_TCR": "", "AT_FWR": "", "AT_CHtR": "", "AT_NHtR": ""},
+        "Anthropometric Indices": {"AT_BMI": "kg/m²", "AT_PI": "kg/m³", "AT_TCR": "", "AT_FWR": "", "AT_CHtR": "", "AT_NHtR": ""},
         "Adiposity Indices": {"AI_WHR": "", "AI_WHtR": "", "AI_WTR": "", "AI_ABSI": "", "AI_ConicityIndex": "", "AI_WCR": "", "AI_WHtPI": "", "AI_BRI": ""},
         "Body Fat (Circumference)": {"BFc_USNavy": "%", "BFc_YMCA": "%", "BFc_mYMCA": "%", "BFc_CovertBailey": "%", "BFc_BehnkeWilmore": "%", "BFc_RFM": "%", "BFc_BAI": "%"},
         "Body Fat (Skinfold)": {"BFs_JacksonPollock3": "%", "BFs_JacksonPollock4": "%", "BFs_JacksonPollock7": "%", "BFs_BehnkeWilmore": "%", "BFs_DurninWomersley": "%", "BFs_Sloan": "%", "BFs_Parrillo": "%"},
         "Body Fat (Other)": {"BFx_BMI": "%", "BFx_JacksonPollock3Girth": "%", "BFx_Henry2018": "%", "BF-Average": "%"},
-        "Basal Metabolic Rate": {"BMR_MifflinStJeor": "kcal / day", "BMR_HarrisBenedict": "kcal / day", "BMR_Kleiber": "kcal / day", "BMR_RozaShizgal": "kcal / day", "BMR_Schofield": "kcal / day", "BMR_Cunningham": "kcal / day", "BMR_KatchMcArdle": "kcal / day", "BMR_FAO2004": "kcal / day", "BMR-Average": "kcal / day"},
+        "Basal Metabolic Rate": {"BMR_MifflinStJeor": "kcal/day", "BMR_HarrisBenedict": "kcal/day", "BMR_Kleiber": "kcal/day", "BMR_RozaShizgal": "kcal/day", "BMR_Schofield": "kcal/day", "BMR_Cunningham": "kcal / day", "BMR_KatchMcArdle": "kcal/day", "BMR_FAO2004": "kcal/day", "BMR-Average": "kcal/day"},
         "Body Surface Area": {"BSA_DuBois": "m²", "BSA_Mosteller": "m²", "BSA_Haycock": "m²",
                                       "BSA_GehanGeorge": "m²", "BSA_Fujimoto": "m²", "BSA-Average": "m²"},
         "Lean Body Mass": {"LBM_Boer": "kg", "LBM_James": "kg", "LBM_Hume": "kg", "LBM-Average": "kg"},
@@ -1857,17 +1857,17 @@ def report(results):
         "Somatotype (Heath-Carter)": {"ST_HeathCarter (Endomorphy)": "", "ST_HeathCarter (Mesomorphy)": "", "ST_HeathCarter (Ectomorphy)": ""}
         }
     description = {
-        "Anthropometric Indices": "Anthropometric Indices",
-        "Adiposity Indices": "Adiposity Indices",
-        "Body Fat (Circumference)": "Body Fat (Circumference)",
-        "Body Fat (Skinfold)": "Body Fat (Skinfold)",
-        "Body Fat (Other)": "Body Fat (Other)",
-        "Basal Metabolic Rate": "Basal Metabolic Rate",
-        "Body Surface Area": "Body Surface Area",
-         "Lean Body Mass":  "Lean Body Mass",
-        "Ideal Body Weight": "Ideal Body Weight",
-        "Frame Classification": "Frame Classification",
-        "Somatotype (Heath-Carter)": "Somatotype (Heath-Carter)"
+        "Anthropometric Indices": "(a) AT_BMI: Body Mass Index (BMI). (b) AT_PI: Ponderal Index (PI). (c) AT_TCR: Thigh-to-Calf Ratio. (d) AT_FWR: Forearm-to-Wrist Ratio. (e) AT_CHtR: Calf-to-Height Ratio (f) AT_NHtR: Neck-to-Height Ratio",
+        "Adiposity Indices": "(a) AI_WHR: Waist-to-Hip Ratio. (b) AI_WHtR: Waist-to-Height Ratio. (c) AI_WTR: Waist-to-Thigh Ratio. (d) AI_ABSI: A Body Shape Index. (e) AI_ConicityIndex: Conicity Index. (f) AI_WCR: Waist-to-Calf Ratio. (g) AI_WHtPI: Waist-to-Height Power Index. (h) AI_BRI: Body Roundness Index",
+        "Body Fat (Circumference)": "(a) BFc_USNavy: US Navy method. (b) BFc_YMCA: YMCA method. (c) BFc_mYMCA: Modified YMCA method. (d) BFc_CovertBailey: Covert Bailey method. (e) BFc_BehnkeWilmore: Behnke-Wilmore circumference method. (f) BFc_RFM: Relative Fat Mass. (g) BFc_BAI: Body Adiposity Index.",
+        "Body Fat (Skinfold)": "(a) BFs_JacksonPollock3: Jackson-Pollock 3-site method. (b) BFs_JacksonPollock4: Jackson-Pollock 4-site method. (c) BFs_JacksonPollock7: Jackson-Pollock 7-site method. (d) BFs_BehnkeWilmore: Behnke-Wilmore skinfold method. (e) BFs_DurninWomersley: Durnin–Womersley 4-site skinfold method. (f) BFs_Sloan: Sloan equation (1967). (g) BFs_Parrillo: Parrillo 9-site formula.",
+        "Body Fat (Other)": "(a) BFx_BMI: Estimate from BMI using Deurenberg's equation. (b) BFx_JacksonPollock3Girth: Jackson-Pollock 3-site + girth method.  (c) BFx_Henry2018: Henry et al. (2018) method for Asian Chinese.",
+        "Basal Metabolic Rate": "(a) BMR_MifflinStJeor: Mifflin-St Jeor equation. (b) BMR_HarrisBenedict: Harris-Benedict equation. (c) BMR_Kleiber: Kleiber's law. (d) BMR_RozaShizgal: Roza-Shizgal revision of the Harris-Benedict equation. (e) BMR_Schofield: Schofield equation. (f) BMR_Cunningham: Cunningham (1980) equation. (g) BMR_KatchMcArdle: Katch and McArdle (1983) equation. (h) BMR_FAO2004: FAO/WHO/UNU (2004) equations.",
+        "Body Surface Area": "(a) BSA_DuBois: Du Bois & Du Bois (1916) formula. (b) BSA_Mosteller: Mosteller (1987) formula. (c) BSA_Haycock: Haycock et al. (1978) formula. (d) BSA_GehanGeorge: Gehan & George (1970) formula. (e) BSA_Fujimoto: Fujimoto formula",
+         "Lean Body Mass":  "(a) LBM_Boer: Boer (1984) formula. (b) LBM_James: James (1977) formula. (c) LBM_Hume: Hume (1966) formula.",
+        "Ideal Body Weight": "(a) IBW_Robinson: Robinson (1983) formula. (b) IBW_Miller: Miller et al. (1983) formula. (c) IBW_Hamwi: Hamwi (1964) formula. (d) IBW_Devine: Devine (1974) formula. (e) IBW_Lemmens: Lemmens et al. (2005) formula. (f) IBW_Peterson: Peterson et al. (2016) formula. (g) IBW_KeysBrozek: Keys & Brozek (1953) formula.",
+        "Frame Classification": "(a) FC_Metropolitan: Metropolitan Life (1983)",
+        "Somatotype (Heath-Carter)": "(a) ST_HeathCarter: Heath and Carter method."
     }
 
     # Print report
